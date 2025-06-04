@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_boilerplate/controller/splash_controller.dart';
+import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/sign_in_screen.dart';
-import 'package:flutter_boilerplate/helper/route_helper.dart';
+import 'package:flutter_boilerplate/features/home/home_screen.dart';
 import 'package:flutter_boilerplate/util/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,29 +15,16 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
 
-    Future.delayed(Duration(seconds: 2), () {
-      if(Get.find<SplashController>().existToken()) {
-        Get.to(Dashbord);
-      }else {
-        Get.to(SignInScreen());
+    Future.delayed(const Duration(seconds: 2), () {
+      if (Get.find<AuthController>().isLoggedIn) {
+        Get.offAll(const HomeScreen());
+      } else {
+        Get.offAll(const SignInScreen());
       }
-    });
-
-    Get.find<SplashController>().initSharedData();
-    _route();
-
-  }
-
-  void _route() {
-    Get.find<SplashController>().getConfigData().then((value) {
-      Timer(Duration(seconds: 1), () async {
-        Get.offNamed(RouteHelper.home);
-      });
     });
   }
 
