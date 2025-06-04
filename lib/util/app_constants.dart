@@ -19,6 +19,7 @@ class AppConstants {
   static const String userNumber = 'user_number';
   static const String searchAddress = 'search_address';
   static const String topic = 'notify';
+  static const String userData = 'user_data';
 
   static List<LanguageModel> languages = [
     LanguageModel(imageUrl: Images.unitedKingdom, languageName: 'English', countryCode: 'US', languageCode: 'en'),
