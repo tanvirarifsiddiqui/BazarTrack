@@ -1,0 +1,3 @@
+enum RestaurantType {
+  allRestaurants,
+}
