@@ -9,8 +9,13 @@ import 'package:flutter_boilerplate/data/repository/splash_repo.dart';
 import 'package:flutter_boilerplate/data/api/api_client.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
+
 import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/controller/advance_controller.dart';
+
+import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
+import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
+
 import 'package:flutter_boilerplate/util/app_constants.dart';
 import 'package:flutter_boilerplate/data/model/response/language_model.dart';
 import 'package:flutter/services.dart';
@@ -27,7 +32,11 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find(), apiClient: Get.find()));
   Get.lazyPut(() => LanguageRepo());
   Get.lazyPut(() => AuthRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+
   Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find()));
+
+  Get.lazyPut(() => OrderRepo());
+
 
   // Controller
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
@@ -36,6 +45,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => LanguageController(sharedPreferences: Get.find()));
   Get.lazyPut(() => AuthController(authRepo: Get.find()));
   Get.lazyPut(() => AdvanceController(advanceRepo: Get.find()));
+  Get.lazyPut(() => OrderController(orderRepo: Get.find()));
+
 
   // Retrieving localized data
   Map<String, Map<String, String>> languages = {};
