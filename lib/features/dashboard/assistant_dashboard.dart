@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/helper/route_helper.dart';
+import 'package:get/get.dart';
 
 class AssistantDashboard extends StatelessWidget {
   const AssistantDashboard({super.key});
@@ -7,7 +9,12 @@ class AssistantDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Assistant Dashboard')),
-      body: const Center(child: Text('Assistant tasks here')),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
+          child: const Text('View Orders'),
+        ),
+      ),
     );
   }
 }
