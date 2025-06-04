@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
+import 'package:flutter_boilerplate/helper/route_helper.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final String orderId;
@@ -41,6 +42,11 @@ class OrderDetailScreen extends StatelessWidget {
                   }
                 },
                 child: Text(order.assignedTo == null ? 'Assign to me' : 'Reassign'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Get.toNamed(RouteHelper.getHistoryRoute('Order', order.orderId)),
+                child: Text('view_history'.tr),
               ),
             ],
           ),

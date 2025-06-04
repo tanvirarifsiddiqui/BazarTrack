@@ -3,6 +3,8 @@ import 'package:flutter_boilerplate/data/model/transaction/wallet_transaction.da
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
 import 'package:get/get.dart';
+import 'package:flutter_boilerplate/data/model/history/history_log.dart';
+import 'package:flutter_boilerplate/features/history/controller/history_controller.dart';
 
 class AdvanceController extends GetxController {
   final AdvanceRepo advanceRepo;
@@ -32,6 +34,19 @@ class AdvanceController extends GetxController {
         description: 'Advance from ${advance.givenBy}',
       ));
       await auth.saveUser(user);
+      Get.find<HistoryController>().addLog(
+        HistoryLog(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          entityType: 'Wallet',
+          entityId: user.id,
+          action: 'advance',
+          changedByUserId: auth.currentUser?.id ?? '',
+          timestamp: DateTime.now(),
+          dataSnapshot: {
+            'after': user.wallet.toJson(),
+          },
+        ),
+      );
     }
     update();
   }
@@ -48,6 +63,19 @@ class AdvanceController extends GetxController {
         description: description,
       ));
       await auth.saveUser(user);
+      Get.find<HistoryController>().addLog(
+        HistoryLog(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          entityType: 'Wallet',
+          entityId: user.id,
+          action: 'purchase',
+          changedByUserId: user.id,
+          timestamp: DateTime.now(),
+          dataSnapshot: {
+            'after': user.wallet.toJson(),
+          },
+        ),
+      );
       update();
     }
   }

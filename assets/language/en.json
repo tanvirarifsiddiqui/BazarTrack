@@ -10,6 +10,8 @@
   "owner_dashboard": "Owner Dashboard",
   "assign_order": "Assign Order",
   "record_advance": "Record Advance",
-  "orders": "Orders"
+  "orders": "Orders",
+  "history": "History",
+  "view_history": "View History"
 }
 
