@@ -15,9 +15,23 @@ class AuthRepo {
     await sharedPreferences.setString(AppConstants.token, token);
   }
 
+  Future<void> signUp(String userJson) async {
+    await saveLogin();
+    await saveUser(userJson);
+  }
+
+  Future<void> saveUser(String userJson) async {
+    await sharedPreferences.setString(AppConstants.userData, userJson);
+  }
+
+  String? getUser() {
+    return sharedPreferences.getString(AppConstants.userData);
+  }
+
   /// Remove the saved token from [SharedPreferences].
   Future<void> logout() async {
     await sharedPreferences.remove(AppConstants.token);
+    await sharedPreferences.remove(AppConstants.userData);
   }
 
   /// Whether a token already exists in storage.

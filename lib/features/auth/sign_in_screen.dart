@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/base/custom_text_field.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
-import 'package:flutter_boilerplate/features/home/home_screen.dart';
+import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
+import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
+import 'package:flutter_boilerplate/features/auth/signup_screen.dart';
+import 'package:flutter_boilerplate/data/model/user/role.dart';
 import 'package:get/get.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -56,8 +59,19 @@ class _SignInScreenState extends State<SignInScreen> {
                 buttonText: 'Login',
                 onPressed: () async {
                   await Get.find<AuthController>().login();
-                  Get.offAll(const HomeScreen());
+                  final user = Get.find<AuthController>().currentUser;
+                  if (user?.role == UserRole.owner) {
+                    Get.offAll(const OwnerDashboard());
+                  } else {
+                    Get.offAll(const AssistantDashboard());
+                  }
                 },
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.to(const SignUpScreen());
+                },
+                child: const Text('Sign Up'),
               ),
             ],
           ),
