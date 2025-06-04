@@ -2,25 +2,35 @@ import 'dart:convert';
 
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 import 'package:flutter_boilerplate/data/model/user/user.dart';
+import 'package:get/get.dart';
 
-class AuthController {
+class AuthController extends GetxController {
   final AuthRepo authRepo;
+  AuthController({required this.authRepo}) {
+    loadUser();
+  }
 
-  AuthController({required this.authRepo});
+  UserModel? _currentUser;
+  UserModel? get currentUser => _currentUser;
 
-  UserModel? get currentUser {
+  void loadUser() {
     final jsonString = authRepo.getUser();
-    if (jsonString == null) return null;
-    return UserModel.fromJson(jsonDecode(jsonString));
+    if (jsonString != null) {
+      _currentUser = UserModel.fromJson(jsonDecode(jsonString));
+    }
   }
 
   Future<void> signUp(UserModel user) async {
     await authRepo.signUp(jsonEncode(user.toJson()));
+    _currentUser = user;
+    update();
   }
 
   /// Save the login flag/token locally.
   Future<void> login() async {
     await authRepo.saveLogin();
+    loadUser();
+    update();
   }
 
   /// Remove the login flag/token.
@@ -32,4 +42,10 @@ class AuthController {
   bool get isLoggedIn => authRepo.isLoggedIn();
 
   bool get isOwner => currentUser?.role == UserRole.owner;
+
+  Future<void> saveUser(UserModel user) async {
+    _currentUser = user;
+    await authRepo.saveUser(jsonEncode(user.toJson()));
+    update();
+  }
 }
