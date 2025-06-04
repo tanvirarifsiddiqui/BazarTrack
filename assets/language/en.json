@@ -1,4 +1,15 @@
 {
   "home": "Home",
+  "advance": "Advance",
+  "amount": "Amount",
+  "given_by": "Given By",
+  "received_by": "Received By",
+  "add_advance": "Add Advance",
+  "wallet_balance": "Wallet Balance",
+  "assistant_dashboard": "Assistant Dashboard",
+  "owner_dashboard": "Owner Dashboard",
+  "assign_order": "Assign Order",
+  "record_advance": "Record Advance",
   "orders": "Orders"
 }
+
