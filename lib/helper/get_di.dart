@@ -24,7 +24,7 @@ Future<Map<String, Map<String, String>>> init() async {
   // Repository
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find(), apiClient: Get.find()));
   Get.lazyPut(() => LanguageRepo());
-  Get.lazyPut(() => AuthRepo(apiClient: Get.find()));
+  Get.lazyPut(() => AuthRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
 
   // Controller
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
