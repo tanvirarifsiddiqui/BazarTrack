@@ -10,7 +10,7 @@ class AssistantDashboard extends StatelessWidget {
     return GetBuilder<AuthController>(builder: (auth) {
       final balance = auth.currentUser?.wallet.balance ?? 0;
       return Scaffold(
-        appBar: AppBar(title: const Text('Assistant Dashboard')),
+        appBar: AppBar(title: Text('assistant_dashboard'.tr)),
         body: Center(
           child: Text('wallet_balance'.tr + ': \$${balance.toStringAsFixed(2)}'),
         ),

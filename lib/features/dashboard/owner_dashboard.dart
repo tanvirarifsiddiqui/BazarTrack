@@ -9,7 +9,7 @@ class OwnerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Owner Dashboard')),
+      appBar: AppBar(title: Text('owner_dashboard'.tr)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -20,7 +20,7 @@ class OwnerDashboard extends StatelessWidget {
                   Get.snackbar('Action', 'Assign order logic here');
                 }
               },
-              child: const Text('Assign Order'),
+              child: Text('assign_order'.tr),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
@@ -29,7 +29,7 @@ class OwnerDashboard extends StatelessWidget {
                   Get.toNamed(RouteHelper.advance);
                 }
               },
-              child: const Text('Record Advance'),
+              child: Text('record_advance'.tr),
             ),
           ],
         ),
