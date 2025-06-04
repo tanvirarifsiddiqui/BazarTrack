@@ -171,4 +171,10 @@ lib/
 
 ---
 
+## Contributor Guidelines
+- Keep new Dart files under the appropriate feature directory from the structure below.
+- Always run `flutter analyze` and `flutter test` before submitting a PR.
+- Commit messages: `<module>: <short description>` (e.g., `orders: implement item model`).
+- Use GetX for navigation and dependency injection. Register new controllers in `helper/get_di.dart`.
+- When adding language strings, update `assets/language/en.json` and other locale files.
 
