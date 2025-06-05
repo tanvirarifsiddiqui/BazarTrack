@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
-import 'package:get/get.dart';
-
 
 class AssistantDashboard extends StatelessWidget {
   const AssistantDashboard({super.key});
@@ -15,18 +13,19 @@ class AssistantDashboard extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(title: Text('assistant_dashboard'.tr)),
         body: Center(
-          child: Text('wallet_balance'.tr + ': \$${balance.toStringAsFixed(2)}'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('wallet_balance'.tr + ': \$${balance.toStringAsFixed(2)}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
+                child: const Text('View Orders'),
+              ),
+            ],
+          ),
         ),
       );
     });
-    return Scaffold(
-      appBar: AppBar(title: const Text('Assistant Dashboard')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
-          child: const Text('View Orders'),
-        ),
-      ),
-    );
   }
 }

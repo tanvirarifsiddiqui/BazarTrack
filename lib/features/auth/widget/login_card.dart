@@ -1,13 +1,16 @@
-class LoginCard extends StatefulWidget {
-  const LoginCard({super.key});
+import 'package:flutter/material.dart';
+import '../../../base/custom_text_field.dart';
 
-  @override
-  State<LoginCard> createState() => _LoginCardState();
-}
+class LoginCard extends StatelessWidget {
+  final TextEditingController controller;
+  const LoginCard({super.key, required this.controller});
 
-class _LoginCardState extends State<LoginCard> {
   @override
   Widget build(BuildContext context) {
-    return CustomTextField(controller: controller, hintText: 'email');
+    return CustomTextField(
+      controller: controller,
+      hintText: 'Email',
+      inputType: TextInputType.emailAddress,
+    );
   }
 }
