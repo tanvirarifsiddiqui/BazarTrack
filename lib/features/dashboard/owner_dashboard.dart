@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/role_guard.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
 import 'package:get/get.dart';
-import 'package:flutter_boilerplate/helper/route_helper.dart';
 
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
@@ -31,6 +30,9 @@ class OwnerDashboard extends StatelessWidget {
                 }
               },
               child: Text('record_advance'.tr),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
               onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
               child: const Text('View Orders'),
             ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 import 'package:flutter_boilerplate/data/model/user/user.dart';
+import 'package:flutter_boilerplate/data/model/user/role.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
