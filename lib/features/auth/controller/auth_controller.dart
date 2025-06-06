@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/data/model/user/user.dart';
 import 'package:flutter_boilerplate/data/model/user/role.dart';
 import 'package:get/get.dart';
 
-class AuthController extends GetxController {
+class AuthController extends GetxController implements GetxService {
   final AuthRepo authRepo;
   AuthController({required this.authRepo}) {
     loadUser();

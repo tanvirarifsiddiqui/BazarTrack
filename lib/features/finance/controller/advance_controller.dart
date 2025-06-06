@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter_boilerplate/data/model/history/history_log.dart';
 import 'package:flutter_boilerplate/features/history/controller/history_controller.dart';
 
-class AdvanceController extends GetxController {
+class AdvanceController extends GetxController implements GetxService {
   final AdvanceRepo advanceRepo;
   AdvanceController({required this.advanceRepo});
 
