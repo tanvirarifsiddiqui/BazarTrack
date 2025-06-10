@@ -27,10 +27,11 @@ class AuthController extends GetxController implements GetxService {
     update();
   }
 
-  /// Save the login flag/token locally.
-  Future<void> login() async {
-    await authRepo.saveLogin();
-    loadUser();
+  Future<void> login(String email, String password) async {
+    final response = await authRepo.login(email, password);
+    if (response.isOk) {
+      loadUser();
+    }
     update();
   }
 

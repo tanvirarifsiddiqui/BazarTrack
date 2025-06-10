@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/controller/theme_controller.dart';
 import 'package:flutter_boilerplate/data/repository/language_repo.dart';
 import 'package:flutter_boilerplate/data/repository/splash_repo.dart';
 import 'package:flutter_boilerplate/data/api/api_client.dart';
+import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 
@@ -29,15 +30,16 @@ Future<Map<String, Map<String, String>>> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   Get.lazyPut(() => sharedPreferences);
   Get.lazyPut(() => ApiClient(appBaseUrl: AppConstants.baseUrl, sharedPreferences: Get.find()));
+  Get.lazyPut(() => BazarTrackApi(client: Get.find()));
 
   // Repository
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find(), apiClient: Get.find()));
   Get.lazyPut(() => LanguageRepo());
-  Get.lazyPut(() => AuthRepo(apiClient: Get.find(), sharedPreferences: Get.find()));
+  Get.lazyPut(() => AuthRepo(api: Get.find(), sharedPreferences: Get.find()));
 
   Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find()));
 
-  Get.lazyPut(() => OrderRepo());
+  Get.lazyPut(() => OrderRepo(api: Get.find()));
   Get.lazyPut(() => HistoryRepo(sharedPreferences: Get.find()));
 
 
