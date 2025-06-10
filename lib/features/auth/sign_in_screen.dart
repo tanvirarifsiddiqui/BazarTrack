@@ -58,7 +58,10 @@ class _SignInScreenState extends State<SignInScreen> {
               CustomButton(
                 buttonText: 'Login',
                 onPressed: () async {
-                  await Get.find<AuthController>().login();
+                  await Get.find<AuthController>().login(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
                   final user = Get.find<AuthController>().currentUser;
                   if (user?.role == UserRole.owner) {
                     Get.offAll(const OwnerDashboard());

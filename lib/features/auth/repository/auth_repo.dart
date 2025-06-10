@@ -1,41 +1,43 @@
-import 'package:flutter_boilerplate/data/api/api_client.dart';
+import 'dart:convert';
+
+import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/util/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 class AuthRepo {
-  final ApiClient apiClient;
+  final BazarTrackApi api;
   final SharedPreferences sharedPreferences;
 
-  AuthRepo({required this.apiClient, required this.sharedPreferences});
+  AuthRepo({required this.api, required this.sharedPreferences});
 
-  /// Save a dummy token locally to simulate a successful login.
-  Future<void> saveLogin() async {
-    const token = 'dummy_token';
-    apiClient.updateHeader(token);
-    await sharedPreferences.setString(AppConstants.token, token);
+  Future<Response> login(String email, String password) async {
+    final response = await api.login(email, password);
+    if (response.isOk && response.body is Map) {
+      final token = response.body['token'];
+      if (token != null) {
+        await sharedPreferences.setString(AppConstants.token, token);
+      }
+      await sharedPreferences.setString(AppConstants.userData, jsonEncode(response.body['user']));
+    }
+    return response;
   }
 
   Future<void> signUp(String userJson) async {
-    await saveLogin();
-    await saveUser(userJson);
+    await sharedPreferences.setString(AppConstants.userData, userJson);
   }
 
   Future<void> saveUser(String userJson) async {
     await sharedPreferences.setString(AppConstants.userData, userJson);
   }
 
-  String? getUser() {
-    return sharedPreferences.getString(AppConstants.userData);
-  }
-
-  /// Remove the saved token from [SharedPreferences].
   Future<void> logout() async {
+    await api.logout();
     await sharedPreferences.remove(AppConstants.token);
     await sharedPreferences.remove(AppConstants.userData);
   }
 
-  /// Whether a token already exists in storage.
-  bool isLoggedIn() {
-    return sharedPreferences.containsKey(AppConstants.token);
-  }
+  String? getUser() => sharedPreferences.getString(AppConstants.userData);
+
+  bool isLoggedIn() => sharedPreferences.containsKey(AppConstants.token);
 }
