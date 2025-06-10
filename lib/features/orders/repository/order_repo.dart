@@ -1,11 +1,21 @@
+import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/data/model/order/order.dart';
 import 'package:flutter_boilerplate/data/model/order/order_status.dart';
 
 class OrderRepo {
-  final List<Order> _orders = [];
+  final BazarTrackApi api;
+  OrderRepo({required this.api});
 
-  List<Order> getOrders({OrderStatus? status, String? assignedTo}) {
-    return _orders.where((o) {
+  final List<Order> _cache = [];
+
+  Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) async {
+    final res = await api.orders();
+    if (res.isOk && res.body is List) {
+      _cache
+        ..clear()
+        ..addAll((res.body as List).map((e) => Order.fromJson(e)));
+    }
+    return _cache.where((o) {
       if (status != null && o.status != status) return false;
       if (assignedTo != null && o.assignedTo != assignedTo) return false;
       return true;
@@ -14,24 +24,27 @@ class OrderRepo {
 
   Order? getById(String id) {
     try {
-      return _orders.firstWhere((o) => o.orderId == id);
+      return _cache.firstWhere((o) => o.orderId == id);
     } catch (_) {
       return null;
     }
   }
 
-  void createOrder(Order order) {
-    _orders.add(order);
+  Future<void> createOrder(Order order) async {
+    await api.createOrder(order.toJson());
+    _cache.add(order);
   }
 
-  void updateOrder(Order order) {
-    final index = _orders.indexWhere((o) => o.orderId == order.orderId);
+  Future<void> updateOrder(Order order) async {
+    await api.updateOrder(int.parse(order.orderId), order.toJson());
+    final index = _cache.indexWhere((o) => o.orderId == order.orderId);
     if (index != -1) {
-      _orders[index] = order;
+      _cache[index] = order;
     }
   }
 
-  void assignOrder(String orderId, String userId) {
+  Future<void> assignOrder(String orderId, String userId) async {
+    await api.assignOrder(int.parse(orderId), {'user_id': int.parse(userId)});
     final order = getById(orderId);
     if (order != null) {
       order.assignedTo = userId;
@@ -40,12 +53,7 @@ class OrderRepo {
   }
 
   bool selfAssign(String orderId, String userId) {
-    final order = getById(orderId);
-    if (order != null && order.assignedTo == null) {
-      order.assignedTo = userId;
-      order.status = OrderStatus.assigned;
-      return true;
-    }
-    return false;
+    assignOrder(orderId, userId);
+    return true;
   }
 }
