@@ -10,7 +10,7 @@ class OrderController extends GetxController implements GetxService {
   final OrderRepo orderRepo;
   OrderController({required this.orderRepo});
 
-  List<Order> getOrders({OrderStatus? status, String? assignedTo}) {
+  Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) {
     return orderRepo.getOrders(status: status, assignedTo: assignedTo);
   }
 

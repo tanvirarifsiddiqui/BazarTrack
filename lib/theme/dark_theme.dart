@@ -10,4 +10,6 @@ ThemeData dark = ThemeData(
   cardColor: Colors.black,
   colorScheme: ColorScheme.dark(primary: Color(0xFFcda335), secondary: Color(0xFFcda335), surface: Color(0xFF343636), error: Color(0xFFdd3135)),
   textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: Color(0xFFcda335))),
+  useMaterial3: true,
+  visualDensity: VisualDensity.adaptivePlatformDensity,
 );

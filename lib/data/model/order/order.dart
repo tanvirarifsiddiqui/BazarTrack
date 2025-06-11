@@ -12,30 +12,31 @@ class Order {
     required this.orderId,
     required this.createdBy,
     this.assignedTo,
-    this.status = OrderStatus.draft,
+    this.status = OrderStatus.pending,
     required this.createdAt,
     this.completedAt,
   });
 
   Order.fromJson(Map<String, dynamic> json)
-      : orderId = json['orderId'],
-        createdBy = json['createdBy'],
-        assignedTo = json['assignedTo'],
-        status = OrderStatus.values.firstWhere(
-          (e) => e.toString() == json['status'],
-          orElse: () => OrderStatus.draft,
-        ),
-        createdAt = DateTime.parse(json['createdAt']),
+      : orderId = (json['orderId'] ?? json['id']).toString(),
+        createdBy = (json['createdBy'] ?? json['created_by']).toString(),
+        assignedTo = json['assignedTo']?.toString() ??
+            json['assigned_to']?.toString(),
+        status = OrderStatusExtension.fromString(json['status'] ?? 'pending'),
+        createdAt = DateTime.parse(
+            json['createdAt'] ?? json['created_at']),
         completedAt = json['completedAt'] != null
             ? DateTime.parse(json['completedAt'])
-            : null;
+            : json['completed_at'] != null
+                ? DateTime.parse(json['completed_at'])
+                : null;
 
   Map<String, dynamic> toJson() => {
-        'orderId': orderId,
-        'createdBy': createdBy,
-        'assignedTo': assignedTo,
-        'status': status.toString(),
-        'createdAt': createdAt.toIso8601String(),
-        'completedAt': completedAt?.toIso8601String(),
+        'id': orderId,
+        'created_by': createdBy,
+        'assigned_to': assignedTo,
+        'status': status.toApi(),
+        'created_at': createdAt.toIso8601String(),
+        'completed_at': completedAt?.toIso8601String(),
       };
 }
