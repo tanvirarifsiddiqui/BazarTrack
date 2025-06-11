@@ -14,7 +14,6 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:http/http.dart' as http;
 
 class ApiClient extends GetxService {
-  final String appBaseUrl;
   final SharedPreferences sharedPreferences;
   static final String noInternetMessage = 'Connection to API server failed due to internet connection';
   final int timeoutInSeconds = 30;
@@ -22,13 +21,17 @@ class ApiClient extends GetxService {
   late String token;
   late Map<String, String> _mainHeaders;
 
-  ApiClient({required this.appBaseUrl, required this.sharedPreferences}) {
+  ApiClient({required this.sharedPreferences}) {
     token = sharedPreferences.getString(AppConstants.token) ?? '';
     debugPrint('Token: $token');
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token'
     };
+  }
+
+  Uri _getUri(String uri) {
+    return uri.startsWith('http') ? Uri.parse(uri) : Uri.parse(AppConstants.baseUrl + uri);
   }
 
   void updateHeader(String token) {
@@ -42,7 +45,7 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       http.Response response0 = await http.get(
-        Uri.parse(appBaseUrl+uri),
+        _getUri(uri),
         headers: headers ?? _mainHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
       Response response = handleResponse(response0);
@@ -58,7 +61,7 @@ class ApiClient extends GetxService {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
       http.Response response0 = await http.post(
-        Uri.parse(appBaseUrl+uri),
+        _getUri(uri),
         body: jsonEncode(body),
         headers: headers ?? _mainHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
@@ -74,7 +77,7 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
-      http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl+uri));
+      http.MultipartRequest request = http.MultipartRequest('POST', _getUri(uri));
       request.headers.addAll(headers ?? _mainHeaders);
       for(MultipartBody multipart in multipartBody) {
         if(multipart.file != null) {
@@ -108,7 +111,7 @@ class ApiClient extends GetxService {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
       http.Response response0 = await http.put(
-        Uri.parse(appBaseUrl+uri),
+        _getUri(uri),
         body: jsonEncode(body),
         headers: headers ?? _mainHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
@@ -124,7 +127,7 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       http.Response response0 = await http.delete(
-        Uri.parse(appBaseUrl+uri),
+        _getUri(uri),
         headers: headers ?? _mainHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
       Response response = handleResponse(response0);
