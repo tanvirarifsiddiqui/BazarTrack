@@ -5,8 +5,6 @@ class AppConstants {
   static const String appName = 'Test Product';
 
   static const String baseUrl = 'https://my_base_url';
-  static const String configUri = '/api/v1/config';
-  static const String loginUri = '/api/v1/auth/login';
 
   // Shared Key
   static const String theme = 'theme';

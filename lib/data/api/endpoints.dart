@@ -1,26 +1,28 @@
+import 'package:flutter_boilerplate/util/app_constants.dart';
+
 class Endpoints {
-  static const login = '/api/auth/login';
-  static const logout = '/api/auth/logout';
-  static const me = '/api/auth/me';
-  static const refresh = '/api/auth/refresh';
+  static const login = '${AppConstants.baseUrl}/api/auth/login';
+  static const logout = '${AppConstants.baseUrl}/api/auth/logout';
+  static const me = '${AppConstants.baseUrl}/api/auth/me';
+  static const refresh = '${AppConstants.baseUrl}/api/auth/refresh';
 
-  static const orders = '/api/orders';
-  static String order(int id) => '/api/orders/\$id';
-  static String assignOrder(int id) => '/api/orders/\$id/assign';
-  static String completeOrder(int id) => '/api/orders/\$id/complete';
+  static const orders = '${AppConstants.baseUrl}/api/orders';
+  static String order(int id) => '${AppConstants.baseUrl}/api/orders/\$id';
+  static String assignOrder(int id) => '${AppConstants.baseUrl}/api/orders/\$id/assign';
+  static String completeOrder(int id) => '${AppConstants.baseUrl}/api/orders/\$id/complete';
 
-  static const orderItems = '/api/order_items';
-  static String itemsOfOrder(int orderId) => '/api/order_items/\$orderId';
-  static String orderItem(int orderId, int id) => '/api/order_items/\$orderId/\$id';
+  static const orderItems = '${AppConstants.baseUrl}/api/order_items';
+  static String itemsOfOrder(int orderId) => '${AppConstants.baseUrl}/api/order_items/\$orderId';
+  static String orderItem(int orderId, int id) => '${AppConstants.baseUrl}/api/order_items/\$orderId/\$id';
 
-  static const payments = '/api/payments';
+  static const payments = '${AppConstants.baseUrl}/api/payments';
 
-  static String wallet(int userId) => '/api/wallet/\$userId';
-  static String walletTransactions(int userId) => '/api/wallet/\$userId/transactions';
+  static String wallet(int userId) => '${AppConstants.baseUrl}/api/wallet/\$userId';
+  static String walletTransactions(int userId) => '${AppConstants.baseUrl}/api/wallet/\$userId/transactions';
 
-  static const history = '/api/history';
-  static String historyByEntity(String entity, int id) => '/api/history/\$entity/\$id';
+  static const history = '${AppConstants.baseUrl}/api/history';
+  static String historyByEntity(String entity, int id) => '${AppConstants.baseUrl}/api/history/\$entity/\$id';
 
-  static const analyticsDashboard = '/api/analytics/dashboard';
-  static const analyticsReports = '/api/analytics/reports';
+  static const analyticsDashboard = '${AppConstants.baseUrl}/api/analytics/dashboard';
+  static const analyticsReports = '${AppConstants.baseUrl}/api/analytics/reports';
 }
