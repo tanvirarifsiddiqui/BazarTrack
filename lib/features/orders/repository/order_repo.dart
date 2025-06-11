@@ -48,7 +48,7 @@ class OrderRepo {
     final order = getById(orderId);
     if (order != null) {
       order.assignedTo = userId;
-      order.status = OrderStatus.assigned;
+      order.status = OrderStatus.pending;
     }
   }
 

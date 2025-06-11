@@ -15,17 +15,17 @@ class UserModel {
   }) : wallet = wallet ?? Wallet();
 
   UserModel.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : id = json['id'].toString(),
         name = json['name'],
-        role = UserRole.values.firstWhere(
-            (e) => e.toString() == json['role'],
-            orElse: () => UserRole.assistant),
-        wallet = Wallet.fromJson(json['wallet']);
+        role = UserRoleExtension.fromString(json['role'] ?? 'assistant'),
+        wallet = json['wallet'] != null
+            ? Wallet.fromJson(json['wallet'])
+            : Wallet();
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
-        'role': role.toString(),
+        'role': role.toApi(),
         'wallet': wallet.toJson(),
       };
 }
