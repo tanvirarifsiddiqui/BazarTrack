@@ -2,9 +2,9 @@ import 'package:flutter_boilerplate/data/model/response/language_model.dart';
 import 'package:flutter_boilerplate/util/images.dart';
 
 class AppConstants {
-  static const String appName = 'Test Product';
+  static const String appName = 'BazarTrack';
 
-  static const String baseUrl = 'https://my_base_url';
+  static const String baseUrl = 'https://bazartrack.dev.alpha.net.bd';
 
   // Shared Key
   static const String theme = 'theme';
