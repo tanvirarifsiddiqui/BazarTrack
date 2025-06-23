@@ -1,3 +1,5 @@
+import '../../../helper/date_converter.dart';
+
 class Advance {
   final double amount;
   final DateTime date;
@@ -13,14 +15,14 @@ class Advance {
 
   factory Advance.fromJson(Map<String, dynamic> json) => Advance(
         amount: json['amount'],
-        date: DateTime.parse(json['date']),
+        date: DateConverter.parseApiDate(json['date']),
         givenBy: json['givenBy'],
         receivedBy: json['receivedBy'],
       );
 
   Map<String, dynamic> toJson() => {
         'amount': amount,
-        'date': date.toIso8601String(),
+        'date': DateConverter.formatApiDate(date),
         'givenBy': givenBy,
         'receivedBy': receivedBy,
       };

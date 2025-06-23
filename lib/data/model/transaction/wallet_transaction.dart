@@ -1,30 +1,32 @@
-enum TransactionType { advance, purchase }
+enum TransactionType { credit, debit }
+
+import '../../../helper/date_converter.dart';
 
 class WalletTransaction {
   final double amount;
   final TransactionType type;
-  final DateTime date;
+  final DateTime createdAt;
   final String description;
 
   WalletTransaction({
     required this.amount,
     required this.type,
-    required this.date,
+    required this.createdAt,
     required this.description,
   });
 
   WalletTransaction.fromJson(Map<String, dynamic> json)
-      : amount = json['amount'],
-        type = TransactionType.values.firstWhere(
-            (e) => e.toString() == json['type'],
-            orElse: () => TransactionType.advance),
-        date = DateTime.parse(json['date']),
-        description = json['description'];
+      : amount = (json['amount'] as num).toDouble(),
+        type = json['type'] == 'debit' ? TransactionType.debit : TransactionType.credit,
+        createdAt = json['created_at'] != null
+            ? DateConverter.parseApiDate(json['created_at'])
+            : DateConverter.parseApiDate(json['date']),
+        description = json['description'] ?? '';
 
   Map<String, dynamic> toJson() => {
         'amount': amount,
-        'type': type.toString(),
-        'date': date.toIso8601String(),
+        'type': type == TransactionType.debit ? 'debit' : 'credit',
+        'created_at': DateConverter.formatApiDate(createdAt),
         'description': description,
       };
 }

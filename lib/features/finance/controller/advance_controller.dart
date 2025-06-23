@@ -29,8 +29,8 @@ class AdvanceController extends GetxController implements GetxService {
       user.wallet.balance += advance.amount;
       user.wallet.transactions.add(WalletTransaction(
         amount: advance.amount,
-        type: TransactionType.advance,
-        date: advance.date,
+        type: TransactionType.credit,
+        createdAt: advance.date,
         description: 'Advance from ${advance.givenBy}',
       ));
       await auth.saveUser(user);
@@ -58,8 +58,8 @@ class AdvanceController extends GetxController implements GetxService {
       user.wallet.balance -= amount;
       user.wallet.transactions.add(WalletTransaction(
         amount: amount,
-        type: TransactionType.purchase,
-        date: DateTime.now(),
+        type: TransactionType.debit,
+        createdAt: DateTime.now(),
         description: description,
       ));
       await auth.saveUser(user);
