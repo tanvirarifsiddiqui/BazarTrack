@@ -1,3 +1,5 @@
+import 'package:flutter_boilerplate/helper/date_converter.dart';
+
 class HistoryLog {
   final String id;
   final String entityType;
@@ -18,22 +20,28 @@ class HistoryLog {
   });
 
   factory HistoryLog.fromJson(Map<String, dynamic> json) => HistoryLog(
-        id: json['id'],
-        entityType: json['entityType'],
-        entityId: json['entityId'],
-        action: json['action'],
-        changedByUserId: json['changedByUserId'],
-        timestamp: DateTime.parse(json['timestamp']),
-        dataSnapshot: Map<String, dynamic>.from(json['dataSnapshot'] ?? {}),
+        id: json['id'].toString(),
+        entityType:
+            json['entityType'] ?? json['entity_type'] ?? '',
+        entityId:
+            (json['entityId'] ?? json['entity_id'] ?? '').toString(),
+        action: json['action'] ?? '',
+        changedByUserId: (json['changedByUserId'] ??
+                json['changed_by_user_id'] ??
+                '')
+            .toString(),
+        timestamp: DateConverter.parseApiDate(json['timestamp']),
+        dataSnapshot: Map<String, dynamic>.from(
+            json['dataSnapshot'] ?? json['data_snapshot'] ?? {}),
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'entityType': entityType,
-        'entityId': entityId,
+        'entity_type': entityType,
+        'entity_id': entityId,
         'action': action,
-        'changedByUserId': changedByUserId,
-        'timestamp': timestamp.toIso8601String(),
-        'dataSnapshot': dataSnapshot,
+        'changed_by_user_id': changedByUserId,
+        'timestamp': DateConverter.formatApiDate(timestamp),
+        'data_snapshot': dataSnapshot,
       };
 }

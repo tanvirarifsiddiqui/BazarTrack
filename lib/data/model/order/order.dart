@@ -1,4 +1,5 @@
 import 'order_status.dart';
+import '../../../helper/date_converter.dart';
 
 class Order {
   final String orderId;
@@ -23,12 +24,12 @@ class Order {
         assignedTo = json['assignedTo']?.toString() ??
             json['assigned_to']?.toString(),
         status = OrderStatusExtension.fromString(json['status'] ?? 'pending'),
-        createdAt = DateTime.parse(
+        createdAt = DateConverter.parseApiDate(
             json['createdAt'] ?? json['created_at']),
         completedAt = json['completedAt'] != null
-            ? DateTime.parse(json['completedAt'])
+            ? DateConverter.parseApiDate(json['completedAt'])
             : json['completed_at'] != null
-                ? DateTime.parse(json['completed_at'])
+                ? DateConverter.parseApiDate(json['completed_at'])
                 : null;
 
   Map<String, dynamic> toJson() => {
@@ -36,7 +37,9 @@ class Order {
         'created_by': createdBy,
         'assigned_to': assignedTo,
         'status': status.toApi(),
-        'created_at': createdAt.toIso8601String(),
-        'completed_at': completedAt?.toIso8601String(),
+        'created_at': DateConverter.formatApiDate(createdAt),
+        'completed_at': completedAt != null
+            ? DateConverter.formatApiDate(completedAt!)
+            : null,
       };
 }

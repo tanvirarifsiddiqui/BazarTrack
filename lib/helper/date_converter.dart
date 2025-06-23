@@ -1,8 +1,21 @@
 import 'package:intl/intl.dart';
 
 class DateConverter {
+  static String formatApiDate(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+  }
+
+  static DateTime parseApiDate(String dateTime) {
+    try {
+      return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime, true).toLocal();
+    } catch (_) {
+      return DateTime.parse(dateTime);
+    }
+  }
+
+  @deprecated
   static String formatDate(DateTime dateTime) {
-    return DateFormat('yyyy-MM-dd hh:mm:ss').format(dateTime);
+    return formatApiDate(dateTime);
   }
 
   static String estimatedDate(DateTime dateTime) {
