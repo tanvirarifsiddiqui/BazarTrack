@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
-import 'package:flutter_boilerplate/data/model/order/order_status.dart';
-import 'package:flutter_boilerplate/data/model/order/order.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
+import 'package:flutter_boilerplate/features/orders/model/order.dart';
 
 class OrderListScreen extends StatelessWidget {
   final OrderStatus? status;

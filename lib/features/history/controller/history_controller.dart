@@ -1,27 +1,19 @@
-import 'package:flutter_boilerplate/data/model/history/history_log.dart';
-import 'package:flutter_boilerplate/features/history/repository/history_repo.dart';
+import 'package:flutter_boilerplate/features/history/model/history_log.dart';
+import 'package:flutter_boilerplate/features/history/service/history_service.dart';
 import 'package:get/get.dart';
 
-class HistoryController extends GetxController implements GetxService {
-  final HistoryRepo historyRepo;
-  HistoryController({required this.historyRepo});
+class HistoryController extends GetxController {
+  final HistoryService historyService;
+  HistoryController({required this.historyService});
 
-  final List<HistoryLog> _logs = [];
-  List<HistoryLog> get logs => _logs;
-
-  @override
-  void onInit() {
-    _logs.addAll(historyRepo.getLogs());
-    super.onInit();
-  }
+  List<HistoryLog> get logs => historyService.logs;
 
   Future<void> addLog(HistoryLog log) async {
-    _logs.add(log);
-    await historyRepo.saveLogs(_logs);
+    await historyService.addLog(log);
     update();
   }
 
   List<HistoryLog> logsForEntity(String entityType, String entityId) {
-    return _logs.where((l) => l.entityType == entityType && l.entityId == entityId).toList();
+    return historyService.logsForEntity(entityType, entityId);
   }
 }

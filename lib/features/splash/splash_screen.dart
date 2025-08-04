@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dar
 import 'package:flutter_boilerplate/features/auth/sign_in_screen.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
-import 'package:flutter_boilerplate/data/model/user/role.dart';
+import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/util/images.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

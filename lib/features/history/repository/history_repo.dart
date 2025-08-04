@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter_boilerplate/data/model/history/history_log.dart';
+import 'package:flutter_boilerplate/features/history/model/history_log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryRepo {
