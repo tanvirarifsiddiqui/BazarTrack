@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dar
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
 import 'package:flutter_boilerplate/features/auth/signup_screen.dart';
-import 'package:flutter_boilerplate/data/model/user/role.dart';
+import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:get/get.dart';
 
 class SignInScreen extends StatefulWidget {

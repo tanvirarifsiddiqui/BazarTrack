@@ -1,4 +1,4 @@
-import '../transaction/wallet_transaction.dart';
+import 'wallet_transaction.dart';
 
 class Wallet {
   double balance;

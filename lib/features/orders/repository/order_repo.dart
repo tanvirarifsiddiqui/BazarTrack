@@ -1,6 +1,6 @@
 import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
-import 'package:flutter_boilerplate/data/model/order/order.dart';
-import 'package:flutter_boilerplate/data/model/order/order_status.dart';
+import 'package:flutter_boilerplate/features/orders/model/order.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 
 class OrderRepo {
   final BazarTrackApi api;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/base/custom_text_field.dart';
-import 'package:flutter_boilerplate/data/model/advance/advance.dart';
+import 'package:flutter_boilerplate/features/finance/model/advance.dart';
 import 'package:flutter_boilerplate/features/finance/controller/advance_controller.dart';
 import 'package:get/get.dart';
 
