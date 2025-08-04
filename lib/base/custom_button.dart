@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class CustomButton extends StatelessWidget {
-  final Function? onPressed;
+  final VoidCallback? onPressed;
   final String buttonText;
   final bool transparent;
   final EdgeInsets? margin;
@@ -33,7 +33,7 @@ class CustomButton extends StatelessWidget {
     return Center(child: SizedBox(width: width ?? context.width, child: Padding(
       padding: margin ?? EdgeInsets.all(0),
       child: TextButton(
-        onPressed: onPressed != null ? onPressed!() : null,
+        onPressed: onPressed,
         style: flatButtonStyle,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           icon != null ? Padding(

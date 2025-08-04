@@ -48,10 +48,10 @@ Future<Map<String, Map<String, String>>> init() async {
 
 
   // Services
-  Get.lazyPut(() => AuthService(authRepo: Get.find()), permanent: true);
-  Get.lazyPut(() => AdvanceService(advanceRepo: Get.find()), permanent: true);
-  Get.lazyPut(() => OrderService(orderRepo: Get.find()), permanent: true);
-  Get.lazyPut(() => HistoryService(historyRepo: Get.find()), permanent: true);
+  Get.put(AuthService(authRepo: Get.find()),permanent: true);
+  Get.put(AdvanceService(advanceRepo: Get.find()), permanent: true);
+  Get.put(OrderService(orderRepo: Get.find()), permanent: true);
+  Get.put(HistoryService(historyRepo: Get.find()), permanent: true);
 
   // Controllers
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));

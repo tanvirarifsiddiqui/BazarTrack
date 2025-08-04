@@ -2,7 +2,7 @@ import 'package:flutter_boilerplate/features/history/model/history_log.dart';
 import 'package:flutter_boilerplate/features/history/repository/history_repo.dart';
 import 'package:get/get.dart';
 
-class HistoryService extends GetxService {
+class HistoryService extends GetxController implements GetxService {
   final HistoryRepo historyRepo;
   HistoryService({required this.historyRepo});
 
