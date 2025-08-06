@@ -18,10 +18,8 @@ class AuthController extends GetxController {
     await authService.signUp(user);
     update();
   }
-
-  Future<void> login(String email, String password) async {
-    await authService.login(email, password);
-    update();
+  Future<bool> login(String email, String password) {
+    return authService.login(email, password);
   }
 
   Future<void> logout() async {

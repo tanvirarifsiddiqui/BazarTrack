@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
 
+import '../auth/sign_in_screen.dart';
+
 class AssistantDashboard extends StatelessWidget {
   const AssistantDashboard({super.key});
 
@@ -21,6 +23,13 @@ class AssistantDashboard extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
                 child: const Text('View Orders'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await Get.find<AuthController>().logout();
+                  Get.offAll(const SignInScreen());
+                },
+                child: const Text('Logout'),
               ),
             ],
           ),

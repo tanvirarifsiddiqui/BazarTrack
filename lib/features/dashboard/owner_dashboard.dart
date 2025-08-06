@@ -3,6 +3,9 @@ import 'package:flutter_boilerplate/util/role_guard.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
 import 'package:get/get.dart';
 
+import '../auth/controller/auth_controller.dart';
+import '../auth/sign_in_screen.dart';
+
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key});
 
@@ -35,6 +38,13 @@ class OwnerDashboard extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),
               child: const Text('View Orders'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await Get.find<AuthController>().logout();
+                Get.offAll(const SignInScreen());
+              },
+              child: const Text('Logout'),
             ),
           ],
         ),

@@ -21,18 +21,22 @@ class AuthService extends GetxController implements GetxService {
     }
   }
 
+
   Future<void> signUp(UserModel user) async {
     await authRepo.signUp(jsonEncode(user.toJson()));
     _currentUser = user;
     update();
   }
 
-  Future<void> login(String email, String password) async {
+// Returns true if login succeeded
+  Future<bool> login(String email, String password) async {
     final response = await authRepo.login(email, password);
     if (response.isOk) {
       loadUser();
+      update();
+      return true;
     }
-    update();
+    return false;
   }
 
   Future<void> logout() async {

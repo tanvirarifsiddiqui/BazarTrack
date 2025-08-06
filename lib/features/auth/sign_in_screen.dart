@@ -58,12 +58,23 @@ class _SignInScreenState extends State<SignInScreen> {
               CustomButton(
                 buttonText: 'Login',
                 onPressed: () async {
-                  await Get.find<AuthController>().login(
-                    _emailController.text,
-                    _passwordController.text,
+                  final auth = Get.find<AuthController>();
+                  final success = await auth.login(
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
                   );
-                  final user = Get.find<AuthController>().currentUser;
-                  if (user?.role == UserRole.owner) {
+
+                  if (!success) {
+                    Get.snackbar(
+                      'Login Failed',
+                      'Invalid email or password. Please try again.',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                    return;
+                  }
+
+                  final user = auth.currentUser!;
+                  if (user.role == UserRole.owner) {
                     Get.offAll(const OwnerDashboard());
                   } else {
                     Get.offAll(const AssistantDashboard());
