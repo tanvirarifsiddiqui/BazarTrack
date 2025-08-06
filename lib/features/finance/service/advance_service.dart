@@ -6,7 +6,7 @@ import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/history/service/history_service.dart';
 import 'package:get/get.dart';
 
-class AdvanceService extends GetxService {
+class AdvanceService extends GetxController implements GetxService {
   final AdvanceRepo advanceRepo;
   AdvanceService({required this.advanceRepo});
 

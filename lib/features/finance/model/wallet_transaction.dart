@@ -1,6 +1,6 @@
+import '../../../helper/date_converter.dart';
 enum TransactionType { credit, debit }
 
-import '../../../helper/date_converter.dart';
 
 class WalletTransaction {
   final double amount;

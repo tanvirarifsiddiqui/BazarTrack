@@ -6,7 +6,7 @@ import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 
-class OrderService extends GetxService {
+class OrderService extends GetxController implements GetxService {
   final OrderRepo orderRepo;
   OrderService({required this.orderRepo});
 
