@@ -17,6 +17,19 @@ class OrderService extends GetxController implements GetxService {
     return orderRepo.getOrders(status: status, assignedTo: assignedTo);
   }
 
+  Future<List<OrderItem>> getItemsOfOrder(String orderId) {
+    return orderRepo.getItemsOfOrder(orderId);
+  }
+
+
+  Future<void> updateOrderItem(OrderItem item) {
+    return orderRepo.updateOrderItem(item);
+  }
+
+  Future<void> completeOrder(String orderId) {
+    return orderRepo.completeOrder(orderId);
+  }
+
   Order? getOrder(String id) => orderRepo.getById(id);
 
   /// Create order and items in two steps

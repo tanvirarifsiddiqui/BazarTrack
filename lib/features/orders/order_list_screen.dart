@@ -1,5 +1,6 @@
 // File: lib/features/orders/screens/order_list_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -56,12 +57,11 @@ class OrderListScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       leading: CircleAvatar(
                         backgroundColor: AppColors.primary.withOpacity(0.2),
-                        child: Text(
-                          order.orderId?.substring(0, 1) ?? '-',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                        child: SvgPicture.asset(
+                          'assets/icons/order_icon.svg',
+                          width: 24,
+                          height: 24,
+                          color: AppColors.primary,
                         ),
                       ),
                       title: Text(

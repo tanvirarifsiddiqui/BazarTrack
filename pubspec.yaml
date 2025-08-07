@@ -22,6 +22,7 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^19.1.0
+  flutter_svg:
 
 dev_dependencies:
   flutter_test:
@@ -35,6 +36,7 @@ flutter:
   assets:
     - assets/image/
     - assets/language/
+    - assets/icons/
 
   fonts:
     - family: Roboto

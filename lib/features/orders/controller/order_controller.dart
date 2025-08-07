@@ -7,13 +7,18 @@ import 'package:flutter_boilerplate/features/orders/service/order_service.dart';
 import 'package:get/get.dart';
 import '../../../helper/route_helper.dart';
 import '../../auth/service/auth_service.dart';
+import '../../history/model/history_log.dart';
+import '../../history/service/history_service.dart';
 
 class OrderController extends GetxController {
   final OrderService orderService;
   final AuthService _auth = Get.find();
+  Order? getOrder(String id) => orderService.getOrder(id);
 
   List<OrderItem> newItems = [];
   String assignedToUserId = '';
+  List<OrderItem> items = [];
+  bool isLoadingItems = false;
 
   OrderController({required this.orderService});
 
@@ -21,7 +26,59 @@ class OrderController extends GetxController {
     return orderService.getOrders(status: status, assignedTo: assignedTo);
   }
 
-  Order? getOrder(String id) => orderService.getOrder(id);
+  Future<List<OrderItem>> getItemsOfOrder(String orderId) {
+    return orderService.getItemsOfOrder(orderId);
+  }
+
+  void assignOrder(String orderId, String userId) {
+    orderService.assignOrder(orderId, userId);
+    loadItems(orderId);
+  }
+
+  void loadItems(String orderId) async {
+    isLoadingItems = true;
+    update();  // show loader
+    items = await orderService.getItemsOfOrder(orderId);
+    isLoadingItems = false;
+    update();  // refresh list
+  }
+  Future<void> updateOrderItem(OrderItem item) async {
+    final prev = getItemsOfOrder(item.orderId.toString());
+    await orderService.updateOrderItem(item);
+    Get.find<HistoryService>().addLog(
+      HistoryLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        entityType: 'OrderItem',
+        entityId: item.id.toString(),
+        action: 'updated',
+        changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+        timestamp: DateTime.now(),
+        dataSnapshot: {
+          'before': prev,
+          'after': item.toJson(),
+        },
+      ),
+    );
+    update();
+  }
+
+  Future<void> completeOrder(String orderId) async {
+    await orderService.completeOrder(orderId);
+    Get.find<HistoryService>().addLog(
+      HistoryLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        entityType: 'Order',
+        entityId: orderId,
+        action: 'completed',
+        changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+        timestamp: DateTime.now(),
+        dataSnapshot: {
+          'after': getOrder(orderId)?.toJson(),
+        },
+      ),
+    );
+    update();
+  }
 
   void onCreateOrderTapped() {
     newItems = [];

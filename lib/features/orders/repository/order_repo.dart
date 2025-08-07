@@ -13,6 +13,16 @@ class OrderRepo {
   final List<Order> _cache = [];
   final List<OrderItem> _itemCache = [];
 
+
+  Future<void> updateOrderItem(OrderItem item) async {
+    await api.updateItem(item.orderId, item.id!, item.toJson());
+  }
+
+  Future<void> completeOrder(String orderId) async {
+    await api.completeOrder(int.parse(orderId), {});
+  }
+
+
   /// Create order + nested items in one HTTP call (if server supports nesting)
   Future<Order> createOrderWithItems(Order order, List<OrderItem> items) async {
     final payload = order.toJsonForCreate(items: items);
@@ -43,6 +53,17 @@ class OrderRepo {
     }
     _itemCache.add(item);
   }
+
+  Future<List<OrderItem>> getItemsOfOrder(String orderId) async {
+    final res = await api.itemsOfOrder(int.parse(orderId));
+    if (res.isOk && res.body is List) {
+      return (res.body as List)
+          .map((e) => OrderItem.fromJson(e))
+          .toList();
+    }
+    return [];
+  }
+
 
   Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) async {
     final res = await api.orders();
