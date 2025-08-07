@@ -8,6 +8,7 @@ import 'package:flutter_boilerplate/firebase_options.dart';
 import 'package:flutter_boilerplate/theme/dark_theme.dart';
 import 'package:flutter_boilerplate/theme/light_theme.dart';
 import 'package:flutter_boilerplate/util/app_constants.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/messages.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
@@ -39,7 +40,11 @@ class MyApp extends StatelessWidget {
           title: AppConstants.appName,
           debugShowCheckedModeBanner: false,
           navigatorKey: Get.key,
-          theme: themeController.darkTheme ? dark : light,
+          theme: ThemeData(
+          primaryColor: AppColors.primary,
+          scaffoldBackgroundColor: AppColors.background,
+          colorScheme: ColorScheme.fromSwatch().copyWith(secondary: AppColors.accent),
+        ),
           locale: localizeController.locale,
           translations: Messages(languages: languages),
           fallbackLocale: Locale(AppConstants.languages[0].languageCode, AppConstants.languages[0].countryCode),

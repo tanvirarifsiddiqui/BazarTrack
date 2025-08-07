@@ -1,5 +1,6 @@
 // File: lib/features/orders/screens/order_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
@@ -30,30 +31,30 @@ class OrderDetailScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            // children: [
-            //   Text('Created by: ${order.createdBy}'),
-            //   Text('Assigned to: ${order.assignedTo ?? 'Unassigned'}'),
-            //   Text('Status: ${order.status.toApi()}'),
-            //   Text('Created at: ${dateFmt.format(order.createdAt)}'),
-            //   Text('Completed at: ${order.completedAt != null ? dateFmt.format(order.completedAt!) : '-'}'),
-            //   const SizedBox(height: 16),
-            //   ElevatedButton(
-            //     onPressed: () {
-            //       if (auth.currentUser?.role == 'owner') {
-            //         controller.assignOrder(order.orderId!, auth.currentUser!.id);
-            //       } else {
-            //         controller.selfAssign(order.orderId!);
-            //       }
-            //     },
-            //     child: Text(order.assignedTo == null ? 'Assign to me' : 'Reassign'),
-            //   ),
-            //   const SizedBox(height: 16),
-            //   ElevatedButton(
-            //     onPressed: () => Get.toNamed(
-            //         RouteHelper.getHistoryRoute('Order', order.orderId!)),
-            //     child: Text('view_history'.tr),
-            //   ),
-            // ],
+            children: [
+              Text('Created by: ${order.createdBy}'),
+              Text('Assigned to: ${order.assignedTo ?? 'Unassigned'}'),
+              Text('Status: ${order.status.toApi()}'),
+              Text('Created at: ${dateFmt.format(order.createdAt)}'),
+              Text('Completed at: ${order.completedAt != null ? dateFmt.format(order.completedAt!) : '-'}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  if (auth.currentUser?.role == 'owner') {
+                    // controller.assignOrder(order.orderId!, auth.currentUser!.id);
+                  } else {
+                    controller.selfAssign(order.orderId!);
+                  }
+                },
+                child: Text(order.assignedTo == null ? 'Assign to me' : 'Reassign'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Get.toNamed(
+                    RouteHelper.getHistoryRoute('Order', order.orderId!)),
+                child: Text('view_history'.tr),
+              ),
+            ],
           ),
         ),
       );
