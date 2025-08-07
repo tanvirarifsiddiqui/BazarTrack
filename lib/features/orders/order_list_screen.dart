@@ -1,3 +1,4 @@
+// File: lib/features/orders/screens/order_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -20,7 +21,7 @@ class OrderListScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: Text('orders'.tr)),
             floatingActionButton: FloatingActionButton(
-              onPressed: controller.createOrder,
+              onPressed: controller.onCreateOrderTapped,
               child: const Icon(Icons.add),
             ),
             body: ListView.builder(
@@ -28,9 +29,10 @@ class OrderListScreen extends StatelessWidget {
               itemBuilder: (_, index) {
                 final order = orders[index];
                 return ListTile(
-                  title: Text(order.orderId),
-                  subtitle: Text(order.status.toString()),
-                  onTap: () => Get.toNamed(RouteHelper.getOrderDetailRoute(order.orderId)),
+                  title: Text(order.orderId ?? '-'),
+                  subtitle: Text(order.status.toApi()),
+                  onTap: () => Get.toNamed(
+                      RouteHelper.getOrderDetailRoute(order.orderId!)),
                 );
               },
             ),

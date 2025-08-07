@@ -1,10 +1,20 @@
+// File: lib/features/orders/controller/order_controller.dart
+
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/orders/service/order_service.dart';
 import 'package:get/get.dart';
+import '../../../helper/route_helper.dart';
+import '../../auth/service/auth_service.dart';
 
 class OrderController extends GetxController {
   final OrderService orderService;
+  final AuthService _auth = Get.find();
+
+  List<OrderItem> newItems = [];
+  String assignedToUserId = '';
+
   OrderController({required this.orderService});
 
   Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) {
@@ -13,23 +23,45 @@ class OrderController extends GetxController {
 
   Order? getOrder(String id) => orderService.getOrder(id);
 
-  void createOrder() {
-    orderService.createOrder();
+  void onCreateOrderTapped() {
+    newItems = [];
+    assignedToUserId = _auth.currentUser?.id ?? '';
+    Get.toNamed(RouteHelper.orderCreate);
+  }
+
+  void addItem() {
+    newItems.add(OrderItem.empty(orderId: 0));
     update();
   }
 
-  void updateOrder(Order order) {
-    orderService.updateOrder(order);
+  void removeItem(int index) {
+    newItems.removeAt(index);
     update();
   }
 
-  void assignOrder(String orderId, String userId) {
-    orderService.assignOrder(orderId, userId);
-    update();
+  Future<void> saveNewOrder() async {
+    if (newItems.isEmpty) {
+      Get.snackbar('Error', 'Add at least one item.');
+      return;
+    }
+
+    final order = Order.create(
+      createdBy: _auth.currentUser!.id.toString(),
+      assignedTo: assignedToUserId,
+      status: OrderStatus.pending,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      final created = await orderService.createOrderWithItems(order, newItems);
+      Get.back(result: created);
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to save order: $e');
+    }
   }
 
-  bool selfAssign(String orderId) {
-    final res = orderService.selfAssign(orderId);
+  Future<bool> selfAssign(String orderId) async {
+    final res = await orderService.selfAssign(orderId);
     update();
     return res;
   }

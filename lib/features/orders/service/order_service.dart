@@ -1,8 +1,11 @@
+// File: lib/features/orders/service/order_service.dart
+
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/history/model/history_log.dart';
 import 'package:flutter_boilerplate/features/history/service/history_service.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 
@@ -16,78 +19,69 @@ class OrderService extends GetxController implements GetxService {
 
   Order? getOrder(String id) => orderRepo.getById(id);
 
-  void createOrder() {
-    final auth = Get.find<AuthService>();
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final order = Order(
-      orderId: id,
-      createdBy: auth.currentUser?.id ?? '',
-      createdAt: DateTime.now(),
-    );
-    orderRepo.createOrder(order);
+  /// Create order and items in two steps
+  Future<Order> createOrderWithItems(Order order, List<OrderItem> items) async {
+    final createdOrder = await orderRepo.createOrder(order);
+    final serverId = int.parse(createdOrder.orderId!);
+    for (var item in items) {
+      final updatedItem = item.copyWith(orderId: serverId);
+      await orderRepo.createOrderItem(updatedItem);
+    }
     Get.find<HistoryService>().addLog(
       HistoryLog(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         entityType: 'Order',
-        entityId: id,
+        entityId: createdOrder.orderId!,
         action: 'created',
-        changedByUserId: auth.currentUser?.id ?? '',
+        changedByUserId: Get.find<AuthService>().currentUser?.id ?? '',
         timestamp: DateTime.now(),
-        dataSnapshot: {'after': order.toJson()},
+        dataSnapshot: {'after': createdOrder.toJson()},
       ),
     );
     update();
+    return createdOrder;
   }
 
-  void updateOrder(Order order) {
-    final prev = orderRepo.getById(order.orderId);
-    orderRepo.updateOrder(order);
-    final auth = Get.find<AuthService>();
+  Future<void> updateOrder(Order order) async {
+    final prev = orderRepo.getById(order.orderId!);
+    await orderRepo.updateOrder(order);
     Get.find<HistoryService>().addLog(
       HistoryLog(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         entityType: 'Order',
-        entityId: order.orderId,
+        entityId: order.orderId!,
         action: 'updated',
-        changedByUserId: auth.currentUser?.id ?? '',
+        changedByUserId: Get.find<AuthService>().currentUser?.id ?? '',
         timestamp: DateTime.now(),
-        dataSnapshot: {
-          'before': prev?.toJson(),
-          'after': order.toJson(),
-        },
+        dataSnapshot: {'before': prev?.toJson(), 'after': order.toJson()},
       ),
     );
     update();
   }
 
-  void assignOrder(String orderId, String userId) {
+  Future<void> assignOrder(String orderId, String userId) async {
     final prev = orderRepo.getById(orderId);
-    orderRepo.assignOrder(orderId, userId);
+    await orderRepo.assignOrder(orderId, userId);
     final order = orderRepo.getById(orderId);
-    final auth = Get.find<AuthService>();
     Get.find<HistoryService>().addLog(
       HistoryLog(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         entityType: 'Order',
         entityId: orderId,
         action: 'assigned',
-        changedByUserId: auth.currentUser?.id ?? '',
+        changedByUserId: Get.find<AuthService>().currentUser?.id ?? '',
         timestamp: DateTime.now(),
-        dataSnapshot: {
-          'before': prev?.toJson(),
-          'after': order?.toJson(),
-        },
+        dataSnapshot: {'before': prev?.toJson(), 'after': order?.toJson()},
       ),
     );
     update();
   }
 
-  bool selfAssign(String orderId) {
-    final auth = Get.find<AuthService>();
-    final userId = auth.currentUser?.id;
+  Future<bool> selfAssign(String orderId) async {
+    final userId = Get.find<AuthService>().currentUser?.id;
     if (userId == null) return false;
     final prev = orderRepo.getById(orderId);
-    final res = orderRepo.selfAssign(orderId, userId);
+    await orderRepo.assignOrder(orderId, userId);
     final order = orderRepo.getById(orderId);
     Get.find<HistoryService>().addLog(
       HistoryLog(
@@ -97,13 +91,10 @@ class OrderService extends GetxController implements GetxService {
         action: 'self-assigned',
         changedByUserId: userId,
         timestamp: DateTime.now(),
-        dataSnapshot: {
-          'before': prev?.toJson(),
-          'after': order?.toJson(),
-        },
+        dataSnapshot: {'before': prev?.toJson(), 'after': order?.toJson()},
       ),
     );
     update();
-    return res;
+    return true;
   }
 }
