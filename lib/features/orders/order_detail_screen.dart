@@ -19,7 +19,9 @@ class OrderDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final orderCtrl = Get.find<OrderController>();
-    final auth      = Get.find<AuthService>();
+    final auth = Get.find<AuthService>();
+    final isOwner = auth.currentUser?.role == UserRole.owner;
+    final isAssistant = auth.currentUser?.role == UserRole.assistant;
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +33,7 @@ class OrderDetailScreen extends StatelessWidget {
             onPressed: () {
               Get.toNamed(RouteHelper.getHistoryRoute('Order', orderId));
             },
-          )
+          ),
         ],
       ),
       body: GetBuilder<OrderController>(
@@ -40,9 +42,7 @@ class OrderDetailScreen extends StatelessWidget {
           if (order == null) {
             return const Center(child: Text('Order not found'));
           }
-
           final dateFmt = DateFormat('yyyy-MM-dd HH:mm');
-          final isOwner = auth.currentUser?.role == UserRole.owner.toApi();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -58,12 +58,31 @@ class OrderDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Summary', style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                          'Summary',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                         const SizedBox(height: 12),
-                        _buildInfoRow('Created by', order.createdBy.toString(), Icons.person),
-                        _buildInfoRow('Assigned to', order.assignedTo ?? 'Unassigned', Icons.group),
-                        _buildInfoRow('Status', order.status.toApi(), Icons.flag),
-                        _buildInfoRow('Created at', dateFmt.format(order.createdAt), Icons.schedule),
+                        _buildInfoRow(
+                          'Created by',
+                          order.createdBy.toString(),
+                          Icons.person,
+                        ),
+                        _buildInfoRow(
+                          'Assigned to',
+                          order.assignedTo ?? 'Unassigned',
+                          Icons.group,
+                        ),
+                        _buildInfoRow(
+                          'Status',
+                          order.status.toApi(),
+                          Icons.flag,
+                        ),
+                        _buildInfoRow(
+                          'Created at',
+                          dateFmt.format(order.createdAt),
+                          Icons.schedule,
+                        ),
                         _buildInfoRow(
                           'Completed at',
                           order.completedAt != null
@@ -77,7 +96,34 @@ class OrderDetailScreen extends StatelessWidget {
                 ),
 
                 // ITEMS LIST via FutureBuilder
-                Text('Items', style: Theme.of(context).textTheme.titleLarge),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Items',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    if (isOwner)
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Item'),
+                        onPressed: () async {
+                          final newItem = OrderItem.empty(
+                            orderId: int.parse(orderId),
+                          );
+                          final created = await Get.to<OrderItem>(
+                            () => EditOrderItemScreen(
+                              orderId: orderId,
+                              item: newItem,
+                            ),
+                          );
+                          if (created != null) {
+                            orderCtrl.loadItems(orderId);
+                          }
+                        },
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 12),
                 FutureBuilder<List<OrderItem>>(
                   future: orderCtrl.getItemsOfOrder(orderId),
@@ -86,7 +132,9 @@ class OrderDetailScreen extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Center(child: Text('Error loading items: ${snapshot.error}'));
+                      return Center(
+                        child: Text('Error loading items: ${snapshot.error}'),
+                      );
                     }
                     final items = snapshot.data!;
                     if (items.isEmpty) {
@@ -105,15 +153,20 @@ class OrderDetailScreen extends StatelessWidget {
                           subtitle: Text(
                             '${item.quantity} ${item.unit} • ${item.status.toApi()}',
                           ),
-                          trailing: item.estimatedCost != null
-                              ? Text(
-                            NumberFormat.simpleCurrency().format(item.estimatedCost),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          )
-                              : null,
+                          trailing:
+                              item.estimatedCost != null
+                                  ? Text(
+                                    NumberFormat.simpleCurrency().format(
+                                      item.estimatedCost,
+                                    ),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                                  : null,
                           onTap: () async {
                             final updated = await Get.to<OrderItem>(
-                                  () => EditOrderItemScreen(
+                              () => EditOrderItemScreen(
                                 orderId: orderId,
                                 item: item,
                               ),
@@ -135,15 +188,16 @@ class OrderDetailScreen extends StatelessWidget {
                 Row(
                   children: [
                     if (!isOwner && order.assignedTo == null)
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.person_add),
-                          label: const Text('Assign to me'),
-                          onPressed: () {
-                            orderCtrl.selfAssign(orderId);
-                          },
+                      if (isAssistant)
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.person_add),
+                            label: const Text('Assign to me'),
+                            onPressed: () {
+                              orderCtrl.selfAssign(orderId);
+                            },
+                          ),
                         ),
-                      ),
 
                     if (isOwner) ...[
                       Expanded(
@@ -157,12 +211,16 @@ class OrderDetailScreen extends StatelessWidget {
                                 final sample = ['2', '3', '4'];
                                 return SimpleDialog(
                                   title: const Text('Select User'),
-                                  children: sample
-                                      .map((u) => SimpleDialogOption(
-                                    child: Text('User #$u'),
-                                    onPressed: () => Navigator.pop(ctx, u),
-                                  ))
-                                      .toList(),
+                                  children:
+                                      sample
+                                          .map(
+                                            (u) => SimpleDialogOption(
+                                              child: Text('User #$u'),
+                                              onPressed:
+                                                  () => Navigator.pop(ctx, u),
+                                            ),
+                                          )
+                                          .toList(),
                                 );
                               },
                             );
@@ -175,22 +233,40 @@ class OrderDetailScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                     ],
 
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.done_all),
-                        label: Text(
+                    if (isAssistant)
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.done_all),
+                          label: Text(
+                            order.status == OrderStatus.completed
+                                ? 'Completed'
+                                : 'Mark Complete',
+                          ),
+                          onPressed:
+                              order.status == OrderStatus.completed
+                                  ? null
+                                  : () {
+                                    orderCtrl.completeOrder(orderId);
+                                  },
+                        ),
+                      ),
+                    if (isOwner)
+                      Expanded(
+                        child: Text(
                           order.status == OrderStatus.completed
                               ? 'Completed'
-                              : 'Mark Complete',
+                              : 'In Progress', // or any status text you prefer
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                order.status == OrderStatus.completed
+                                    ? Colors.green
+                                    : Colors.orange,
+                          ),
                         ),
-                        onPressed: order.status == OrderStatus.completed
-                            ? null
-                            : () {
-                          orderCtrl.completeOrder(orderId);
-                        },
                       ),
-                    ),
-                  ],
+                    ],
                 ),
               ],
             ),
