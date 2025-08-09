@@ -6,8 +6,7 @@ import 'package:flutter_boilerplate/features/orders/controller/order_controller.
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
 class EditOrderItemScreen extends StatefulWidget {
-  /// Pass in a “blank” item (with id == null) to add,
-  /// or an existing item (id != null) to edit.
+
   final String orderId;
   final OrderItem item;
 
@@ -27,6 +26,8 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
   late final TextEditingController _unitCtrl;
   late final TextEditingController _estCostCtrl;
   late OrderItemStatus _status;
+
+  final OrderController _controller = Get.find<OrderController>();
   bool _saving = false;
 
   bool get _isNew => widget.item.id == null;
@@ -74,17 +75,41 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
       if (_isNew) {
         // CREATE
         final created =
-        await Get.find<OrderController>().createOrderItem(updated);
+        await _controller.createOrderItem(updated);
         Get.back(result: created);
       } else {
         // UPDATE
-        await Get.find<OrderController>().updateOrderItem(updated);
+        await _controller.updateOrderItem(updated);
         Get.back(result: updated);
       }
     } catch (e) {
       Get.snackbar('Error', 'Could not save item: $e');
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _confirmAndDelete() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Delete Item?'),
+        content: Text('Are you sure you want to delete this item?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true),  child: Text('Delete', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    try {
+      await _controller.deleteOrderItem(widget.item);
+      Get.back(); // pop the edit screen
+      Get.snackbar('Deleted', 'Item has been removed', snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -95,7 +120,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
         title: Text(_isNew ? 'Add Item' : 'Edit Item'),
         actions: [
           IconButton(onPressed: (){
-            // Get.find<OrderController>().deleteOrderItem(widget.item);
+            _confirmAndDelete();
           }, icon: Icon(Icons.delete, color: Colors.red,))
         ],
       ),

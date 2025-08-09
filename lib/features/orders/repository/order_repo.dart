@@ -34,9 +34,11 @@ class OrderRepo {
     // update your local cache if you have one
     return updated;
   }
-
-  Future<void> deleteOrderItem(OrderItem item) async {
-    await api.deleteOrder(item.id!);
+  Future<void> deleteOrderItem(int orderId, int id) async {
+    final res = await api.deleteItem(orderId, id);
+    if (!res.isOk) {
+      throw Exception('Failed to delete order item (${res.statusCode})');
+    }
   }
 
   Future<void> completeOrder(String orderId) async {

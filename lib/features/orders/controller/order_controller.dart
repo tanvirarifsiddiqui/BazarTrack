@@ -42,9 +42,9 @@ class OrderController extends GetxController {
     isLoadingItems = false;
     update();  // refresh list
   }
-  // lib/features/orders/controller/order_controller.dart
 
-  /// Update an existing item, log before/after, then refresh list
+
+  // Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item) async {
     // 1) take a snapshot of "before"
     final beforeList = await orderService.getItemsOfOrder(item.orderId.toString());
@@ -88,6 +88,11 @@ class OrderController extends GetxController {
       ),
     );
     update();
+  }
+
+  Future<void> deleteOrderItem(OrderItem item) async {
+    await orderService.deleteOrderItem(item);
+    loadItems(item.orderId.toString());
   }
 
   void onCreateOrderTapped() {
