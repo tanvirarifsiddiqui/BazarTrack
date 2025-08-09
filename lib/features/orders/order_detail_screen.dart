@@ -1,5 +1,6 @@
 // File: lib/features/orders/screens/order_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -24,8 +25,8 @@ class OrderDetailScreen extends StatelessWidget {
     final isAssistant = auth.currentUser?.role == UserRole.assistant;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Order #$orderId'),
+      appBar: CustomAppBar(
+        title: 'Order #$orderId',
         actions: [
           IconButton(
             icon: const Icon(Icons.history),

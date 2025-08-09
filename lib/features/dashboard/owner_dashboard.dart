@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/finance/advance_screen.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
@@ -32,9 +33,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_currentIndex].tr),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: _titles[_currentIndex].tr,
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(

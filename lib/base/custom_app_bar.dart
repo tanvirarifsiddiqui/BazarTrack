@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:flutter_boilerplate/util/styles.dart';
 import 'package:flutter/material.dart';
@@ -5,27 +6,28 @@ import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final bool isBackButtonExist;
-  final Function? onBackPressed;
-  final bool showCart;
-  const CustomAppBar({super.key, required this.title, this.isBackButtonExist = true, this.onBackPressed, this.showCart = false});
+  final List<Widget>? actions;
+  const CustomAppBar({super.key, required this.title, this.actions});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyMedium!.color)),
+      title: Text(
+        title,
+        style: robotoRegular.copyWith(
+          fontSize: Dimensions.fontSizeAppbar,
+          fontWeight: FontWeight.w400,
+          // color: Theme.of(context).textTheme.bodyMedium!.color,
+          color: Colors.white,
+        ),
+      ),
+      actions: actions,
       centerTitle: true,
-      leading: isBackButtonExist ? IconButton(
-        icon: Icon(Icons.arrow_back_ios),
-        color: Theme.of(context).textTheme.bodyMedium!.color,
-        onPressed: () => onBackPressed != null ? onBackPressed!() : Navigator.pop(context),
-      ) : SizedBox(),
-      backgroundColor: Theme.of(context).cardColor,
-      elevation: 0,
-      // actions: showCart ? [
-      //   IconButton(onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),
-      //     icon: CartWidget(color: Theme.of(context).textTheme.bodyText1.color, size: 25),
-      //   )] : null,
+      backgroundColor: AppColors.primary,
+      iconTheme: IconThemeData(
+        color: Colors.white
+      ),
+
     );
   }
 

@@ -1,6 +1,7 @@
 // lib/features/orders/screens/edit_order_item_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
@@ -116,8 +117,8 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isNew ? 'Add Item' : 'Edit Item'),
+      appBar: CustomAppBar(
+        title: _isNew ? 'Add Item' : 'Edit Item',
         actions: [
           IconButton(onPressed: (){
             _confirmAndDelete();
