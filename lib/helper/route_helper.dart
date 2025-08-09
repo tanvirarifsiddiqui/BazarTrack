@@ -32,8 +32,8 @@ class RouteHelper {
   static String getHistoryRoute(String type, String id) => '$history?type=$type&id=$id';
 
   static List<GetPage> routes = [
-    GetPage(name: initial, page: () => SplashScreen()),
-    GetPage(name: splash, page: () => SplashScreen()),
+    GetPage(name: initial, page: () => const SplashScreen()),
+    GetPage(name: splash, page: () => const SplashScreen()),
     GetPage(name: signUp, page: () => const SignUpScreen()),
     GetPage(name: ownerDashboard, page: () => const OwnerDashboard()),
     GetPage(name: assistantDashboard, page: () => const AssistantDashboard()),

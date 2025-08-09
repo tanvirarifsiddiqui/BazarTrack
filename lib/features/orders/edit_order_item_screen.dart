@@ -120,7 +120,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
       appBar: CustomAppBar(
         title: _isNew ? 'Add Item' : 'Edit Item',
         actions: [
-          IconButton(onPressed: (){
+          if(!_isNew)IconButton(onPressed: (){
             _confirmAndDelete();
           }, icon: Icon(Icons.delete, color: Colors.red,))
         ],

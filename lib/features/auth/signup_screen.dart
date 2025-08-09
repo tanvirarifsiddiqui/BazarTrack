@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/base/custom_text_field.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
@@ -28,7 +29,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
+      appBar: CustomAppBar(title: 'Sign Up'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
