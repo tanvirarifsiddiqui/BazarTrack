@@ -12,6 +12,9 @@
   "record_advance": "Record Advance",
   "orders": "Orders",
   "history": "History",
-  "view_history": "View History"
+  "view_history": "View History",
+  "view_orders": "View Orders",
+  "profile": "Profile",
+  "created_at": "@date"
 }
 

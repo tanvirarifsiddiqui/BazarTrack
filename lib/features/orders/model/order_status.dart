@@ -1,3 +1,5 @@
+// File: lib/features/orders/model/order_status.dart
+
 enum OrderStatus { pending, inProgress, completed }
 
 extension OrderStatusExtension on OrderStatus {
