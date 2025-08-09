@@ -93,6 +93,11 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isNew ? 'Add Item' : 'Edit Item'),
+        actions: [
+          IconButton(onPressed: (){
+            // Get.find<OrderController>().deleteOrderItem(widget.item);
+          }, icon: Icon(Icons.delete, color: Colors.red,))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

@@ -22,8 +22,24 @@ class OrderService extends GetxController implements GetxService {
     return await orderRepo.getItemsOfOrder(orderId);
   }
 
-  Future<void> updateOrderItem(OrderItem item) async {
-    await orderRepo.updateOrderItem(item);
+  Future<OrderItem> updateOrderItem(OrderItem item) async {
+    final updated = await orderRepo.updateOrderItem(item);
+
+    // record history
+    Get.find<HistoryService>().addLog(HistoryLog(
+      id:              DateTime.now().millisecondsSinceEpoch.toString(),
+      entityType:      'OrderItem',
+      entityId:        updated.id.toString(),
+      action:          'updated',
+      changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+      timestamp:       DateTime.now(),
+      dataSnapshot:    { 'after': updated.toJson() },
+    ));
+
+    return updated;
+  }
+  Future<void> deleteOrderItem(OrderItem item) async {
+    await orderRepo.deleteOrderItem(item);
   }
 
   Future<void> completeOrder(String orderId) async {

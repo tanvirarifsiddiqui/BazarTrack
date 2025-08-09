@@ -42,25 +42,35 @@ class OrderController extends GetxController {
     isLoadingItems = false;
     update();  // refresh list
   }
+  // lib/features/orders/controller/order_controller.dart
+
+  /// Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item) async {
-    final prev = getItemsOfOrder(item.orderId.toString());
-    await orderService.updateOrderItem(item);
-    Get.find<HistoryService>().addLog(
-      HistoryLog(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        entityType: 'OrderItem',
-        entityId: item.id.toString(),
-        action: 'updated',
-        changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
-        timestamp: DateTime.now(),
-        dataSnapshot: {
-          'before': prev,
-          'after': item.toJson(),
-        },
-      ),
-    );
-    update();
+    // 1) take a snapshot of "before"
+    final beforeList = await orderService.getItemsOfOrder(item.orderId.toString());
+
+    // 2) actually update and get the updated object
+    final updated = await orderService.updateOrderItem(item);
+
+    // 3) log both before & after
+    Get.find<HistoryService>().addLog(HistoryLog(
+      id:              DateTime.now().millisecondsSinceEpoch.toString(),
+      entityType:      'OrderItem',
+      entityId:        updated.id.toString(),
+      action:          'updated',
+      changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+      timestamp:       DateTime.now(),
+      dataSnapshot:    {
+        'before': beforeList.map((i) => i.toJson()).toList(),
+        'after':  updated.toJson(),
+      },
+    ));
+
+    // 4) reload your visible list
+    loadItems(item.orderId.toString());
   }
+
+
 
   Future<void> completeOrder(String orderId) async {
     await orderService.completeOrder(orderId);

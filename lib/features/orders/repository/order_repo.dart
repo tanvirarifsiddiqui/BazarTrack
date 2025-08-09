@@ -14,8 +14,29 @@ class OrderRepo {
   final List<OrderItem> _itemCache = [];
 
 
-  Future<void> updateOrderItem(OrderItem item) async {
-    await api.updateItem(item.orderId, item.id!, item.toJson());
+  Future<OrderItem> updateOrderItem(OrderItem item) async {
+    final res = await api.updateItem(
+      item.orderId,
+      item.id!,
+      item.toJson(),
+    );
+
+    if (!res.isOk || res.body is! Map<String, dynamic>) {
+      throw Exception('Failed to update order item (${res.statusCode})');
+    }
+
+    final body = Map<String, dynamic>.from(res.body as Map);
+    // Some APIs return order_id:null on update—fix it here
+    body['order_id'] ??= item.orderId;
+
+    final updated = OrderItem.fromJson(body);
+
+    // update your local cache if you have one
+    return updated;
+  }
+
+  Future<void> deleteOrderItem(OrderItem item) async {
+    await api.deleteOrder(item.id!);
   }
 
   Future<void> completeOrder(String orderId) async {
@@ -46,8 +67,8 @@ class OrderRepo {
     return createdOrder;
   }
 
-  /// POST /api/order_items
-  /// Now returns the server’s created OrderItem instead of void.
+  // POST /api/order_items
+  // Now returns the server’s created OrderItem instead of void.
   Future<OrderItem> createOrderItem(OrderItem item) async {
     // 1) send JSON for creation (omit id/order_id)
     final res = await api.createItem(item.toJsonForCreate());
