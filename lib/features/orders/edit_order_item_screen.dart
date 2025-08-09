@@ -2,42 +2,45 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
+import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
 class EditOrderItemScreen extends StatefulWidget {
+  /// Pass in a “blank” item (with id == null) to add,
+  /// or an existing item (id != null) to edit.
   final String orderId;
   final OrderItem item;
 
   const EditOrderItemScreen({
-    super.key,
+    Key? key,
     required this.orderId,
     required this.item,
-  });
+  }) : super(key: key);
 
   @override
-  State<EditOrderItemScreen> createState() => _EditOrderItemScreenState();
+  _EditOrderItemScreenState createState() => _EditOrderItemScreenState();
 }
 
 class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
-  late TextEditingController _productCtrl;
-  late TextEditingController _quantityCtrl;
-  late TextEditingController _unitCtrl;
-  late TextEditingController _estCostCtrl;
-  OrderItemStatus _status = OrderItemStatus.pending;
+  late final TextEditingController _productCtrl;
+  late final TextEditingController _quantityCtrl;
+  late final TextEditingController _unitCtrl;
+  late final TextEditingController _estCostCtrl;
+  late OrderItemStatus _status;
   bool _saving = false;
+
+  bool get _isNew => widget.item.id == null;
 
   @override
   void initState() {
     super.initState();
     final i = widget.item;
-    _productCtrl = TextEditingController(text: i.productName);
-    _quantityCtrl = TextEditingController(text: i.quantity.toString());
-    _unitCtrl = TextEditingController(text: i.unit);
-    _estCostCtrl = TextEditingController(
-      text: i.estimatedCost?.toString() ?? '',
-    );
-    _status = i.status;
+    _productCtrl   = TextEditingController(text: i.productName);
+    _quantityCtrl  = TextEditingController(text: i.quantity.toString());
+    _unitCtrl      = TextEditingController(text: i.unit);
+    _estCostCtrl   =
+        TextEditingController(text: i.estimatedCost?.toString() ?? '');
+    _status        = i.status;
   }
 
   @override
@@ -51,21 +54,35 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
 
   Future<void> _save() async {
     setState(() => _saving = true);
-    final qty = int.tryParse(_quantityCtrl.text.trim()) ?? 1;
+
+    final qty = int.tryParse(_quantityCtrl.text.trim()) ?? widget.item.quantity;
     final est = double.tryParse(_estCostCtrl.text.trim());
+
+    // Build a copy with new values
     final updated = widget.item.copyWith(
-      productName: _productCtrl.text.trim(),
-      quantity: qty,
-      unit: _unitCtrl.text.trim(),
+      orderId: _isNew ? int.parse(widget.orderId) : widget.item.orderId,
+      productName:   _productCtrl.text.trim(),
+      quantity:      qty,
+      unit:          _unitCtrl.text.trim(),
       estimatedCost: est,
-      status: _status,
+      status:        _status,
+      // For new items, assign the correct orderId
+      // orderId:       _isNew ? int.parse(widget.orderId) : widget.item.orderId,
     );
 
     try {
-      await Get.find<OrderController>().updateOrderItem(updated);
-      Get.back(result: updated);
+      if (_isNew) {
+        // CREATE
+        final created =
+        await Get.find<OrderController>().createOrderItem(updated);
+        Get.back(result: created);
+      } else {
+        // UPDATE
+        await Get.find<OrderController>().updateOrderItem(updated);
+        Get.back(result: updated);
+      }
     } catch (e) {
-      Get.snackbar('Error', 'Could not update item: $e');
+      Get.snackbar('Error', 'Could not save item: $e');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -75,7 +92,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Item'),
+        title: Text(_isNew ? 'Add Item' : 'Edit Item'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -107,10 +124,8 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _estCostCtrl,
-              decoration:
-              const InputDecoration(labelText: 'Estimated Cost'),
-              keyboardType:
-              TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Estimated Cost'),
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<OrderItemStatus>(
@@ -135,7 +150,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
                   : const Icon(Icons.save),
-              label: const Text('Save Item'),
+              label: Text(_isNew ? 'Add Item' : 'Save Item'),
               onPressed: _saving ? null : _save,
             ),
           ],

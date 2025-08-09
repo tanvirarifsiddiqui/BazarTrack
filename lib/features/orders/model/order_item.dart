@@ -53,11 +53,16 @@ class OrderItem {
   }
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
+    int? parseInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      return int.tryParse(v.toString());
+    }
     return OrderItem(
-      id: json['id'] as int?,
-      orderId: json['order_id'] as int,
-      productName: json['product_name'] as String? ?? '',
-      quantity: json['quantity'] as int? ?? 0,
+      id: parseInt(json['id']),
+      orderId: parseInt(json['order_id'])!,
+      productName: json['product_name']?.toString() ?? '',
+      quantity: parseInt(json['quantity']) ?? 0,
       unit: json['unit'] as String? ?? '',
       estimatedCost: json['estimated_cost'] != null
           ? double.tryParse(json['estimated_cost'].toString())
@@ -87,9 +92,12 @@ class OrderItem {
 
   Map<String, dynamic> toJsonForCreate() {
     final data = <String, dynamic>{
+      if (id != null) 'id': id,
+      'order_id': orderId,
       'product_name': productName,
       'quantity': quantity,
       'unit': unit,
+      if (estimatedCost != null) 'estimated_cost': estimatedCost,
       'status': status.toApi(),
     };
     if (estimatedCost != null) data['estimated_cost'] = estimatedCost;

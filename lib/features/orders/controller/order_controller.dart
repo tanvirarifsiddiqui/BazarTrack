@@ -91,6 +91,10 @@ class OrderController extends GetxController {
     update();
   }
 
+  Future<OrderItem> createOrderItem(OrderItem item) {
+    return orderService.createOrderItem(item);
+  }
+
   void removeItem(int index) {
     newItems.removeAt(index);
     update();

@@ -46,12 +46,23 @@ class OrderRepo {
     return createdOrder;
   }
 
-  Future<void> createOrderItem(OrderItem item) async {
-    final res = await api.createItem(item.toJson());
-    if (!res.isOk) {
-      throw Exception('Failed to create order item: ${res.statusCode}');
+  /// POST /api/order_items
+  /// Now returns the server’s created OrderItem instead of void.
+  Future<OrderItem> createOrderItem(OrderItem item) async {
+    // 1) send JSON for creation (omit id/order_id)
+    final res = await api.createItem(item.toJsonForCreate());
+    print(item.toJsonForCreate());
+    if (!res.isOk || res.body is! Map<String, dynamic>) {
+      throw Exception('Failed to create order item (${res.statusCode})');
     }
-    _itemCache.add(item);
+
+    // 2) parse the newly‐created item from the response JSON
+    final Map<String, dynamic> body = res.body as Map<String, dynamic>;
+    final created = OrderItem.fromJson(body);
+
+    // 3) cache & return it
+    _itemCache.add(created);
+    return created;
   }
 
   Future<List<OrderItem>> getItemsOfOrder(String orderId) async {
