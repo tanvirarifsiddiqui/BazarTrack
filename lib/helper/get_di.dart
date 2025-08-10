@@ -11,10 +11,13 @@ import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
+import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 
 import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/controller/advance_controller.dart';
+import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/service/advance_service.dart';
+import 'package:flutter_boilerplate/features/finance/service/finance_service.dart';
 
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
@@ -40,11 +43,10 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find(), apiClient: Get.find()));
   Get.lazyPut(() => LanguageRepo());
   Get.lazyPut(() => AuthRepo(api: Get.find(), sharedPreferences: Get.find()));
-
   Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find()));
-
   Get.lazyPut(() => OrderRepo(api: Get.find()));
   Get.lazyPut(() => HistoryRepo(sharedPreferences: Get.find()));
+  Get.lazyPut(() => FinanceRepo(api: Get.find()));
 
 
   // Services
@@ -52,6 +54,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(AdvanceService(advanceRepo: Get.find()), permanent: true);
   Get.put(OrderService(orderRepo: Get.find()), permanent: true);
   Get.put(HistoryService(historyRepo: Get.find()), permanent: true);
+  Get.put(FinanceService(repo: Get.find()));
 
   // Controllers
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
@@ -62,6 +65,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AdvanceController(advanceService: Get.find()), fenix: true);
   Get.lazyPut(() => OrderController(orderService: Get.find()), fenix: true);
   Get.lazyPut(() => HistoryController(historyService: Get.find()), fenix: true);
+  Get.lazyPut(() => FinanceController(service: Get.find()), fenix: true);
 
 
   // Retrieving localized data

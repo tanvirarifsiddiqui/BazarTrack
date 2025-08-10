@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
-
 import '../../util/colors.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -58,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
                     user.role.name.capitalizeFirst ?? '',
                     style: const TextStyle(color: Colors.white),
                   ),
-                  backgroundColor: AppColors.primary.withOpacity(0.8),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.8),
                 ),
 
                 const SizedBox(height: 20),
