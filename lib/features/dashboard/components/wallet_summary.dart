@@ -13,8 +13,10 @@ class Assistant {
   final String name;
   final double balance; // e.g. paid out or total collected
 
-  Assistant({required this.name, required this.balance,});
-
+  Assistant({
+    required this.name,
+    required this.balance,
+  });
 }
 
 final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
@@ -153,23 +155,20 @@ class _AssistantRow extends StatelessWidget {
 
         const SizedBox(width: 12),
 
-        // Name + spent/total + progress
+        // Name column now centered vertically so it lines up with the avatar
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // name
+              // name (now visually centered relative to avatar)
               Text(
                 assistant.name,
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
-
-
-              const SizedBox(height: 8),
-
 
             ],
           ),
@@ -189,7 +188,6 @@ class _AssistantRow extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
           ],
         ),
       ],

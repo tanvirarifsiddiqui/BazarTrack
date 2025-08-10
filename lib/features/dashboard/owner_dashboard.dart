@@ -18,51 +18,132 @@ class OwnerDashboard extends StatefulWidget {
 class _OwnerDashboardState extends State<OwnerDashboard> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens =  [
-    OwnerDashboardDetails(),
-    OrderListScreen(), // Already implemented
-    AdvanceScreen(), // You need to implement this screen
-    ProfileScreen()
-  ];
+  // Keep screens in state to avoid recreating them on each build
+  late final List<Widget> _screens;
 
+  // Titles for AppBar (use .tr for translations if desired)
   final List<String> _titles = [
     'owners_dashboard',
     'view_orders',
-    'assign_order',
-    'profile',
+    'finance',
+    'history',
   ];
+
+  // preserve scroll / widget state between tabs
+  final PageStorageBucket _bucket = PageStorageBucket();
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const OwnerDashboardDetails(),
+      OrderListScreen(),
+      AdvanceScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
+  void _onTabSelected(int index) => setState(() => _currentIndex = index);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
+      // use your custom app bar but make it a little more functional
       appBar: CustomAppBar(
         title: _titles[_currentIndex].tr,
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.space_dashboard_rounded),
-            label: 'Dashboard',
+        // optional actions: search / notifications
+        actions: [
+
+          IconButton(
+            tooltip: 'profile'.tr,
+            icon: const Icon(CupertinoIcons.profile_circled),
+            onPressed: () {
+              Get.to(
+                () => ProfileScreen(),
+                transition: Transition.cupertino, // or try others like fadeIn, zoom, rightToLeft
+                duration: const Duration(milliseconds: 400),
+              );
+            },
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Advance',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.profile_circled),
-            label: 'Profile',
-          ),
+
         ],
       ),
+
+      // keep children alive and preserve scroll positions
+      body: SafeArea(
+        child: PageStorage(
+          bucket: _bucket,
+          child: IndexedStack(
+            index: _currentIndex,
+            children: _screens
+                .asMap()
+                .map((i, w) => MapEntry(i, KeyedSubtree(key: PageStorageKey('tab_$i'), child: w)))
+                .values
+                .toList(),
+          ),
+        ),
+      ),
+
+      // Elevated container for the BottomNavigationBar (rounded + shadow)
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabSelected,
+            type: BottomNavigationBarType.fixed, // ensures labels always visible
+            backgroundColor: colorScheme.surface,
+            selectedItemColor: theme.primaryColor,
+            unselectedItemColor: Colors.grey[600],
+            showUnselectedLabels: true,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 11),
+            elevation: 6,
+
+            // slightly larger icon for better tap target
+            selectedIconTheme: IconThemeData(size: 26, color: theme.primaryColor),
+            unselectedIconTheme: IconThemeData(size: 22, color: Colors.grey[600]),
+
+            items: [
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.space_dashboard_rounded),
+                label: 'Dashboard'.tr,
+                tooltip: 'dashboard'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.list_alt_rounded),
+                label: 'Orders'.tr,
+                tooltip: 'orders'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.attach_money),
+                label: 'finance'.tr,
+                tooltip: 'finance'.tr,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.history),
+                label: 'history'.tr,
+                tooltip: 'history'.tr,
+              ),
+            ],
+          ),
+        ),
+      ),
+
     );
   }
 }

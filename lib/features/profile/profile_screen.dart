@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +13,7 @@ class ProfileScreen extends StatelessWidget {
     final authCtrl = Get.find<AuthController>();
 
     return Scaffold(
+      appBar: CustomAppBar(title: "Profile"),
       body: GetBuilder<AuthController>(
         builder: (_) {
           final user = authCtrl.currentUser;
