@@ -11,6 +11,7 @@ import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
 
+import '../../util/dimensions.dart';
 import 'edit_order_item_screen.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -157,10 +158,12 @@ class OrderDetailScreen extends StatelessWidget {
                           trailing:
                               item.estimatedCost != null
                                   ? Text(
-                                    NumberFormat.simpleCurrency().format(
-                                      item.estimatedCost,
-                                    ),
-                                    style: const TextStyle(
+                                    NumberFormat.currency(
+                                      // locale: 'bn_BD', // Bangla Bangladesh locale
+                                      symbol: '৳', // Taka symbol
+                                    ).format(item.estimatedCost),
+                                    style: TextStyle(
+                                      fontSize: Dimensions.fontSizeLarge,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -267,7 +270,7 @@ class OrderDetailScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ],
+                  ],
                 ),
               ],
             ),
