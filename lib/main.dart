@@ -1,12 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/controller/localization_controller.dart';
 import 'package:flutter_boilerplate/controller/theme_controller.dart';
-import 'package:flutter_boilerplate/firebase_options.dart';
-import 'package:flutter_boilerplate/theme/dark_theme.dart';
-import 'package:flutter_boilerplate/theme/light_theme.dart';
 import 'package:flutter_boilerplate/util/app_constants.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/messages.dart';

@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 class OrderActivityTimeline extends StatelessWidget {
   final ThemeData theme;
-  const OrderActivityTimeline(this.theme);
+  const OrderActivityTimeline(this.theme, {super.key});
 
   @override
   Widget build(BuildContext context) {

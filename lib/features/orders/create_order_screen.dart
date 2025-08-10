@@ -6,6 +6,8 @@ import 'package:flutter_boilerplate/features/orders/controller/order_controller.
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
 class CreateOrderScreen extends StatelessWidget {
+  const CreateOrderScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<OrderController>();

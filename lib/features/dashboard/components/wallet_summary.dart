@@ -1,73 +1,197 @@
 /*
-// Title: Assistant Wallet Summary
-// Description: Wallet Summary For paid out, pending, refunds
+// Title: Assistant Wallet — Single Card List View
+// Description: Show list of assistants and balances inside one full-width card
 // Author: Md. Tanvir Arif Siddiqui
 // Date: August 10, 2025
 // Time: 10:22 AM
 */
-import 'package:flutter/material.dart';
 
-/// 2. Assistant Wallet Summary
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class Assistant {
+  final String name;
+  final double balance; // e.g. paid out or total collected
+
+  Assistant({required this.name, required this.balance,});
+
+}
+
+final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
+
+// WalletSummary showing ALL assistants inside a single full-width card.
 class WalletSummary extends StatelessWidget {
   final ThemeData theme;
-  const WalletSummary(this.theme);
+  final List<Assistant> assistants;
+  final EdgeInsetsGeometry padding;
+
+  const WalletSummary({
+    required this.theme,
+    required this.assistants,
+    this.padding = const EdgeInsets.all(16),
+    Key? key,
+  }) : super(key: key);
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty) return '';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = theme.textTheme;
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Assistant Wallet', style: textTheme.titleLarge),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Text('Balance:', style: textTheme.titleMedium),
-                const SizedBox(width: 8),
-                Text(
-                  '\$1,245.00',
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: theme.primaryColor,
+
+    if (assistants.isEmpty) {
+      return SizedBox(
+        width: double.infinity,
+        child: Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: padding,
+            child: Text('No assistants found', style: textTheme.bodyMedium),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: double.infinity, // ensures the card takes maximum available width
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: padding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // header
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Assistant Wallets',
+                      style: textTheme.titleLarge,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _WalletStat('Paid Out', '৳ 3,200', Icons.attach_money),
-                _WalletStat('Pending', '৳ 560', Icons.hourglass_empty),
-                _WalletStat('Refunds', '৳ 120', Icons.refresh),
-              ],
-            ),
-          ],
+                  Text(
+                    '${assistants.length} assistants',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // list of assistants (in same card)
+              Column(
+                children: List.generate(assistants.length, (i) {
+                  final a = assistants[i];
+                  return Column(
+                    children: [
+                      _AssistantRow(
+                        assistant: a,
+                        theme: theme,
+                        initials: _initials(a.name),
+                      ),
+                      if (i < assistants.length - 1)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 12),
+                          child: Divider(height: 1, color: Colors.grey[300]),
+                        ),
+                    ],
+                  );
+                }),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _WalletStat extends StatelessWidget {
-  final String label;
-  final String amount;
-  final IconData icon;
-  const _WalletStat(this.label, this.amount, this.icon);
+class _AssistantRow extends StatelessWidget {
+  final Assistant assistant;
+  final ThemeData theme;
+  final String initials;
+
+  const _AssistantRow({
+    required this.assistant,
+    required this.theme,
+    required this.initials,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Column(
+    final textTheme = theme.textTheme;
+    final avatarColor = theme.primaryColor;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 24, color: Colors.grey[700]),
-        const SizedBox(height: 4),
-        Text(amount, style: textTheme.titleMedium),
-        const SizedBox(height: 2),
-        Text(label, style: textTheme.bodySmall),
+        // Avatar
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: avatarColor.withValues(alpha: 0.12),
+          child: Text(
+            initials,
+            style: textTheme.titleMedium?.copyWith(
+              color: avatarColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // Name + spent/total + progress
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // name
+              Text(
+                assistant.name,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+
+
+              const SizedBox(height: 8),
+
+
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // Balance (prominent)
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _takaFormat.format(assistant.balance),
+              style: textTheme.titleLarge?.copyWith(
+                color: theme.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+          ],
+        ),
       ],
     );
   }

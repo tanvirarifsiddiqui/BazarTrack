@@ -12,10 +12,10 @@ class EditOrderItemScreen extends StatefulWidget {
   final OrderItem item;
 
   const EditOrderItemScreen({
-    Key? key,
+    super.key,
     required this.orderId,
     required this.item,
-  }) : super(key: key);
+  });
 
   @override
   _EditOrderItemScreenState createState() => _EditOrderItemScreenState();

@@ -1,6 +1,5 @@
 import 'package:flutter_boilerplate/features/auth/model/user.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
-import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {

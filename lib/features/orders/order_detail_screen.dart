@@ -16,7 +16,7 @@ import 'edit_order_item_screen.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final String orderId;
-  const OrderDetailScreen({Key? key, required this.orderId}) : super(key: key);
+  const OrderDetailScreen({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {

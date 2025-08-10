@@ -15,7 +15,7 @@ import 'components/stats_summary.dart';
 import 'components/wallet_summary.dart';
 
 class OwnerDashboardDetails extends StatelessWidget {
-  const OwnerDashboardDetails({Key? key}) : super(key: key);
+  const OwnerDashboardDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,14 @@ class OwnerDashboardDetails extends StatelessWidget {
           children: [
             StatsSummary(theme),
             spacing,
-            WalletSummary(theme),
+            WalletSummary(
+              theme: theme,
+              assistants: [
+                Assistant(name: 'Zaid Hasan', balance: 1600.0),
+                Assistant(name: 'Aisha', balance: 1450.0),
+                Assistant(name: 'Omar Faruk',  balance: 2100.0),
+              ],
+            ),
             spacing,
             AdvanceHistory(theme),
             spacing,

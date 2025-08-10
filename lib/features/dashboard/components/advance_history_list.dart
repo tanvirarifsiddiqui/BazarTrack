@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// 3. Advance History List
 class AdvanceHistory extends StatelessWidget {
   final ThemeData theme;
-  const AdvanceHistory(this.theme);
+  const AdvanceHistory(this.theme, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +30,11 @@ class AdvanceHistory extends StatelessWidget {
           children: [
             Text('Advance History', style: theme.textTheme.titleLarge),
             const SizedBox(height: 12),
-            ListView.separated(
+            ListView.builder(
               itemCount: advances.length,
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              separatorBuilder: (_, __) => const Divider(),
+              // separatorBuilder: (_, __) => const Divider(),
               itemBuilder: (ctx, idx) {
                 final adv = advances[idx];
                 return ListTile(

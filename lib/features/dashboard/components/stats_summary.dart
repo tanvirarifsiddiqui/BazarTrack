@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 /// 1. Stats Summary: Total, Assigned, In Progress, Completed
 class StatsSummary extends StatelessWidget {
   final ThemeData theme;
-  const StatsSummary(this.theme);
+  const StatsSummary(this.theme, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class _StatTile extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: textTheme.titleLarge,
+                    style: textTheme.titleMedium,
                     overflow: TextOverflow.ellipsis, // Prevents overflow
                   ),
                   const SizedBox(height: 4),
