@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
+import 'package:flutter_boilerplate/features/dashboard/owner_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/advance_screen.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
-import 'package:flutter_boilerplate/helper/route_helper.dart';
 import 'package:get/get.dart';
 
 import '../orders/order_list_screen.dart';
@@ -19,12 +19,14 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
   int _currentIndex = 0;
 
   final List<Widget> _screens =  [
+    OwnerDashboardDetails(),
     OrderListScreen(), // Already implemented
     AdvanceScreen(), // You need to implement this screen
     ProfileScreen()
   ];
 
   final List<String> _titles = [
+    'owners_dashboard',
     'view_orders',
     'assign_order',
     'profile',
@@ -43,6 +45,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.space_dashboard_rounded),
+            label: 'Dashboard',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list_alt),
             label: 'Orders',
