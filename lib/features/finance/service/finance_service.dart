@@ -22,7 +22,5 @@ class FinanceService extends GetxService {
   Future<Finance>       recordPayment(Finance f) => repo.createPayment(f);
 
   Future<double>        fetchBalance(int uid)   => repo.getWalletBalance(uid);
-  Future<List<Finance>> fetchTransactions(int uid) =>
-      repo.getWalletTransactions(uid);
 
 }

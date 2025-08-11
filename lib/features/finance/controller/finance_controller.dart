@@ -7,6 +7,7 @@
 */
 
 import 'package:get/get.dart';
+import '../../auth/service/auth_service.dart';
 import '../model/finance.dart';
 import '../model/assistant.dart';
 import '../service/finance_service.dart';
@@ -21,19 +22,21 @@ class FinanceController extends GetxController {
   var isLoadingAssistants = false.obs;
 
   // Assistant wallet flows
-  var balance            = 0.0.obs;
   var transactions       = <Finance>[].obs;
   var isLoadingWallet    = false.obs;
-
+  final AuthService    auth = Get.find();
   @override
   void onInit() {
     super.onInit();
-    _loadAssistants();
+    loadAssistantsAndTransactions();
   }
 
-  Future<void> _loadAssistants() async {
+
+
+  Future<void> loadAssistantsAndTransactions() async {
     isLoadingAssistants.value = true;
     assistants.value = await service.fetchAssistants(withBalance: true);
+    loadAllTransactions();
     isLoadingAssistants.value = false;
   }
 
@@ -46,13 +49,12 @@ class FinanceController extends GetxController {
     );
     final created = await service.recordPayment(f);
     // optionally refresh balance & list
-    _loadAssistants();
+    loadAssistantsAndTransactions();
   }
 
-  Future<void> loadWalletForAssistant(int assistantId) async {
+  Future<void> loadAllTransactions() async {
     isLoadingWallet.value = true;
-    balance.value      = await service.fetchBalance(assistantId);
-    transactions.value = await service.fetchTransactions(assistantId);
+    transactions.value = await service.fetchPayments();
     isLoadingWallet.value = false;
   }
 
@@ -64,6 +66,6 @@ class FinanceController extends GetxController {
       createdAt: DateTime.now(),
     );
     await service.recordPayment(f);
-    await loadWalletForAssistant(assistantId);
+    await loadAssistantsAndTransactions();
   }
 }

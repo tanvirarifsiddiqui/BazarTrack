@@ -40,8 +40,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     _screens = [
       const OwnerDashboardDetails(),
       const OrderListScreen(),
-      // const OwnerFinancePage(),
-      const AssistantFinancePage(),
+      const OwnerFinancePage(),
+      // const AssistantFinancePage(),
       const AdvanceScreen(),
     ];
   }
