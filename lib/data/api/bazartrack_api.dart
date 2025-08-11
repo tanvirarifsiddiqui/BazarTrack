@@ -46,6 +46,13 @@ class BazarTrackApi {
   Future<Response> wallet(int userId) => client.getData(Endpoints.wallet(userId));
   Future<Response> walletTransactions(int userId) => client.getData(Endpoints.walletTransactions(userId));
 
+  // Assistants
+  Future<Response> assistants({bool withBalance = false}) {
+    final uri = Endpoints.assistants + (withBalance ? '/?with_balance=true' : '');
+    return client.getData(uri);
+  }
+
+
   // History
   Future<Response> history() => client.getData(Endpoints.history);
   Future<Response> historyByEntity(String entity, int id) => client.getData(Endpoints.historyByEntity(entity, id));

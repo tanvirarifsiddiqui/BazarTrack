@@ -19,6 +19,8 @@ class Endpoints {
   static String wallet(int userId) => '${AppConstants.baseUrl}/api/wallet/$userId';
   static String walletTransactions(int userId) => '${AppConstants.baseUrl}/api/wallet/$userId/transactions';
 
+  static const assistants = '${AppConstants.baseUrl}/api/assistants';
+
   static const history = '${AppConstants.baseUrl}/api/history';
   static String historyByEntity(String entity, int id) => '${AppConstants.baseUrl}/api/history/$entity/$id';
 

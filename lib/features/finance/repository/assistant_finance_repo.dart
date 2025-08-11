@@ -1,18 +1,9 @@
-/*
-// Title: Finance Repository
-// Description: This is the Finance Repository for getting finance related data.
-// Author: Md. Tanvir Arif Siddiqui
-// Date: August 10, 2025
-// Time: 04:24 PM
-*/
-
 import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
-import '../model/assistant.dart';
 import '../model/finance.dart';
 
-class FinanceRepo {
+class AssistantFinanceRepo {
   final BazarTrackApi api;
-  FinanceRepo({ required this.api });
+  AssistantFinanceRepo({ required this.api });
 
   Future<List<Finance>> getPayments() async {
     final res = await api.payments();
@@ -53,15 +44,4 @@ class FinanceRepo {
     return [];
   }
 
-  Future<List<Assistant>> getAssistants({bool withBalance = false}) async {
-    final res = await api.assistants(withBalance: withBalance);
-    if (res.isOk && res.body is List) {
-      return (res.body as List)
-          .map((e) => Assistant.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    return [];
-  }
 }
-
-

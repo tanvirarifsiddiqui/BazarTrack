@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/advance_screen.dart';
-import 'package:flutter_boilerplate/features/finance/finance_screen.dart';
+import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
 
+import '../finance/owner_finance_screen.dart';
 import '../orders/order_list_screen.dart';
 
 class OwnerDashboard extends StatefulWidget {
@@ -39,7 +40,8 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     _screens = [
       const OwnerDashboardDetails(),
       const OrderListScreen(),
-      const FinanceScreen(),
+      // const OwnerFinancePage(),
+      const AssistantFinancePage(),
       const AdvanceScreen(),
     ];
   }

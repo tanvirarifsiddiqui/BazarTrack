@@ -1,20 +1,14 @@
-/*
-// Title: Finance Controller
-// Description: Business Logic for Finance Feature
-// Author: Md. Tanvir Arif Siddiqui
-// Date: August 10, 2025
-// Time: 05:17 PM
-*/
-
 import 'package:get/get.dart';
 import '../model/finance.dart';
 import '../model/assistant.dart';
 import '../service/finance_service.dart';
+import '../../auth/service/auth_service.dart';
 
-class FinanceController extends GetxController {
+class AssistantFinanceController extends GetxController {
   final FinanceService service;
+  final AuthService    auth;
 
-  FinanceController({ required this.service, });
+  AssistantFinanceController({ required this.service, required this.auth });
 
   // Owner flows
   var assistants          = <Assistant>[].obs;
@@ -25,11 +19,12 @@ class FinanceController extends GetxController {
   var transactions       = <Finance>[].obs;
   var isLoadingWallet    = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    _loadAssistants();
-  }
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   if (isAssistant)
+  //     _loadWalletForCurrentUser();
+  // }
 
   Future<void> _loadAssistants() async {
     isLoadingAssistants.value = true;
@@ -60,7 +55,7 @@ class FinanceController extends GetxController {
     final f = Finance(
       userId:    assistantId,
       amount:    amount,
-      type:      'credit',
+      type:      'debit',
       createdAt: DateTime.now(),
     );
     await service.recordPayment(f);

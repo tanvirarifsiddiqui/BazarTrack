@@ -2,7 +2,7 @@ class Finance {
   int?      id;
   int       userId;
   double    amount;
-  String    type;      // credit | debit | wallet
+  String    type;       // “credit” or “debit”
   DateTime  createdAt;
 
   Finance({
@@ -14,24 +14,24 @@ class Finance {
   });
 
   factory Finance.fromJson(Map<String, dynamic> json) {
-    int? parseInt(dynamic v) {
-      if (v == null) return null;
-      if (v is int) return v;
-      if (v is String) return int.tryParse(v);
+    // parse ints or strings
+    int parseInt(dynamic v) {
+      if (v is int)    return v;
+      if (v is String) return int.tryParse(v) ?? 0;
       if (v is double) return v.toInt();
-      return null;
+      return 0;
+    }
+    // parse amount (num or String)
+    double parseAmt(dynamic v) {
+      if (v is num)    return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
     }
 
-    // parse amount whether num or String
-    dynamic rawAmt = json['amount'];
-    final amt = rawAmt is num
-        ? rawAmt.toDouble()
-        : double.tryParse(rawAmt.toString()) ?? 0.0;
-
     return Finance(
-      id:        parseInt(json['id']),
-      userId:    parseInt(json['user_id']) ?? 0,
-      amount:    amt,
+      id:        json['id'] != null  ? parseInt(json['id']) : null,
+      userId:    parseInt(json['user_id']),
+      amount:    parseAmt(json['amount']),
       type:      json['type'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
