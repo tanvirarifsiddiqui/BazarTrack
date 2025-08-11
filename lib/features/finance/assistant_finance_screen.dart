@@ -31,36 +31,47 @@ class AssistantFinancePage extends StatelessWidget {
         }
         return RefreshIndicator(
           onRefresh: () => ctrl.loadWalletForAssistant(userId),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'Balance: ${fmt.format(ctrl.balance.value)}',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(color: Colors.blue),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Card(
+                      elevation: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Balance: ${fmt.format(ctrl.balance.value)}',
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(color: Colors.blue),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Transactions',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  'Transactions',
-                  style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Expanded(
+                child: ctrl.transactions.isEmpty
+                    ? const Center(child: Text('No transactions yet'))
+                    : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: ctrl.transactions.length,
+                  itemBuilder: (_, i) =>
+                      _buildTile(ctrl.transactions[i], fmt),
                 ),
-                const SizedBox(height: 12),
-                ...ctrl.transactions.map((t) => _buildTile(t, fmt)),
-                if (ctrl.transactions.isEmpty)
-                  const Center(child: Text('No transactions yet')),
-              ],
-            ),
+              ),
+            ],
           ),
+
         );
       }),
       floatingActionButton:ctrl.isOwner?FloatingActionButton(

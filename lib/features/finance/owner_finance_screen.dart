@@ -23,7 +23,7 @@ class OwnerFinancePage extends StatelessWidget {
     final fmt = NumberFormat.currency(symbol: '৳');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Assistants Wallets')),
+      appBar: AppBar(title: const Text('Assistants Wallets'),centerTitle: true,),
       body: Obx(() {
         if (ctrl.isLoadingAssistants.value) {
           return const Center(child: CircularProgressIndicator());
@@ -31,37 +31,49 @@ class OwnerFinancePage extends StatelessWidget {
 
         return RefreshIndicator(
           onRefresh: () => ctrl.loadAssistantsAndTransactions(),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Assistants List
-              ...ctrl.assistants.map((a) => Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: CircleAvatar(child: Text(a.name[0])),
-                  title: Text(a.name),
-                  subtitle: a.balance != null
-                      ? Text('Balance: ${fmt.format(a.balance)}')
-                      : null,
-                  onTap: () => Get.to(
-                          () => AssistantFinancePage(assistant: a)),
+              // Assistants List (Static)
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                child: Column(
+                  children: [
+                    ...ctrl.assistants.map((a) => Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: CircleAvatar(child: Text(a.name[0])),
+                        title: Text(a.name),
+                        subtitle: a.balance != null
+                            ? Text('Balance: ${fmt.format(a.balance)}')
+                            : null,
+                        onTap: () => Get.to(
+                                () => AssistantFinancePage(assistant: a)),
+                      ),
+                    )),
+                    const SizedBox(height: 12),
+                    // Transactions Title
+                    Text(
+                      'All Transactions:',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Divider()
+                  ],
                 ),
-              )),
-
-              const SizedBox(height: 24),
-
-              // Transactions Title
-              Text(
-                'All Transactions',
-                style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 12),
 
-              // Transactions List
-              if (ctrl.transactions.isEmpty)
-                const Center(child: Text('No transactions yet'))
-              else
-                ...ctrl.transactions.map((t) => _buildTile(t, fmt)),
+              // Transactions List (Scrollable)
+              Expanded(
+                child: ctrl.transactions.isEmpty
+                    ? const Center(child: Text('No transactions yet'))
+                    : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: ctrl.transactions.length,
+                  itemBuilder: (_, i) =>
+                      _buildTile(ctrl.transactions[i], fmt),
+                ),
+              ),
             ],
           ),
         );
