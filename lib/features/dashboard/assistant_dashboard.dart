@@ -18,7 +18,7 @@ class AssistantDashboard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('wallet_balance'.tr + ': \$${balance.toStringAsFixed(2)}'),
+              Text('${'wallet_balance'.tr}: \$${balance.toStringAsFixed(2)}'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => Get.toNamed(RouteHelper.getOrdersRoute()),

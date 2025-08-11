@@ -1,10 +1,8 @@
-// lib/features/finance/model/finance.dart
-
 class Finance {
   int?      id;
   int       userId;
   double    amount;
-  String    type;      // “credit” or “debit” or “wallet”
+  String    type;      // credit | debit | wallet
   DateTime  createdAt;
 
   Finance({
@@ -16,29 +14,27 @@ class Finance {
   });
 
   factory Finance.fromJson(Map<String, dynamic> json) {
-    // JSON might give 'amount' as num or String
-    final raw = json['amount'];
-    final double amt = (raw is num)
-        ? raw.toDouble()
-        : double.tryParse(raw.toString()) ?? 0.0;
+    int? parseInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      if (v is String) return int.tryParse(v);
+      if (v is double) return v.toInt();
+      return null;
+    }
+
+    // parse amount whether num or String
+    dynamic rawAmt = json['amount'];
+    final amt = rawAmt is num
+        ? rawAmt.toDouble()
+        : double.tryParse(rawAmt.toString()) ?? 0.0;
 
     return Finance(
-      id:        json['id'] as int?,
-      userId:    json['user_id'] as int,
+      id:        parseInt(json['id']),
+      userId:    parseInt(json['user_id']) ?? 0,
       amount:    amt,
       type:      json['type'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      if (id != null) 'id': id,
-      'user_id':       userId,
-      'amount':        amount,
-      'type':          type,
-      'created_at':    createdAt.toIso8601String(),
-    };
   }
 
   Map<String, dynamic> toJsonForCreate() {

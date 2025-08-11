@@ -5,7 +5,7 @@
 // Date: August 10, 2025
 // Time: 05:41 PM
 */
-// lib/features/finance/screens/finance_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -15,46 +15,54 @@ import 'controller/finance_controller.dart';
 import 'model/finance.dart';
 
 class FinanceScreen extends StatelessWidget {
-  const FinanceScreen({Key? key}) : super(key: key);
+  const FinanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = Get.put(FinanceController(service: Get.find()));
-    final numFormat = NumberFormat.currency(symbol: '\$');
+    final financeController = Get.put(FinanceController(service: Get.find()));
+    final numFormat = NumberFormat.currency(symbol: '৳');
     final auth = Get.find<AuthService>();
     final isOwner = auth.currentUser?.role == UserRole.owner;
     final isAssistant = auth.currentUser?.role == UserRole.assistant;
     return Scaffold(
       body: Obx(() {
-        if (ctrl.isLoading.value) {
+        if (financeController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
         return RefreshIndicator(
-          onRefresh: ctrl.loadPayments,
+          onRefresh: financeController.loadPayments,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              if(isAssistant)...[_buildSummary(context, ctrl, numFormat),
-              const SizedBox(height: 24),],
+              if (isAssistant) ...[
+                _buildSummary(context, financeController, numFormat),
+                const SizedBox(height: 24),
+              ],
               Text(
                 'Transactions',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 12),
-              ...ctrl.payments.map((p) => _buildTile(p, numFormat)),
-              if (ctrl.payments.isEmpty)
+              ...financeController.payments.map((p) => _buildTile(p, numFormat)),
+              if (financeController.payments.isEmpty)
                 const Center(child: Text('No transactions yet')),
             ],
           ),
         );
       }),
-
       floatingActionButton:
-          isAssistant
+          isOwner
               ? FloatingActionButton(
-                heroTag: 'balance_add_item',
+                heroTag: 'finance_add',
+                onPressed:
+                    () => _showAddDialog(
+                      context,
+                      financeController,
+                      numFormat,
+                      isOwner,
+                      isAssistant,
+                    ),
                 child: const Icon(Icons.add),
-                onPressed: () => _showAddDialog(context, ctrl, numFormat),
               )
               : null,
     );
@@ -140,60 +148,65 @@ class FinanceScreen extends StatelessWidget {
 
   Future<void> _showAddDialog(
     BuildContext c,
-    FinanceController ctrl,
-    NumberFormat fmt,
+    FinanceController financeController,
+    NumberFormat numberFormat,
+    bool isOwner,
+    bool isAssistant,
   ) {
-    final amtCtrl = TextEditingController();
-    var type = 'credit';
+    final amountController = TextEditingController();
+    String type = isOwner ? 'credit' : 'debit';
 
-    return showModalBottomSheet(
+    return showDialog<void>(
       context: c,
-      isScrollControlled: true,
-      builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(c).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Record Payment'),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Record Payment', style: Theme.of(c).textTheme.titleMedium),
-              const SizedBox(height: 12),
               TextField(
-                controller: amtCtrl,
+                controller: amountController,
                 decoration: const InputDecoration(labelText: 'Amount'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: type,
-                items:
-                    ['credit', 'debit']
-                        .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                        .toList(),
-                onChanged: (v) => type = v!,
-                decoration: const InputDecoration(labelText: 'Type'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                child: const Text('Save'),
-                onPressed: () {
-                  final amount = double.tryParse(amtCtrl.text.trim()) ?? 0;
-                  final finance = Finance(
-                    userId: int.parse(Get.find<AuthService>().currentUser!.id),
-                    amount: amount,
-                    type: type,
-                    createdAt: DateTime.now(),
-                  );
-                  ctrl.addPayment(finance).then((_) => Navigator.pop(c));
-                },
-              ),
-              const SizedBox(height: 16),
+              // Only allow “credit” for owners, “debit” for assistants
+              if (isOwner || isAssistant)
+                DropdownButtonFormField<String>(
+                  value: type,
+                  items:
+                      [if (isOwner) 'credit', if (isAssistant) 'debit']
+                          .map(
+                            (t) => DropdownMenuItem(value: t, child: Text(t)),
+                          )
+                          .toList(),
+                  onChanged: (v) => type = v ?? type,
+                  decoration: const InputDecoration(labelText: 'Type'),
+                ),
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
+                final userId = int.parse(
+                  Get.find<AuthService>().currentUser!.id,
+                );
+                final finance = Finance(
+                  userId: userId,
+                  amount: amount,
+                  type: type,
+                  createdAt: DateTime.now(),
+                );
+                financeController.addPayment(finance).then((_) => Navigator.pop(ctx));
+              },
+              child: const Text('Save'),
+            ),
+          ],
         );
       },
     );

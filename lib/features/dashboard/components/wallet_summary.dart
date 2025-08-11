@@ -31,8 +31,8 @@ class WalletSummary extends StatelessWidget {
     required this.theme,
     required this.assistants,
     this.padding = const EdgeInsets.all(16),
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   String _initials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -129,8 +129,8 @@ class _AssistantRow extends StatelessWidget {
     required this.assistant,
     required this.theme,
     required this.initials,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
