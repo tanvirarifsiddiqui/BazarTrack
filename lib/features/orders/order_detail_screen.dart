@@ -4,7 +4,6 @@ import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -93,7 +92,6 @@ class OrderDetailScreen extends StatelessWidget {
                           color: Theme.of(context).primaryColorDark,
                         ),
                       ),
-                      if (isOwner)
                         CustomButton(
                           icon: Icons.add,
                           height: 35,
