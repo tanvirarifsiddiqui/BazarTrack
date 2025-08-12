@@ -12,7 +12,7 @@ class AssistantFinanceController extends GetxController {
 
   // Owner flows
   var isLoadingAssistants = false.obs;
-  bool get isOwner     => auth.currentUser?.role == UserRole.owner.toApi();
+  bool get isOwner     => auth.currentUser?.role == UserRole.owner;
 
 
 

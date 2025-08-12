@@ -6,9 +6,10 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/finance_input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
+import '../../util/colors.dart';
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
 import 'model/finance.dart';
@@ -44,7 +45,8 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
     final parts = name.trim().split(RegExp(r'\s+'));
     if (parts.isEmpty) return '';
     if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0, 1) + parts.last.substring(0, 1)).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
   }
 
   @override
@@ -74,14 +76,18 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                      backgroundColor: theme.primaryColor.withValues(
+                        alpha: 0.12,
+                      ),
                       child: Text(
                         _initials(displayName),
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -101,12 +107,16 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                         children: [
                           Text(
                             displayName,
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             'Current balance',
-                            style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
@@ -122,7 +132,10 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                             child: SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: theme.primaryColor),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.primaryColor,
+                              ),
                             ),
                           ),
                         );
@@ -140,7 +153,12 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          Text('Available', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                          Text(
+                            'Available',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                          ),
                         ],
                       );
                     }),
@@ -155,7 +173,12 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: Row(
               children: [
-                Expanded(child: Text('Transactions', style: theme.textTheme.titleLarge)),
+                Expanded(
+                  child: Text(
+                    'Transactions',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                ),
                 IconButton(
                   tooltip: 'Filter',
                   icon: const Icon(Icons.filter_list_rounded),
@@ -174,7 +197,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
               child: Obx(() {
                 final List<Finance> tx = ctrl.transactions;
 
-                if (tx.isEmpty) {
+                if (tx.isEmpty && ctrl.isLoadingWallet.value == false) {
                   // keep a scrollable view so user can pull-to-refresh
                   return ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -184,73 +207,143 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                       Center(
                         child: Column(
                           children: [
-                            Icon(Icons.receipt_long, size: 56, color: Colors.grey[300]),
+                            Icon(
+                              Icons.receipt_long,
+                              size: 56,
+                              color: Colors.grey[300],
+                            ),
                             const SizedBox(height: 12),
-                            Text('No transactions yet', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
-                            const SizedBox(height: 200), // so pull-to-refresh is possible
+                            Text(
+                              'No transactions yet',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 200,
+                            ), // so pull-to-refresh is possible
                           ],
                         ),
                       ),
                     ],
                   );
                 }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: tx.length,
-                  itemBuilder: (_, i) => CustomFinanceTile(finance: tx[i], numFormat: numFormat),
-                );
+                return ctrl.isLoadingWallet.value
+                    ? Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: tx.length,
+                      itemBuilder:
+                          (_, i) => CustomFinanceTile(
+                            finance: tx[i],
+                            numFormat: numFormat,
+                          ),
+                    );
               }),
             ),
           ),
         ],
       ),
 
-      // FAB visible for owners only (isOwner is non-reactive getter)
-      floatingActionButton: ctrl.isOwner
-          ? FloatingActionButton.extended(
-        heroTag: 'assistant_add',
-        icon: const Icon(Icons.add),
-        label: const Text('Credit'),
-        onPressed: () => _showCreditDialog(context),
-      )
-          : null,
+      // FAB visible for Assistant only (isOwner is non-reactive getter)
+      floatingActionButton:
+          ctrl.isOwner
+              ? FloatingActionButton.extended(
+                heroTag: 'assistant_add',
+                icon: const Icon(Icons.add),
+                label: const Text('Debit'),
+                onPressed: () => _showCreditDialog(context),
+              )
+              : null,
     );
   }
 
   void _showCreditDialog(BuildContext context) {
     final amtCtrl = TextEditingController();
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
 
     showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Credit Assistant'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amtCtrl,
-              decoration: const InputDecoration(labelText: 'Amount'),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
-              if (amt > 0) {
-                final selectedId = widget.assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
-                ctrl.addCreditForAssistant(selectedId, amt).then((_) => Navigator.pop(context));
-              }
-            },
-            child: const Text('Save'),
+            titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            contentPadding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+
+            title: Row(
+              children: [
+                const Icon(
+                  Icons.account_balance_wallet_rounded,
+                  size: 28,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Debit Expense',
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: amtCtrl,
+                  decoration: AppInputDecorations.financeInputDecoration(
+                    label: "Amount",
+                    hint: 'Enter credit amount',
+                    prefixIcon: Icons.currency_exchange_rounded,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.textButtonTextColor,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
+                label: const Text('Save'),
+                onPressed: () {
+                  final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
+                  if (amt > 0) {
+                    final selectedId =
+                        widget.assistant?.id ??
+                        int.parse(ctrl.auth.currentUser!.id);
+                    ctrl
+                        .addCreditForAssistant(selectedId, amt)
+                        .then((_) => Navigator.pop(context));
+                  }
+                },
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
-
