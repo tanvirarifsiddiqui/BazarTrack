@@ -7,12 +7,11 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_finance_tile.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import 'assistant_finance_screen.dart';
 import 'controller/finance_controller.dart';
-import 'model/finance.dart';
 
 class OwnerFinancePage extends StatelessWidget {
   const OwnerFinancePage({Key? key}) : super(key: key);
@@ -71,7 +70,7 @@ class OwnerFinancePage extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: ctrl.transactions.length,
                   itemBuilder: (_, i) =>
-                      _buildTile(ctrl.transactions[i], fmt),
+                  CustomFinanceTile(finance: ctrl.transactions[i], numFormat: fmt)
                 ),
               ),
             ],
@@ -137,22 +136,5 @@ class OwnerFinancePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTile(Finance t, NumberFormat fmt) {
-    final credit = t.type == 'credit';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: credit ? Colors.green[50] : Colors.red[50],
-      child: ListTile(
-        leading: Icon(
-          credit ? Icons.arrow_upward : Icons.arrow_downward,
-          color: credit ? Colors.green : Colors.red,
-        ),
-        title: Text(
-          fmt.format(t.amount),
-          style: TextStyle(color: credit ? Colors.green : Colors.red),
-        ),
-        subtitle: Text(DateFormat('yyyy-MM-dd HH:mm').format(t.createdAt)),
-      ),
-    );
-  }
+
 }

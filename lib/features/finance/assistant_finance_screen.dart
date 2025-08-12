@@ -1,144 +1,256 @@
+/*
+// Title: Assistant Finance Page (polished)
+// Description: Assistant wallet + transactions (static header, scrollable transactions)
+// Author: Md. Tanvir Arif Siddiqui
+// Date: August 11, 2025
+*/
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:intl/intl.dart';
 
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
 import 'model/finance.dart';
+import 'package:flutter_boilerplate/base/custom_finance_tile.dart';
 
-class AssistantFinancePage extends StatelessWidget {
+class AssistantFinancePage extends StatefulWidget {
   final Assistant? assistant;
-  const AssistantFinancePage({Key? key, this.assistant}) : super(key: key);
+  const AssistantFinancePage({super.key, this.assistant});
+
+  @override
+  State<AssistantFinancePage> createState() => _AssistantFinancePageState();
+}
+
+class _AssistantFinancePageState extends State<AssistantFinancePage> {
+  late final AssistantFinanceController ctrl;
+  late final NumberFormat numFormat;
+  late final int userId;
+
+  @override
+  void initState() {
+    super.initState();
+    ctrl = Get.find<AssistantFinanceController>();
+    numFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
+    userId = widget.assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
+
+    // Load wallet once after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ctrl.loadWalletForAssistant(userId);
+    });
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty) return '';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1)).toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = Get.find<AssistantFinanceController>();
-    final fmt = NumberFormat.currency(symbol: '৳');
-    final userId = assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
-
-    // load that assistant’s wallet on enter
-    ctrl.loadWalletForAssistant(userId);
+    final theme = Theme.of(context);
+    final displayName = widget.assistant?.name ?? ctrl.auth.currentUser!.name;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${assistant?.name ?? ctrl.auth.currentUser!.name}\'s Wallet'),
+        title: Text("$displayName's Wallet"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh_rounded),
+            onPressed: () => ctrl.loadWalletForAssistant(userId),
+          ),
+        ],
       ),
-      body: Obx(() {
-        if (ctrl.isLoadingWallet.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return RefreshIndicator(
-          onRefresh: () => ctrl.loadWalletForAssistant(userId),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+
+      // body: static header + transactions list (scrollable)
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header card (balance area is reactive)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
                   children: [
-                    Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Balance: ${fmt.format(ctrl.balance.value)}',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleLarge?.copyWith(color: Colors.blue),
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                      child: Text(
+                        _initials(displayName),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Transactions',
-                      style: Theme.of(context).textTheme.titleLarge,
+
+                    const SizedBox(width: 14),
+
+                    // Name and label (static)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            displayName,
+                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Current balance',
+                            style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
                     ),
+
+                    // Balance (observed)
+                    Obx(() {
+                      if (ctrl.isLoadingWallet.value) {
+                        return SizedBox(
+                          width: 110,
+                          height: 36,
+                          child: Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: theme.primaryColor),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            numFormat.format(ctrl.balance.value),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('Available', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
-              Expanded(
-                child: ctrl.transactions.isEmpty
-                    ? const Center(child: Text('No transactions yet'))
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: ctrl.transactions.length,
-                  itemBuilder: (_, i) =>
-                      _buildTile(ctrl.transactions[i], fmt),
-                ),
-              ),
-            ],
+            ),
           ),
 
-        );
-      }),
-      floatingActionButton:ctrl.isOwner?FloatingActionButton(
-        heroTag: 'assistant_add',
-        // child: Text("৳",style: TextStyle(fontSize: 28),),
-        child: Icon(Icons.add),
-        onPressed: () {
-          _showCreditDialog(context, ctrl);
-        },
-      ):null,
-    );
-  }
-
-  void _showCreditDialog(BuildContext c, AssistantFinanceController ctrl) {
-    final amtCtrl = TextEditingController();
-    int selectedId = int.parse(ctrl.auth.currentUser!.id);
-
-    showDialog<void>(
-      context: c,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Debit Assistant'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+          // Transactions header (static)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: Row(
               children: [
-                TextField(
-                  controller: amtCtrl,
-                  decoration: const InputDecoration(labelText: 'Amount'),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                Expanded(child: Text('Transactions', style: theme.textTheme.titleLarge)),
+                IconButton(
+                  tooltip: 'Filter',
+                  icon: const Icon(Icons.filter_list_rounded),
+                  onPressed: () {
+                    // Add filters (All / Credit / Debit) can be applied
+                  },
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(c),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
-                  ctrl
-                      .addCreditForAssistant(selectedId, amt)
-                      .then((_) => Navigator.pop(c));
-                },
-                child: const Text('Save'),
-              ),
-            ],
           ),
+
+          // Transactions list (scrollable & reactive)
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => ctrl.loadWalletForAssistant(userId),
+              child: Obx(() {
+                final List<Finance> tx = ctrl.transactions;
+
+                if (tx.isEmpty) {
+                  // keep a scrollable view so user can pull-to-refresh
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      const SizedBox(height: 40),
+                      Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.receipt_long, size: 56, color: Colors.grey[300]),
+                            const SizedBox(height: 12),
+                            Text('No transactions yet', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+                            const SizedBox(height: 200), // so pull-to-refresh is possible
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: tx.length,
+                  itemBuilder: (_, i) => CustomFinanceTile(finance: tx[i], numFormat: numFormat),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+
+      // FAB visible for owners only (isOwner is non-reactive getter)
+      floatingActionButton: ctrl.isOwner
+          ? FloatingActionButton.extended(
+        heroTag: 'assistant_add',
+        icon: const Icon(Icons.add),
+        label: const Text('Credit'),
+        onPressed: () => _showCreditDialog(context),
+      )
+          : null,
     );
   }
 
-  Widget _buildTile(Finance t, NumberFormat fmt) {
-    final credit = t.type == 'credit';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      color: credit ? Colors.green[50] : Colors.red[50],
-      child: ListTile(
-        leading: Icon(
-          credit ? Icons.arrow_upward : Icons.arrow_downward,
-          color: credit ? Colors.green : Colors.red,
+  void _showCreditDialog(BuildContext context) {
+    final amtCtrl = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Credit Assistant'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amtCtrl,
+              decoration: const InputDecoration(labelText: 'Amount'),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            ),
+          ],
         ),
-        title: Text(
-          fmt.format(t.amount),
-          style: TextStyle(color: credit ? Colors.green : Colors.red),
-        ),
-        subtitle: Text(DateFormat('yyyy-MM-dd HH:mm').format(t.createdAt)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
+              if (amt > 0) {
+                final selectedId = widget.assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
+                ctrl.addCreditForAssistant(selectedId, amt).then((_) => Navigator.pop(context));
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }
 }
+

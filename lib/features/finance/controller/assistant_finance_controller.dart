@@ -28,11 +28,6 @@ class AssistantFinanceController extends GetxController {
   //     _loadWalletForCurrentUser();
   // }
 
-  Future<void> _loadAssistants() async {
-    isLoadingAssistants.value = true;
-    isLoadingAssistants.value = false;
-  }
-
   Future<void> loadWalletForAssistant(int assistantId) async {
     isLoadingWallet.value = true;
     balance.value      = await service.fetchBalance(assistantId);
