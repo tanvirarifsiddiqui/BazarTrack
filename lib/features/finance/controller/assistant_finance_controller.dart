@@ -35,7 +35,7 @@ class AssistantFinanceController extends GetxController {
     isLoadingWallet.value = false;
   }
 
-  Future<void> addCreditForAssistant(int assistantId, double amount) async {
+  Future<void> addDebitForAssistant(int assistantId, double amount) async {
     final f = Finance(
       userId:    assistantId,
       amount:    amount,

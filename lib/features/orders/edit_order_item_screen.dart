@@ -6,6 +6,9 @@ import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
+import '../auth/model/role.dart';
+import '../auth/service/auth_service.dart';
+
 class EditOrderItemScreen extends StatefulWidget {
 
   final String orderId;
@@ -26,23 +29,25 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
   late final TextEditingController _quantityCtrl;
   late final TextEditingController _unitCtrl;
   late final TextEditingController _estCostCtrl;
+  late final TextEditingController _actualCostCtrl;
   late OrderItemStatus _status;
 
   final OrderController _controller = Get.find<OrderController>();
   bool _saving = false;
-
+  bool _isPurchased = false;
   bool get _isNew => widget.item.id == null;
 
   @override
   void initState() {
     super.initState();
-    final i = widget.item;
-    _productCtrl   = TextEditingController(text: i.productName);
-    _quantityCtrl  = TextEditingController(text: i.quantity.toString());
-    _unitCtrl      = TextEditingController(text: i.unit);
-    _estCostCtrl   =
-        TextEditingController(text: i.estimatedCost?.toString() ?? '');
-    _status        = i.status;
+    final orderItem = widget.item;
+    _isPurchased = orderItem.status == OrderItemStatus.purchased;
+    _productCtrl   = TextEditingController(text: orderItem.productName);
+    _quantityCtrl  = TextEditingController(text: orderItem.quantity.toString());
+    _unitCtrl      = TextEditingController(text: orderItem.unit);
+    _estCostCtrl   = TextEditingController(text: orderItem.estimatedCost?.toString() ?? '');
+    _actualCostCtrl  = TextEditingController(text: orderItem.actualCost?.toString() ?? '');
+    _status        = orderItem.status;
   }
 
   @override
@@ -51,6 +56,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
     _quantityCtrl.dispose();
     _unitCtrl.dispose();
     _estCostCtrl.dispose();
+    _actualCostCtrl.dispose();
     super.dispose();
   }
 
@@ -59,6 +65,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
 
     final qty = int.tryParse(_quantityCtrl.text.trim()) ?? widget.item.quantity;
     final est = double.tryParse(_estCostCtrl.text.trim());
+    final actualCost = double.tryParse(_actualCostCtrl.text.trim());
 
     // Build a copy with new values
     final updated = widget.item.copyWith(
@@ -67,6 +74,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
       quantity:      qty,
       unit:          _unitCtrl.text.trim(),
       estimatedCost: est,
+      actualCost: actualCost,
       status:        _status,
       // For new items, assign the correct orderId
       // orderId:       _isNew ? int.parse(widget.orderId) : widget.item.orderId,
@@ -80,7 +88,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
         Get.back(result: created);
       } else {
         // UPDATE
-        await _controller.updateOrderItem(updated);
+        await _controller.updateOrderItem(updated, _isPurchased);
         Get.back(result: updated);
       }
     } catch (e) {
@@ -116,6 +124,9 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Get.find<AuthService>();
+    final isAssistant = auth.currentUser?.role == UserRole.assistant;
+
     return Scaffold(
       appBar: CustomAppBar(
         title: _isNew ? 'Add Item' : 'Edit Item',
@@ -159,13 +170,21 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
               keyboardType: TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
-            DropdownButtonFormField<OrderItemStatus>(
+            if(isAssistant && !_isPurchased)...[
+              TextFormField(
+                controller: _actualCostCtrl,
+                decoration: const InputDecoration(labelText: 'Actual Cost'),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if(!_isPurchased)DropdownButtonFormField<OrderItemStatus>(
               value: _status,
               decoration: const InputDecoration(labelText: 'Status'),
               items: OrderItemStatus.values
-                  .map((s) => DropdownMenuItem(
-                value: s,
-                child: Text(s.toApi()),
+                  .map((status) => DropdownMenuItem(
+                value: status,
+                child: Text(status.toApi()),
               ))
                   .toList(),
               onChanged: (v) {

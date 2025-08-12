@@ -251,7 +251,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
 
       // FAB visible for Assistant only (isOwner is non-reactive getter)
       floatingActionButton:
-          ctrl.isOwner
+          !ctrl.isOwner
               ? FloatingActionButton.extended(
                 heroTag: 'assistant_add',
                 icon: const Icon(Icons.add),
@@ -337,7 +337,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                         widget.assistant?.id ??
                         int.parse(ctrl.auth.currentUser!.id);
                     ctrl
-                        .addCreditForAssistant(selectedId, amt)
+                        .addDebitForAssistant(selectedId, amt)
                         .then((_) => Navigator.pop(context));
                   }
                 },

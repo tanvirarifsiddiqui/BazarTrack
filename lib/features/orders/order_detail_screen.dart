@@ -1,6 +1,7 @@
 // File: lib/features/orders/screens/order_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
+import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -10,8 +11,6 @@ import 'package:flutter_boilerplate/features/orders/controller/order_controller.
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
-
-import '../../util/dimensions.dart';
 import 'edit_order_item_screen.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -46,15 +45,15 @@ class OrderDetailScreen extends StatelessWidget {
           }
           final dateFmt = DateFormat('yyyy-MM-dd HH:mm');
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ORDER INFO CARD
                 Card(
                   elevation: 3,
-                  margin: const EdgeInsets.only(bottom: 24),
+                  margin: const EdgeInsets.only(bottom: 16),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -62,34 +61,18 @@ class OrderDetailScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Summary',
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 12),
-                        _buildInfoRow(
-                          'Created by',
-                          order.createdBy.toString(),
-                          Icons.person,
-                        ),
-                        _buildInfoRow(
-                          'Assigned to',
-                          order.assignedTo ?? 'Unassigned',
-                          Icons.group,
-                        ),
-                        _buildInfoRow(
-                          'Status',
-                          order.status.toApi(),
-                          Icons.flag,
-                        ),
-                        _buildInfoRow(
-                          'Created at',
-                          dateFmt.format(order.createdAt),
-                          Icons.schedule,
-                        ),
+                        _buildInfoRow('Created by', order.createdBy.toString(), Icons.person),
+                        _buildInfoRow('Assigned to', order.assignedTo ?? 'Unassigned', Icons.group),
+                        _buildInfoRow('Status', order.status.toApi(), Icons.flag),
+                        _buildInfoRow('Created at', dateFmt.format(order.createdAt), Icons.schedule),
                         _buildInfoRow(
                           'Completed at',
-                          order.completedAt != null
-                              ? dateFmt.format(order.completedAt!)
-                              : '-',
+                          order.completedAt != null ? dateFmt.format(order.completedAt!) : '-',
                           Icons.check_circle,
                         ),
                       ],
@@ -97,180 +80,178 @@ class OrderDetailScreen extends StatelessWidget {
                   ),
                 ),
 
-                // ITEMS LIST via FutureBuilder
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Items',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    if (isOwner)
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Item'),
-                        onPressed: () async {
-                          final newItem = OrderItem.empty(
-                            orderId: int.parse(orderId),
-                          );
-                          final created = await Get.to<OrderItem>(
-                            () => EditOrderItemScreen(
-                              orderId: orderId,
-                              item: newItem,
-                            ),
-                          );
-                          if (created != null) {
-                            orderCtrl.loadItems(orderId);
-                          }
-                        },
+                // ITEMS HEADER
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Order Items',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColorDark,
+                        ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                FutureBuilder<List<OrderItem>>(
-                  future: orderCtrl.getItemsOfOrder(orderId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error loading items: ${snapshot.error}'),
-                      );
-                    }
-                    final items = snapshot.data!;
-                    if (items.isEmpty) {
-                      return const Center(child: Text('No items added yet.'));
-                    }
-                    return ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (_, idx) {
-                        final item = items[idx];
-                        return ListTile(
-                          leading: const Icon(Icons.shopping_basket),
-                          title: Text(item.productName),
-                          subtitle: Text(
-                            '${item.quantity} ${item.unit} • ${item.status.toApi()}',
-                          ),
-                          trailing:
-                              item.estimatedCost != null
-                                  ? Text(
-                                    NumberFormat.currency(
-                                      // locale: 'bn_BD', // Bangla Bangladesh locale
-                                      symbol: '৳', // Taka symbol
-                                    ).format(item.estimatedCost),
-                                    style: TextStyle(
-                                      fontSize: Dimensions.fontSizeLarge,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                  : null,
-                          onTap: () async {
-                            final updated = await Get.to<OrderItem>(
-                              () => EditOrderItemScreen(
-                                orderId: orderId,
-                                item: item,
-                              ),
+                      if (isOwner)
+                        CustomButton(
+                          icon: Icons.add,
+                          height: 35,
+                          width: 100,
+                          buttonText: 'Add Item',
+                          onPressed: () async {
+                            final newItem = OrderItem.empty(orderId: int.parse(orderId));
+                            final created = await Get.to<OrderItem>(
+                                  () => EditOrderItemScreen(orderId: orderId, item: newItem),
                             );
-                            if (updated != null) {
-                              // trigger reload by rebuilding
-                              orderCtrl.update();
+                            if (created != null) {
+                              orderCtrl.loadItems(orderId);
                             }
                           },
-                        );
-                      },
-                    );
-                  },
+                        ),
+                    ],
+                  ),
                 ),
 
-                const SizedBox(height: 32),
+                // SCROLLABLE ITEMS LIST ONLY
+                Expanded(
+                  child: FutureBuilder<List<OrderItem>>(
+                    future: orderCtrl.getItemsOfOrder(orderId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error loading items: ${snapshot.error}'));
+                      }
+
+                      final items = snapshot.data ?? [];
+                      if (items.isEmpty) {
+                        return const Center(child: Text('No items added yet.'));
+                      }
+
+                      return ListView.separated(
+                        padding: const EdgeInsets.only(top: 4, bottom: 12),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (_, idx) {
+                          final item = items[idx];
+                          return ListTile(
+                            leading: const Icon(Icons.shopping_basket),
+                            title: Text(item.productName),
+                            subtitle: Text(
+                              '${item.quantity} ${item.unit} • ${item.status.toApi()}',
+                            ),
+                            trailing: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (item.estimatedCost != null)
+                                  Text(
+                                    'Est: ${NumberFormat.currency(symbol: '৳').format(item.estimatedCost)}',
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                if (item.actualCost != null)
+                                  Text(
+                                    'Act: ${NumberFormat.currency(symbol: '৳').format(item.actualCost)}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            onTap: () async {
+                              final updated = await Get.to<OrderItem>(
+                                    () => EditOrderItemScreen(orderId: orderId, item: item),
+                              );
+                              if (updated != null) {
+                                orderCtrl.update();
+                              }
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
 
                 // ACTION BUTTONS
-                Row(
-                  children: [
-                    if (!isOwner && order.assignedTo == null)
-                      if (isAssistant)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Row(
+                    children: [
+                      if (!isOwner && order.assignedTo == null && isAssistant)
                         Expanded(
                           child: ElevatedButton.icon(
                             icon: const Icon(Icons.person_add),
                             label: const Text('Assign to me'),
-                            onPressed: () {
-                              orderCtrl.selfAssign(orderId);
+                            onPressed: () => orderCtrl.selfAssign(orderId),
+                          ),
+                        ),
+
+                      if (isOwner) ...[
+                        Expanded(
+                          child: CustomButton(
+                            buttonText: 'Assign User',
+                            icon: Icons.person,
+                            onPressed: () async {
+                              final userId = await showDialog<String>(
+                                context: context,
+                                builder: (ctx) {
+                                  final sample = ['2', '3', '4'];
+                                  return SimpleDialog(
+                                    title: const Text('Select User'),
+                                    children: sample
+                                        .map((u) => SimpleDialogOption(
+                                      child: Text('User #$u'),
+                                      onPressed: () => Navigator.pop(ctx, u),
+                                    ))
+                                        .toList(),
+                                  );
+                                },
+                              );
+                              if (userId != null) {
+                                orderCtrl.assignOrder(orderId, userId);
+                              }
                             },
                           ),
                         ),
+                        const SizedBox(width: 12),
+                      ],
+                      if (isAssistant)
+                        Expanded(
+                          child: CustomButton(
+                            icon: Icons.done_all,
+                            buttonText:
+                              order.status == OrderStatus.completed
+                                  ? 'Completed'
+                                  : 'Mark Complete',
 
-                    if (isOwner) ...[
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.person),
-                          label: const Text('Assign User'),
-                          onPressed: () async {
-                            final userId = await showDialog<String>(
-                              context: context,
-                              builder: (ctx) {
-                                final sample = ['2', '3', '4'];
-                                return SimpleDialog(
-                                  title: const Text('Select User'),
-                                  children:
-                                      sample
-                                          .map(
-                                            (u) => SimpleDialogOption(
-                                              child: Text('User #$u'),
-                                              onPressed:
-                                                  () => Navigator.pop(ctx, u),
-                                            ),
-                                          )
-                                          .toList(),
-                                );
-                              },
-                            );
-                            if (userId != null) {
-                              orderCtrl.assignOrder(orderId, userId);
-                            }
-                          },
+                            onPressed: order.status == OrderStatus.completed
+                                ? null
+                                : () => orderCtrl.completeOrder(orderId),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
 
-                    if (isAssistant)
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.done_all),
-                          label: Text(
+                      if (isOwner)
+                        Expanded(
+                          child: Text(
                             order.status == OrderStatus.completed
                                 ? 'Completed'
-                                : 'Mark Complete',
-                          ),
-                          onPressed:
-                              order.status == OrderStatus.completed
-                                  ? null
-                                  : () {
-                                    orderCtrl.completeOrder(orderId);
-                                  },
-                        ),
-                      ),
-                    if (isOwner)
-                      Expanded(
-                        child: Text(
-                          order.status == OrderStatus.completed
-                              ? 'Completed'
-                              : 'In Progress', // or any status text you prefer
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                order.status == OrderStatus.completed
-                                    ? Colors.green
-                                    : Colors.orange,
+                                : 'In Progress',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: order.status == OrderStatus.completed
+                                  ? Colors.green
+                                  : Colors.orange,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
