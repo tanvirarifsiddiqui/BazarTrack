@@ -99,7 +99,7 @@ class OrderRepo {
   }
 
 
-  Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) async {
+  Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) async {
     final res = await api.orders();
     if (res.isOk && res.body is List) {
       _cache
@@ -122,17 +122,17 @@ class OrderRepo {
     if (idx != -1) _cache[idx] = order;
   }
 
-  Future<void> assignOrder(String orderId, String userId) async {
-    final res = await api.assignOrder(int.parse(orderId), {'user_id': int.parse(userId)});
+  Future<void> assignOrder(String orderId, int userId) async {
+    final res = await api.assignOrder(int.parse(orderId), {'user_id': userId});
     if (!res.isOk) throw Exception('Failed to assign order: ${res.statusCode}');
     final order = getById(orderId);
     if (order != null) {
-      order.assignedTo = userId;
+      order.assignedTo = userId.toString();
       order.status = OrderStatus.pending;
     }
   }
 
-  bool selfAssign(String orderId, String userId) {
+  bool selfAssign(String orderId, int userId) {
     assignOrder(orderId, userId);
     return true;
   }

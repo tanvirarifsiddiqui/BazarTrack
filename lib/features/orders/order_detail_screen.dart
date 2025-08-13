@@ -66,7 +66,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow('Created by', order.createdBy.toString(), Icons.person),
-                        _buildInfoRow('Assigned to', order.assignedTo ?? 'Unassigned', Icons.group),
+                        _buildInfoRow('Assigned to', order.assignedTo.toString(), Icons.group),
                         _buildInfoRow('Status', order.status.toApi(), Icons.flag),
                         _buildInfoRow('Created at', dateFmt.format(order.createdAt), Icons.schedule),
                         _buildInfoRow(
@@ -92,7 +92,7 @@ class OrderDetailScreen extends StatelessWidget {
                           color: Theme.of(context).primaryColorDark,
                         ),
                       ),
-                        CustomButton(
+                      if(isOwner)CustomButton(
                           icon: Icons.add,
                           height: 35,
                           width: 100,
@@ -181,10 +181,17 @@ class OrderDetailScreen extends StatelessWidget {
                     children: [
                       if (!isOwner && order.assignedTo == null && isAssistant)
                         Expanded(
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.person_add),
-                            label: const Text('Assign to me'),
-                            onPressed: () => orderCtrl.selfAssign(orderId),
+                          child: CustomButton(
+                            icon: Icons.person_add,
+                            width: MediaQuery.of(context).size.width * .45,
+                            buttonText: 'Assign to me',
+                            onPressed: () {
+                              try{
+                                orderCtrl.selfAssign(orderId);
+                              }catch(e){
+                                Get.snackbar('Error', 'Could not Self Assign: $e');
+                              }
+                            },
                           ),
                         ),
 

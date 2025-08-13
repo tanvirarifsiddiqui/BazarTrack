@@ -5,12 +5,15 @@ import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
+import '../../util/finance_input_decoration.dart';
+
 class CreateOrderScreen extends StatelessWidget {
   const CreateOrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<OrderController>();
+    int? selectedId;
 
     return Scaffold(
       appBar: AppBar(
@@ -22,10 +25,27 @@ class CreateOrderScreen extends StatelessWidget {
           child: Column(
             children: [
               // 1) Assigned To
-              TextFormField(
-                initialValue: ctrl.assignedToUserId,
-                decoration: InputDecoration(labelText: 'Assign To User ID'),
-                onChanged: (v) => ctrl.assignedToUserId = v,
+              DropdownButtonFormField<int>(
+                borderRadius: BorderRadius.circular(12),
+                value: selectedId,
+                items:
+                [DropdownMenuItem(
+                    value: null,
+                      child: Text("None")
+                  )
+                ,...ctrl.assistants
+                    .map(
+                      (a) => DropdownMenuItem(
+                    value: a.id,
+                    child: Text(a.name),
+                  ),
+                )
+                    .toList(),],
+                onChanged: (v) => ctrl.assignedToUserId = v ?? selectedId,
+                decoration: AppInputDecorations.financeInputDecoration(
+                  label: 'Select Assistant',
+                  prefixIcon: Icons.person_outline_rounded,
+                ),
               ),
 
               const SizedBox(height: 16),

@@ -14,7 +14,7 @@ class OrderService extends GetxController implements GetxService {
 
   OrderService({ required this.orderRepo });
 
-  Future<List<Order>> getOrders({ OrderStatus? status, String? assignedTo }) async {
+  Future<List<Order>> getOrders({ OrderStatus? status, int? assignedTo }) async {
     return await orderRepo.getOrders(status: status, assignedTo: assignedTo);
   }
 
@@ -135,7 +135,7 @@ class OrderService extends GetxController implements GetxService {
   }
 
   /// Assign an Order to a user + log
-  Future<void> assignOrder(String orderId, String userId) async {
+  Future<void> assignOrder(String orderId, int userId) async {
     final previous = orderRepo.getById(orderId);
     await orderRepo.assignOrder(orderId, userId);
     final updatedOrder = orderRepo.getById(orderId);
@@ -164,7 +164,7 @@ class OrderService extends GetxController implements GetxService {
     if (userId == null) return false;
 
     final previous = orderRepo.getById(orderId);
-    await orderRepo.assignOrder(orderId, userId);
+    await orderRepo.assignOrder(orderId, int.parse(userId));
     final updatedOrder = orderRepo.getById(orderId);
 
     Get.find<HistoryService>().addLog(
