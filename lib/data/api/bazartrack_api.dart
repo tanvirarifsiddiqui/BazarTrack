@@ -11,8 +11,8 @@ class BazarTrackApi {
       'email': email,
       'password': password,
     });
-    if (res.isOk && res.body is Map && res.body['data']['token'] != null) {
-      client.updateHeader(res.body['data']['token']);
+    if (res.isOk && res.body is Map && res.body['token'] != null) {
+      client.updateHeader(res.body['token']);
     }
     return res;
   }

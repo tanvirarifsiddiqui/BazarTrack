@@ -14,11 +14,11 @@ class AuthRepo {
   Future<Response> login(String email, String password) async {
     final response = await api.login(email, password);
     if (response.isOk && response.body is Map) {
-      final token = await response.body['data']['token'];
+      final token = response.body['token'];
       if (token != null) {
         await sharedPreferences.setString(AppConstants.token, token);
       }
-      await sharedPreferences.setString(AppConstants.userData, jsonEncode(response.body['data']['user']));
+      await sharedPreferences.setString(AppConstants.userData, jsonEncode(response.body['user']));
     }
     return response;
   }
