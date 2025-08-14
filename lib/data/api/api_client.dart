@@ -34,7 +34,9 @@ class ApiClient extends GetxService {
     return uri.startsWith('http') ? Uri.parse(uri) : Uri.parse(AppConstants.baseUrl + uri);
   }
 
-  void updateHeader(String token) {
+  /// update header and internal token
+  void updateHeader(String newToken) {
+    token = newToken;
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token'
@@ -77,21 +79,35 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
+
       http.MultipartRequest request = http.MultipartRequest('POST', _getUri(uri));
-      request.headers.addAll(headers ?? _mainHeaders);
-      for(MultipartBody multipart in multipartBody) {
-        if(multipart.file != null) {
-          if(foundation.kIsWeb) {
+
+      // For multipart, don't send Content-Type: application/json — let MultipartRequest set it.
+      final Map<String, String> multipartHeaders = headers != null
+          ? Map<String, String>.from(headers)
+          : Map<String, String>.from(_mainHeaders)..remove('Content-Type');
+
+      request.headers.addAll(multipartHeaders);
+
+      for (MultipartBody multipart in multipartBody) {
+        if (multipart.file != null) {
+          if (foundation.kIsWeb) {
             Uint8List list = await multipart.file!.readAsBytes();
             http.MultipartFile part = http.MultipartFile(
-              multipart.key, multipart.file!.readAsBytes().asStream(), list.length,
-              filename: basename(multipart.file!.path), contentType: MediaType('image', 'jpg'),
+              multipart.key,
+              multipart.file!.readAsBytes().asStream(),
+              list.length,
+              filename: basename(multipart.file!.path),
+              contentType: MediaType('image', 'jpg'),
             );
             request.files.add(part);
-          }else {
+          } else {
             File file = File(multipart.file!.path);
             request.files.add(http.MultipartFile(
-              multipart.key, file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last,
+              multipart.key,
+              file.readAsBytes().asStream(),
+              file.lengthSync(),
+              filename: file.path.split('/').last,
             ));
           }
         }
@@ -138,27 +154,77 @@ class ApiClient extends GetxService {
     }
   }
 
+
   Response handleResponse(http.Response response) {
-    dynamic body;
+    dynamic decoded;
     try {
-      body = jsonDecode(response.body);
-    }catch(e) {
-      debugPrint(e.toString());
+      decoded = jsonDecode(response.body);
+    } catch (e) {
+      debugPrint('JSON decode failed: $e');
+      decoded = null;
     }
+
+    // If API uses wrapper { error, msg, data: ... } prefer data as actual body
+    dynamic mainBody;
+    if (decoded is Map && decoded.containsKey('data')) {
+      mainBody = decoded['data'];
+    } else {
+      mainBody = decoded ?? response.body;
+    }
+
     Response response0 = Response(
-      body: body ?? response.body,
-      bodyString: response.body.toString(), headers: response.headers, statusCode: response.statusCode, statusText: response.reasonPhrase,
+      body: mainBody,
+      bodyString: response.body.toString(),
+      headers: response.headers,
+      statusCode: response.statusCode,
+      statusText: response.reasonPhrase,
     );
-    if(response0.statusCode != 200 && response0.body != null && response0.body is !String) {
-      if(response0.body.toString().startsWith('{errors: [{code:')) {
-        ErrorResponse errorResponse = ErrorResponse.fromJson(response0.body);
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: errorResponse.errors?[0].message);
-      }else if(response0.body.toString().startsWith('{message')) {
-        response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
+
+    if (response0.statusCode != 200) {
+      if (decoded is Map) {
+        // Prefer msg -> message -> error -> errors[0].message
+        final dynamic msg = decoded['msg'] ?? decoded['message'] ?? decoded['error'];
+        if (msg != null) {
+          response0 = Response(
+            statusCode: response0.statusCode,
+            body: response0.body,
+            bodyString: response0.bodyString,
+            headers: response0.headers,
+            statusText: msg.toString(),
+          );
+        } else if (decoded['errors'] != null) {
+          try {
+            final errors = decoded['errors'];
+            if (errors is List && errors.isNotEmpty) {
+              final first = errors[0];
+              final message = (first is Map && first.containsKey('message')) ? first['message'] : first.toString();
+              response0 = Response(
+                statusCode: response0.statusCode,
+                body: response0.body,
+                bodyString: response0.bodyString,
+                headers: response0.headers,
+                statusText: message.toString(),
+              );
+            }
+          } catch (_) {}
+        }
+      } else if (mainBody == null) {
+        // No body and non-200 => likely connectivity
+        response0 = Response(statusCode: 0, statusText: noInternetMessage);
       }
-    }else if(response0.statusCode != 200 && response0.body == null) {
-      response0 = Response(statusCode: 0, statusText: noInternetMessage);
+    } else {
+      // status == 200: set statusText to msg if present (useful for UX)
+      if (decoded is Map && decoded['msg'] != null) {
+        response0 = Response(
+          statusCode: response0.statusCode,
+          body: response0.body,
+          bodyString: response0.bodyString,
+          headers: response0.headers,
+          statusText: decoded['msg'].toString(),
+        );
+      }
     }
+
     return response0;
   }
 }
