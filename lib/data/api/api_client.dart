@@ -34,9 +34,7 @@ class ApiClient extends GetxService {
     return uri.startsWith('http') ? Uri.parse(uri) : Uri.parse(AppConstants.baseUrl + uri);
   }
 
-  /// update header and internal token
-  void updateHeader(String newToken) {
-    token = newToken;
+  void updateHeader(String token) {
     _mainHeaders = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token'
@@ -62,6 +60,7 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
+      debugPrint('====> API Json Body: ${jsonEncode(body)}');
       http.Response response0 = await http.post(
         _getUri(uri),
         body: jsonEncode(body),
@@ -79,35 +78,21 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
-
       http.MultipartRequest request = http.MultipartRequest('POST', _getUri(uri));
-
-      // For multipart, don't send Content-Type: application/json — let MultipartRequest set it.
-      final Map<String, String> multipartHeaders = headers != null
-          ? Map<String, String>.from(headers)
-          : Map<String, String>.from(_mainHeaders)..remove('Content-Type');
-
-      request.headers.addAll(multipartHeaders);
-
-      for (MultipartBody multipart in multipartBody) {
-        if (multipart.file != null) {
-          if (foundation.kIsWeb) {
+      request.headers.addAll(headers ?? _mainHeaders);
+      for(MultipartBody multipart in multipartBody) {
+        if(multipart.file != null) {
+          if(foundation.kIsWeb) {
             Uint8List list = await multipart.file!.readAsBytes();
             http.MultipartFile part = http.MultipartFile(
-              multipart.key,
-              multipart.file!.readAsBytes().asStream(),
-              list.length,
-              filename: basename(multipart.file!.path),
-              contentType: MediaType('image', 'jpg'),
+              multipart.key, multipart.file!.readAsBytes().asStream(), list.length,
+              filename: basename(multipart.file!.path), contentType: MediaType('image', 'jpg'),
             );
             request.files.add(part);
-          } else {
+          }else {
             File file = File(multipart.file!.path);
             request.files.add(http.MultipartFile(
-              multipart.key,
-              file.readAsBytes().asStream(),
-              file.lengthSync(),
-              filename: file.path.split('/').last,
+              multipart.key, file.readAsBytes().asStream(), file.lengthSync(), filename: file.path.split('/').last,
             ));
           }
         }

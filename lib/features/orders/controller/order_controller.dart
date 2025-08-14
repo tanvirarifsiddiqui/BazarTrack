@@ -156,12 +156,12 @@ class OrderController extends GetxController {
     }
 
     print('This is Assigned User Id: $assignedToUserId');
-    final order =Order.create(
-              createdBy: _auth.currentUser!.id.toString(),
-              assignedTo: assignedToUserId.toString(),
-              status: OrderStatus.pending,
-              createdAt: DateTime.now(),
-            );
+    final order = Order.create(
+      createdBy: _auth.currentUser!.id.toString(),
+      assignedTo: assignedToUserId?.toString(), // <-- null-safe for proper response
+      status: OrderStatus.pending,
+      createdAt: DateTime.now(),
+    );
 
     try {
       final created = await orderService.createOrderWithItems(order, newItems);
@@ -170,6 +170,7 @@ class OrderController extends GetxController {
       Get.snackbar('Error', 'Failed to save order: $e');
     }
   }
+
 
   Future<bool> selfAssign(String orderId) async {
     final res = await orderService.selfAssign(orderId);

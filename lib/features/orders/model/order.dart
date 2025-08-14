@@ -71,13 +71,25 @@ class Order {
   Map<String, dynamic> toJsonForCreate({
     required List<OrderItem> items,
   }) {
-    return {
+    final Map<String, dynamic> map = {
       'created_by': int.tryParse(createdBy) ?? createdBy,
-      'assigned_to': int.tryParse(assignedTo ?? createdBy) ?? (assignedTo ?? createdBy),
       'status': status.toApi(),
       'created_at': createdAt.toIso8601String(),
-      'completed_at': completedAt?.toIso8601String(),
       'items': items.map((i) => i.toJsonForCreate()).toList(),
     };
+
+    // only include assigned_to if it's provided (and convert to int if possible)
+    if (assignedTo != null && assignedTo!.isNotEmpty) {
+      final parsed = int.tryParse(assignedTo!);
+      map['assigned_to'] = parsed ?? assignedTo;
+    }
+
+    // include completed_at only if present (omit otherwise)
+    if (completedAt != null) {
+      map['completed_at'] = completedAt!.toIso8601String();
+    }
+
+    return map;
   }
+
 }
