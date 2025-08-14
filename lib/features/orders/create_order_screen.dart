@@ -20,6 +20,7 @@ class CreateOrderScreen extends StatelessWidget {
         title: Text('New Order'),
       ),
       body: GetBuilder<OrderController>(
+        id: 'newOrder',
         builder: (_) => Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -65,7 +66,7 @@ class CreateOrderScreen extends StatelessWidget {
                       onDelete: () => ctrl.removeItem(idx),
                       onChanged: (updated) {
                         ctrl.newItems[idx] = updated;
-                        ctrl.update();
+                        ctrl.update(['newOrder']);
                       },
                     );
                   },

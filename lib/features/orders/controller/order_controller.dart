@@ -141,12 +141,12 @@ class OrderController extends GetxController {
 
   void addItem() {
     newItems.add(OrderItem.empty(orderId: 0));
-    update();
+    update(['newOrder']);
   }
 
   void removeItem(int index) {
     newItems.removeAt(index);
-    update();
+    update(['newOrder']);
   }
 
   Future<void> saveNewOrder() async {
@@ -165,6 +165,7 @@ class OrderController extends GetxController {
 
     try {
       final created = await orderService.createOrderWithItems(order, newItems);
+      update();
       Get.back(result: created);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save order: $e');
