@@ -93,6 +93,9 @@ class HistoryViewPage extends StatelessWidget {
             // scrollDirection: Axis.horizontal,
             child: DataTable(
               dataRowHeight: 25,
+              headingRowHeight: 25,
+              horizontalMargin: 0,
+              columnSpacing: 10,
               columns: const [
                 DataColumn(
                   label: Align(
@@ -133,25 +136,35 @@ class HistoryViewPage extends StatelessWidget {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columns: const [
-          DataColumn(label: Text('Product')),
-          DataColumn(label: Text('Qty')),
-          DataColumn(label: Text('Unit')),
-          DataColumn(label: Text('Est. Cost')),
-          DataColumn(label: Text('Act. Cost')),
-          DataColumn(label: Text('Status')),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Items:", style: TextStyle(fontWeight: FontWeight.bold),),
+          DataTable(
+            dataRowHeight: 25,
+            headingRowHeight: 25,
+            horizontalMargin: 0,
+            columnSpacing: 10,
+            columns: const [
+              DataColumn(label: Text('Product')),
+              DataColumn(label: Text('Qty')),
+              DataColumn(label: Text('Unit')),
+              DataColumn(label: Text('Est. Cost')),
+              DataColumn(label: Text('Act. Cost')),
+              DataColumn(label: Text('Status')),
+            ],
+            rows: items.map((it) {
+              return DataRow(cells: [
+                DataCell(Text(it.productName)),
+                DataCell(Text(it.quantity.toString())),
+                DataCell(Text(it.unit)),
+                DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
+                DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
+                DataCell(Text(it.status)),
+              ]);
+            }).toList(),
+          ),
         ],
-        rows: items.map((it) {
-          return DataRow(cells: [
-            DataCell(Text(it.productName)),
-            DataCell(Text(it.quantity.toString())),
-            DataCell(Text(it.unit)),
-            DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
-            DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
-            DataCell(Text(it.status)),
-          ]);
-        }).toList(),
       ),
     );
   }

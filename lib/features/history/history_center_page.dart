@@ -133,11 +133,14 @@ class _HistoryList extends StatelessWidget {
           // scrollDirection: Axis.horizontal,
           child: DataTable(
             dataRowHeight: 25,
+            headingRowHeight: 25,
+            horizontalMargin: 0,
+            columnSpacing: 10,
             columns: const [
               DataColumn(
                 label: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Field'),
+                  child: Text('Name'),
                 ),
               ),
               DataColumn(
@@ -177,11 +180,12 @@ class _HistoryList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: Text("Items:", style: TextStyle(fontWeight: FontWeight.bold),),
-          ),
+          Text("Items:", style: TextStyle(fontWeight: FontWeight.bold),),
           DataTable(
+            dataRowHeight: 25,
+            headingRowHeight: 25,
+            horizontalMargin: 0,
+            columnSpacing: 10,
             columns: const [
               DataColumn(label: Text('Product')),
               DataColumn(label: Text('Qty')),
