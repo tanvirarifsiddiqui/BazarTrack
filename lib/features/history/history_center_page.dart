@@ -1,11 +1,9 @@
-// lib/features/history/screens/history_center_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import 'controller/history_controller.dart';
 import 'model/history_log.dart';
+import 'model/history_log_item.dart';
 
 class HistoryCenterPage extends StatelessWidget {
   const HistoryCenterPage({Key? key}) : super(key: key);
@@ -65,7 +63,7 @@ class _HistoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('dd MMM yyyy, hh:mm a');
+    final fmt = DateFormat('dd MMM yyyy, hh:mma');
 
     return Obx(() {
       if (loading.value) {
@@ -77,8 +75,8 @@ class _HistoryList extends StatelessWidget {
       return ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: logs.length,
-        itemBuilder: (ctx, i) {
-          final log = logs[i];
+        itemBuilder: (context, index) {
+          final log = logs[index];
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
             // 1) Unique key per tile
@@ -101,33 +99,73 @@ class _HistoryList extends StatelessWidget {
     });
   }
 
-  /// Renders the `dataSnapshot` map (handles nested lists)
+
   Widget _buildSnapshot(Map<String, dynamic> snapshot) {
-    if (snapshot.isEmpty) return const Text('No snapshot data.');
+    if (snapshot.isEmpty) return const Text('No snapshot data');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: snapshot.entries.map((e) {
         final key = e.key;
-        final val = e.value;
-        if (val is List) {
+        final value = e.value;
+
+        if (key == 'items' && value is List) {
+          final items = (value)
+              .whereType<Map<String, dynamic>>()
+              .map((m) => HistoryLogItem.fromJson(m))
+              .toList();
+          return _buildItemsTable(items);
+        }
+
+        // Non‐items entries render as before
+        if (value is List) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('$key:', style: const TextStyle(fontWeight: FontWeight.bold)),
-              ...val.map((item) => Padding(
-                padding: const EdgeInsets.only(left: 8, top: 4),
-                child: Text(item.toString()),
-              )),
-              const SizedBox(height: 8),
+              ...value.map((v) => Text(v.toString()))
             ],
           );
         }
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 6),
-          child: Text('$key: $val'),
-        );
+
+        return Text('$key: $value');
       }).toList(),
     );
   }
+
+  /// DataTable to show products with nullable costs
+  Widget _buildItemsTable(List<HistoryLogItem> items) {
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Text('No items'),
+      );
+    }
+
+    return SingleChildScrollView(
+      key: PageStorageKey('history_items_table_scroll_${items.length}'),
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('Product')),
+          DataColumn(label: Text('Qty')),
+          DataColumn(label: Text('Unit')),
+          DataColumn(label: Text('Est. Cost')),
+          DataColumn(label: Text('Act. Cost')),
+          DataColumn(label: Text('Status')),
+        ],
+        rows: items.map((it) {
+          return DataRow(cells: [
+            DataCell(Text(it.productName)),
+            DataCell(Text(it.quantity.toString())),
+            DataCell(Text(it.unit)),
+            DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
+            DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
+            DataCell(Text(it.status)),
+          ]);
+        }).toList(),
+      ),
+    );
+  }
+
 }

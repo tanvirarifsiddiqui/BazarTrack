@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import 'controller/history_controller.dart';
+import 'model/history_log_item.dart';
 
 class HistoryViewPage extends StatelessWidget {
   final String entity;
@@ -58,24 +59,35 @@ class HistoryViewPage extends StatelessWidget {
     );
   }
 
+  // Wherever you build the snapshot view, replace the items‐list case
+
   Widget _buildSnapshot(Map<String, dynamic> snapshot) {
     if (snapshot.isEmpty) return const Text('No snapshot data');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: snapshot.entries.map((entry) {
-        final key = entry.key;
-        final value = entry.value;
+      children: snapshot.entries.map((e) {
+        final key = e.key;
+        final value = e.value;
 
+        if (key == 'items' && value is List) {
+          // Use your typed items getter if you have the log instance:
+          // final items = log.items;
+          // Here, rebuild from raw value:
+          final items = (value)
+              .whereType<Map<String, dynamic>>()
+              .map((m) => HistoryLogItem.fromJson(m))
+              .toList();
+          return _buildItemsTable(items);
+        }
+
+        // Non‐items entries render as before
         if (value is List) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('$key:', style: const TextStyle(fontWeight: FontWeight.bold)),
-              ...value.map((item) => Padding(
-                padding: const EdgeInsets.only(left: 8, top: 4),
-                child: Text(item.toString()),
-              )),
+              ...value.map((v) => Text(v.toString()))
             ],
           );
         }
@@ -84,4 +96,39 @@ class HistoryViewPage extends StatelessWidget {
       }).toList(),
     );
   }
+
+  /// DataTable to show products with nullable costs
+  Widget _buildItemsTable(List<HistoryLogItem> items) {
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Text('No items'),
+      );
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('Product')),
+          DataColumn(label: Text('Qty')),
+          DataColumn(label: Text('Unit')),
+          DataColumn(label: Text('Est. Cost')),
+          DataColumn(label: Text('Act. Cost')),
+          DataColumn(label: Text('Status')),
+        ],
+        rows: items.map((it) {
+          return DataRow(cells: [
+            DataCell(Text(it.productName)),
+            DataCell(Text(it.quantity.toString())),
+            DataCell(Text(it.unit)),
+            DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
+            DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
+            DataCell(Text(it.status)),
+          ]);
+        }).toList(),
+      ),
+    );
+  }
+
 }

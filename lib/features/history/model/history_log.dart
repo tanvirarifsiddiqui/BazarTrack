@@ -1,4 +1,4 @@
-// lib/features/history/model/history_log.dart
+import 'history_log_item.dart';
 
 class HistoryLog {
   final int id;
@@ -19,8 +19,6 @@ class HistoryLog {
     required this.dataSnapshot,
   });
 
-// lib/features/history/model/history_log.dart
-
   factory HistoryLog.fromJson(Map<String, dynamic> json) {
     // data_snapshot can be a Map or an empty List
     final rawSnap = json['data_snapshot'];
@@ -39,6 +37,16 @@ class HistoryLog {
     );
   }
 
+  List<HistoryLogItem> get items {
+    final raw = dataSnapshot['items'];
+    if (raw is List) {
+      return raw
+          .whereType<Map<String, dynamic>>()
+          .map((m) => HistoryLogItem.fromJson(m))
+          .toList();
+    }
+    return [];
+  }
 
   Map<String, dynamic> toJson() => {
     'entity_type': entityType,
