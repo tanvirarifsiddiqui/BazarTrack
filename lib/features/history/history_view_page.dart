@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -28,34 +29,38 @@ class HistoryViewPage extends StatelessWidget {
     }
 // here i want to create a page specially for history. here I want to show 4 tabs for history (all, order, order_item, payment) basically [order, order_item, payment] these 3 type of entity. I want to show them individually. different Page and all tab i want to show all history)
     return Scaffold(
-      appBar: AppBar(title: Text('History: $entity')),
-      body: Obx(() {
-        if (ctrl.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (ctrl.logs.isEmpty) {
-          return const Center(child: Text('No history found.'));
-        }
-
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: ctrl.logs.length,
-          itemBuilder: (_, i) {
-            final log = ctrl.logs[i];
-            return ExpansionTile(
-              title: Text('${log.action} by User ${log.changedByUserId}'),
-              subtitle: Text(fmt.format(log.timestamp)),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: _buildSnapshot(log.dataSnapshot),
-                )
-              ],
-            );
-          },
-        );
-      }),
+      appBar: CustomAppBar(title: 'History: $entity'),
+      body: SafeArea(
+        child: Obx(() {
+          if (ctrl.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+        
+          if (ctrl.logs.isEmpty) {
+            return const Center(child: Text('No history found.'));
+          }
+        
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: ctrl.logs.length,
+            itemBuilder: (_, i) {
+              final log = ctrl.logs[i];
+              return ExpansionTile(
+                title: Text('${log.action} by User ${log.changedByUserId}'),
+                subtitle: Text(fmt.format(log.timestamp)),
+                childrenPadding: const EdgeInsets.symmetric(horizontal: 12),
+                expandedAlignment: Alignment.centerLeft,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: _buildSnapshot(log.dataSnapshot),
+                  )
+                ],
+              );
+            },
+          );
+        }),
+      ),
     );
   }
 

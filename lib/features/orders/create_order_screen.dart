@@ -1,5 +1,3 @@
-// lib/features/orders/presentation/create_order_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
@@ -20,83 +18,85 @@ class CreateOrderScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('New Order'),
       ),
-      body: GetBuilder<OrderController>(
-        id: 'newOrder',
-        builder: (_) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // 1) Assigned To
-              DropdownButtonFormField<int>(
-                borderRadius: BorderRadius.circular(12),
-                value: selectedId,
-                items:
-                [DropdownMenuItem(
-                    value: null,
-                      child: Text("None")
+      body: SafeArea(
+        child: GetBuilder<OrderController>(
+          id: 'newOrder',
+          builder: (_) => Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // 1) Assigned To
+                DropdownButtonFormField<int>(
+                  borderRadius: BorderRadius.circular(12),
+                  value: selectedId,
+                  items:
+                  [DropdownMenuItem(
+                      value: null,
+                        child: Text("None")
+                    )
+                  ,...ctrl.assistants
+                      .map(
+                        (a) => DropdownMenuItem(
+                      value: a.id,
+                      child: Text(a.name),
+                    ),
                   )
-                ,...ctrl.assistants
-                    .map(
-                      (a) => DropdownMenuItem(
-                    value: a.id,
-                    child: Text(a.name),
+                      .toList(),],
+                  onChanged: (v) => ctrl.assignedToUserId = v ?? selectedId,
+                  decoration: AppInputDecorations.financeInputDecoration(
+                    label: 'Select Assistant',
+                    prefixIcon: Icons.person_outline_rounded,
                   ),
-                )
-                    .toList(),],
-                onChanged: (v) => ctrl.assignedToUserId = v ?? selectedId,
-                decoration: AppInputDecorations.financeInputDecoration(
-                  label: 'Select Assistant',
-                  prefixIcon: Icons.person_outline_rounded,
                 ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // 2) Items list
-              Expanded(
-                child: ctrl.newItems.isEmpty
-                    ? Center(child: Text('No items yet'))
-                    : ListView.separated(
-                  itemCount: ctrl.newItems.length,
-                  separatorBuilder: (_, __) =>
-                      Divider(color: Colors.grey),
-                  itemBuilder: (_, idx) {
-                    final item = ctrl.newItems[idx];
-                    return _OrderItemTile(
-                      item: item,
-                      onDelete: () => ctrl.removeItem(idx),
-                      onChanged: (updated) {
-                        ctrl.newItems[idx] = updated;
-                        ctrl.update(['newOrder']);
-                      },
-                    );
-                  },
+        
+                const SizedBox(height: 16),
+        
+                // 2) Items list
+                Expanded(
+                  child: ctrl.newItems.isEmpty
+                      ? Center(child: Text('No items yet'))
+                      : ListView.separated(
+                    itemCount: ctrl.newItems.length,
+                    separatorBuilder: (_, __) =>
+                        Divider(color: Colors.grey),
+                    itemBuilder: (_, idx) {
+                      final item = ctrl.newItems[idx];
+                      return _OrderItemTile(
+                        item: item,
+                        onDelete: () => ctrl.removeItem(idx),
+                        onChanged: (updated) {
+                          ctrl.newItems[idx] = updated;
+                          ctrl.update(['newOrder']);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // 3) Add Item & Save buttons side by side
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      icon: Icons.add,
-                      buttonText: 'Add Item',
-                      onPressed: ctrl.addItem,
+        
+                const SizedBox(height: 16),
+        
+                // 3) Add Item & Save buttons side by side
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        icon: Icons.add,
+                        buttonText: 'Add Item',
+                        onPressed: ctrl.addItem,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomButton(
-                      icon: Icons.save,
-                      buttonText: 'Save Order',
-                      onPressed: ctrl.saveNewOrder,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: CustomButton(
+                        icon: Icons.save,
+                        buttonText: 'Save Order',
+                        onPressed: ctrl.saveNewOrder,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -85,10 +85,9 @@ class _HistoryList extends StatelessWidget {
               // 2) Force a bool, never reuse old state
               key: PageStorageKey('exp_${log.entityType}_${log.id}'),
               initiallyExpanded: false,
-
               title: Text('${log.entityType} · ${log.action}'),
               subtitle: Text(fmt.format(log.timestamp)),
-              childrenPadding: const EdgeInsets.all(12),
+              childrenPadding: const EdgeInsets.symmetric(horizontal: 12),
               expandedAlignment: Alignment.centerLeft,
               children: [
                 _buildSnapshot(log.dataSnapshot),

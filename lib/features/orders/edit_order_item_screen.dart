@@ -144,74 +144,76 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
           }, icon: Icon(Icons.delete, color: Colors.red,))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            TextFormField(
-              controller: _productCtrl,
-              decoration: const InputDecoration(labelText: 'Product Name'),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _quantityCtrl,
-                    decoration: const InputDecoration(labelText: 'Quantity'),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _unitCtrl,
-                    decoration: const InputDecoration(labelText: 'Unit'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _estCostCtrl,
-              decoration: const InputDecoration(labelText: 'Estimated Cost'),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            const SizedBox(height: 12),
-            if(isAssistant && !_isPurchased)...[
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ListView(
+            children: [
               TextFormField(
-                controller: _actualCostCtrl,
-                decoration: const InputDecoration(labelText: 'Actual Cost'),
+                controller: _productCtrl,
+                decoration: const InputDecoration(labelText: 'Product Name'),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _quantityCtrl,
+                      decoration: const InputDecoration(labelText: 'Quantity'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _unitCtrl,
+                      decoration: const InputDecoration(labelText: 'Unit'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _estCostCtrl,
+                decoration: const InputDecoration(labelText: 'Estimated Cost'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
               ),
               const SizedBox(height: 12),
+              if(isAssistant && !_isPurchased)...[
+                TextFormField(
+                  controller: _actualCostCtrl,
+                  decoration: const InputDecoration(labelText: 'Actual Cost'),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                ),
+                const SizedBox(height: 12),
+              ],
+              if(!_isPurchased)DropdownButtonFormField<OrderItemStatus>(
+                value: _status,
+                decoration: const InputDecoration(labelText: 'Status'),
+                items: OrderItemStatus.values
+                    .map((status) => DropdownMenuItem(
+                  value: status,
+                  child: Text(status.toApi()),
+                ))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setState(() => _status = v);
+                },
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                icon: _saving
+                    ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                    : const Icon(Icons.save),
+                label: Text(_isNew ? 'Add Item' : 'Save Item'),
+                onPressed: _saving ? null : _save,
+              ),
             ],
-            if(!_isPurchased)DropdownButtonFormField<OrderItemStatus>(
-              value: _status,
-              decoration: const InputDecoration(labelText: 'Status'),
-              items: OrderItemStatus.values
-                  .map((status) => DropdownMenuItem(
-                value: status,
-                child: Text(status.toApi()),
-              ))
-                  .toList(),
-              onChanged: (v) {
-                if (v != null) setState(() => _status = v);
-              },
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              icon: _saving
-                  ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-                  : const Icon(Icons.save),
-              label: Text(_isNew ? 'Add Item' : 'Save Item'),
-              onPressed: _saving ? null : _save,
-            ),
-          ],
+          ),
         ),
       ),
     );

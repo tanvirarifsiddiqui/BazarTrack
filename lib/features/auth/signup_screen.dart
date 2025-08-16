@@ -28,51 +28,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Sign Up'),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            CustomTextField(
-              controller: _nameController,
-              hintText: 'Name',
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Radio<UserRole>(
-                  value: UserRole.owner,
-                  groupValue: _role,
-                  onChanged: (val) => setState(() => _role = val!),
-                ),
-                const Text('Owner'),
-                Radio<UserRole>(
-                  value: UserRole.assistant,
-                  groupValue: _role,
-                  onChanged: (val) => setState(() => _role = val!),
-                ),
-                const Text('Assistant'),
-              ],
-            ),
-            const SizedBox(height: 16),
-            CustomButton(
-              buttonText: 'Create Account',
-              onPressed: () async {
-                final user = UserModel(
-                  id: DateTime.now().microsecondsSinceEpoch.toString(),
-                  name: _nameController.text,
-                  role: _role,
-                );
-                await Get.find<AuthController>().signUp(user);
-                if (_role == UserRole.owner) {
-                  Get.offAll(const OwnerDashboard());
-                } else {
-                  Get.offAll(const AssistantDashboard());
-                }
-              },
-            )
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppBar(title: 'Sign Up'),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              CustomTextField(
+                controller: _nameController,
+                hintText: 'Name',
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Radio<UserRole>(
+                    value: UserRole.owner,
+                    groupValue: _role,
+                    onChanged: (val) => setState(() => _role = val!),
+                  ),
+                  const Text('Owner'),
+                  Radio<UserRole>(
+                    value: UserRole.assistant,
+                    groupValue: _role,
+                    onChanged: (val) => setState(() => _role = val!),
+                  ),
+                  const Text('Assistant'),
+                ],
+              ),
+              const SizedBox(height: 16),
+              CustomButton(
+                buttonText: 'Create Account',
+                onPressed: () async {
+                  final user = UserModel(
+                    id: DateTime.now().microsecondsSinceEpoch.toString(),
+                    name: _nameController.text,
+                    role: _role,
+                  );
+                  await Get.find<AuthController>().signUp(user);
+                  if (_role == UserRole.owner) {
+                    Get.offAll(const OwnerDashboard());
+                  } else {
+                    Get.offAll(const AssistantDashboard());
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

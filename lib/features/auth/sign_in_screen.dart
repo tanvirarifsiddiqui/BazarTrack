@@ -33,62 +33,64 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Sign In'),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CustomTextField(
-                controller: _emailController,
-                hintText: 'Email',
-                focusNode: _emailFocus,
-                nextFocus: _passwordFocus,
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                controller: _passwordController,
-                hintText: 'Password',
-                focusNode: _passwordFocus,
-                isPassword: true,
-                inputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 16),
-              CustomButton(
-                buttonText: 'Login',
-                onPressed: () async {
-                  final auth = Get.find<AuthController>();
-                  final success = await auth.login(
-                    _emailController.text.trim(),
-                    _passwordController.text.trim(),
-                  );
-
-                  if (!success) {
-                    Get.snackbar(
-                      'Login Failed',
-                      'Invalid email or password. Please try again.',
-                      snackPosition: SnackPosition.BOTTOM,
+    return SafeArea(
+      child: Scaffold(
+        appBar: CustomAppBar(title: 'Sign In'),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomTextField(
+                  controller: _emailController,
+                  hintText: 'Email',
+                  focusNode: _emailFocus,
+                  nextFocus: _passwordFocus,
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  controller: _passwordController,
+                  hintText: 'Password',
+                  focusNode: _passwordFocus,
+                  isPassword: true,
+                  inputAction: TextInputAction.done,
+                ),
+                const SizedBox(height: 16),
+                CustomButton(
+                  buttonText: 'Login',
+                  onPressed: () async {
+                    final auth = Get.find<AuthController>();
+                    final success = await auth.login(
+                      _emailController.text.trim(),
+                      _passwordController.text.trim(),
                     );
-                    return;
-                  }
-
-                  final user = auth.currentUser!;
-                  if (user.role == UserRole.owner) {
-                    Get.offAll(const OwnerDashboard());
-                  } else {
-                    Get.offAll(const AssistantDashboard());
-                  }
-                },
-              ),
-              TextButton(
-                onPressed: () {
-                  Get.to(const SignUpScreen());
-                },
-                child: const Text('Sign Up'),
-              ),
-            ],
+      
+                    if (!success) {
+                      Get.snackbar(
+                        'Login Failed',
+                        'Invalid email or password. Please try again.',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+      
+                    final user = auth.currentUser!;
+                    if (user.role == UserRole.owner) {
+                      Get.offAll(const OwnerDashboard());
+                    } else {
+                      Get.offAll(const AssistantDashboard());
+                    }
+                  },
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.to(const SignUpScreen());
+                  },
+                  child: const Text('Sign Up'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
