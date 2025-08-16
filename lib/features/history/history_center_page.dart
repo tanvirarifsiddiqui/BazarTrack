@@ -89,6 +89,7 @@ class _HistoryList extends StatelessWidget {
               title: Text('${log.entityType} · ${log.action}'),
               subtitle: Text(fmt.format(log.timestamp)),
               childrenPadding: const EdgeInsets.all(12),
+              expandedAlignment: Alignment.centerLeft,
               children: [
                 _buildSnapshot(log.dataSnapshot),
               ],
@@ -103,33 +104,61 @@ class _HistoryList extends StatelessWidget {
   Widget _buildSnapshot(Map<String, dynamic> snapshot) {
     if (snapshot.isEmpty) return const Text('No snapshot data');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: snapshot.entries.map((e) {
-        final key = e.key;
-        final value = e.value;
+    final rows = <DataRow>[];
+    List<HistoryLogItem> items = [];
 
-        if (key == 'items' && value is List) {
-          final items = (value)
+    snapshot.forEach((key, value) {
+      if (key == 'items') {
+        if (value is List) {
+          items = value
               .whereType<Map<String, dynamic>>()
               .map((m) => HistoryLogItem.fromJson(m))
               .toList();
-          return _buildItemsTable(items);
         }
+      } else {
+        rows.add(
+          DataRow(cells: [
+            DataCell(Text(key, style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataCell(Text(': ${value ?? ''}')),
+          ]),
+        );
+      }
+    });
 
-        // Non‐items entries render as before
-        if (value is List) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('$key:', style: const TextStyle(fontWeight: FontWeight.bold)),
-              ...value.map((v) => Text(v.toString()))
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SingleChildScrollView(
+          key: PageStorageKey('history_items_table_scroll_${snapshot.length}'),
+          // scrollDirection: Axis.horizontal,
+          child: DataTable(
+            dataRowHeight: 25,
+            columns: const [
+              DataColumn(
+                label: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Field'),
+                ),
+              ),
+              DataColumn(
+                label: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Value'),
+                ),
+              ),
             ],
-          );
-        }
+            rows: rows,
+          )
+        ),
 
-        return Text('$key: $value');
-      }).toList(),
+        const SizedBox(height: 16),
+
+        // --- Items table (only if present) ---
+        if (items.isNotEmpty)
+          _buildItemsTable(items)
+        else
+          const Text(''),
+      ],
     );
   }
 
@@ -145,25 +174,34 @@ class _HistoryList extends StatelessWidget {
     return SingleChildScrollView(
       key: PageStorageKey('history_items_table_scroll_${items.length}'),
       scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columns: const [
-          DataColumn(label: Text('Product')),
-          DataColumn(label: Text('Qty')),
-          DataColumn(label: Text('Unit')),
-          DataColumn(label: Text('Est. Cost')),
-          DataColumn(label: Text('Act. Cost')),
-          DataColumn(label: Text('Status')),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: Text("Items:", style: TextStyle(fontWeight: FontWeight.bold),),
+          ),
+          DataTable(
+            columns: const [
+              DataColumn(label: Text('Product')),
+              DataColumn(label: Text('Qty')),
+              DataColumn(label: Text('Unit')),
+              DataColumn(label: Text('Est. Cost')),
+              DataColumn(label: Text('Act. Cost')),
+              DataColumn(label: Text('Status')),
+            ],
+            rows: items.map((it) {
+              return DataRow(cells: [
+                DataCell(Text(it.productName)),
+                DataCell(Text(it.quantity.toString())),
+                DataCell(Text(it.unit)),
+                DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
+                DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
+                DataCell(Text(it.status)),
+              ]);
+            }).toList(),
+          ),
         ],
-        rows: items.map((it) {
-          return DataRow(cells: [
-            DataCell(Text(it.productName)),
-            DataCell(Text(it.quantity.toString())),
-            DataCell(Text(it.unit)),
-            DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
-            DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
-            DataCell(Text(it.status)),
-          ]);
-        }).toList(),
       ),
     );
   }
