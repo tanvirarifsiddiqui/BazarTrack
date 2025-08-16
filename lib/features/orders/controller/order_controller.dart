@@ -82,20 +82,20 @@ class OrderController extends GetxController {
     }
 
     // 3) log both before & after
-    Get.find<HistoryService>().addLog(
-      HistoryLog(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        entityType: 'OrderItem',
-        entityId: updated.id.toString(),
-        action: 'updated',
-        changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
-        timestamp: DateTime.now(),
-        dataSnapshot: {
-          'before': beforeList.map((i) => i.toJson()).toList(),
-          'after': updated.toJson(),
-        },
-      ),
-    );
+    // Get.find<HistoryService>().addLog(
+    //   HistoryLog(
+    //     id: DateTime.now().millisecondsSinceEpoch.toString(),
+    //     entityType: 'OrderItem',
+    //     entityId: updated.id.toString(),
+    //     action: 'updated',
+    //     changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+    //     timestamp: DateTime.now(),
+    //     dataSnapshot: {
+    //       'before': beforeList.map((i) => i.toJson()).toList(),
+    //       'after': updated.toJson(),
+    //     },
+    //   ),
+    // );
 
     // 4) reload your visible list
     loadItems(item.orderId.toString());
@@ -114,17 +114,17 @@ class OrderController extends GetxController {
 
   Future<void> completeOrder(String orderId) async {
     await orderService.completeOrder(orderId);
-    Get.find<HistoryService>().addLog(
-      HistoryLog(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        entityType: 'Order',
-        entityId: orderId,
-        action: 'completed',
-        changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
-        timestamp: DateTime.now(),
-        dataSnapshot: {'after': getOrder(orderId)?.toJson()},
-      ),
-    );
+    // Get.find<HistoryService>().addLog(
+    //   HistoryLog(
+    //     id: DateTime.now().millisecondsSinceEpoch.toString(),
+    //     entityType: 'Order',
+    //     entityId: orderId,
+    //     action: 'completed',
+    //     changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
+    //     timestamp: DateTime.now(),
+    //     dataSnapshot: {'after': getOrder(orderId)?.toJson()},
+    //   ),
+    // );
     update();
   }
 

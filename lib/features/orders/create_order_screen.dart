@@ -1,6 +1,7 @@
 // lib/features/orders/presentation/create_order_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
@@ -79,17 +80,17 @@ class CreateOrderScreen extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.add),
-                      label: Text('Add Item'),
+                    child: CustomButton(
+                      icon: Icons.add,
+                      buttonText: 'Add Item',
                       onPressed: ctrl.addItem,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.save),
-                      label: Text('Save Order'),
+                    child: CustomButton(
+                      icon: Icons.save,
+                      buttonText: 'Save Order',
                       onPressed: ctrl.saveNewOrder,
                     ),
                   ),

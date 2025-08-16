@@ -49,7 +49,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => AuthRepo(api: Get.find(), sharedPreferences: Get.find()));
   Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find()));
   Get.lazyPut(() => OrderRepo(api: Get.find()));
-  Get.lazyPut(() => HistoryRepo(sharedPreferences: Get.find()));
+  Get.lazyPut(() => HistoryRepo(api: Get.find()));
   Get.lazyPut(() => FinanceRepo(api: Get.find()));
   Get.lazyPut(() => AssistantFinanceRepo(api: Get.find()));
 

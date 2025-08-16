@@ -34,19 +34,19 @@ class AdvanceService extends GetxController implements GetxService {
         description: 'Advance from ${advance.givenBy}',
       ));
       await auth.saveUser(user);
-      Get.find<HistoryService>().addLog(
-        HistoryLog(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          entityType: 'Wallet',
-          entityId: user.id,
-          action: 'advance',
-          changedByUserId: auth.currentUser?.id ?? '',
-          timestamp: DateTime.now(),
-          dataSnapshot: {
-            'after': user.wallet.toJson(),
-          },
-        ),
-      );
+      // Get.find<HistoryService>().addLog(
+      //   HistoryLog(
+      //     id: DateTime.now().millisecondsSinceEpoch.toString(),
+      //     entityType: 'Wallet',
+      //     entityId: user.id,
+      //     action: 'advance',
+      //     changedByUserId: auth.currentUser?.id ?? '',
+      //     timestamp: DateTime.now(),
+      //     dataSnapshot: {
+      //       'after': user.wallet.toJson(),
+      //     },
+      //   ),
+      // );
     }
     update();
   }
@@ -63,19 +63,19 @@ class AdvanceService extends GetxController implements GetxService {
         description: description,
       ));
       await auth.saveUser(user);
-      Get.find<HistoryService>().addLog(
-        HistoryLog(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          entityType: 'Wallet',
-          entityId: user.id,
-          action: 'purchase',
-          changedByUserId: user.id,
-          timestamp: DateTime.now(),
-          dataSnapshot: {
-            'after': user.wallet.toJson(),
-          },
-        ),
-      );
+      // Get.find<HistoryService>().addLog(
+      //   HistoryLog(
+      //     id: DateTime.now().millisecondsSinceEpoch.toString(),
+      //     entityType: 'Wallet',
+      //     entityId: user.id,
+      //     action: 'purchase',
+      //     changedByUserId: user.id,
+      //     timestamp: DateTime.now(),
+      //     dataSnapshot: {
+      //       'after': user.wallet.toJson(),
+      //     },
+      //   ),
+      // );
       update();
     }
   }

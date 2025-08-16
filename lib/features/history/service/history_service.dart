@@ -1,29 +1,22 @@
-import 'package:flutter_boilerplate/features/history/model/history_log.dart';
-import 'package:flutter_boilerplate/features/history/repository/history_repo.dart';
 import 'package:get/get.dart';
+import '../model/history_log.dart';
+import '../repository/history_repo.dart';
 
-class HistoryService extends GetxController implements GetxService {
+class HistoryService extends GetxService {
   final HistoryRepo historyRepo;
-  HistoryService({required this.historyRepo});
+  HistoryService({ required this.historyRepo });
 
-  final List<HistoryLog> _logs = [];
-  List<HistoryLog> get logs => _logs;
+  Future<List<HistoryLog>> fetchAll() => historyRepo.getAll();
 
-  @override
-  void onInit() {
-    _logs.addAll(historyRepo.getLogs());
-    super.onInit();
-  }
+  Future<List<HistoryLog>> fetchByEntity(String entity) =>
+      historyRepo.getByEntity(entity);
 
-  Future<void> addLog(HistoryLog log) async {
-    _logs.add(log);
-    await historyRepo.saveLogs(_logs);
-    update();
-  }
+  Future<List<HistoryLog>> fetchByEntityId(String entity, int id) =>
+      historyRepo.getByEntityId(entity, id);
 
-  List<HistoryLog> logsForEntity(String entityType, String entityId) {
-    return _logs
-        .where((l) => l.entityType == entityType && l.entityId == entityId)
-        .toList();
-  }
+  Future<HistoryLog> createLog(HistoryLog log) =>
+      historyRepo.create(log);
+
+  Future<bool> deleteLog(int id) =>
+      historyRepo.delete(id);
 }

@@ -1,19 +1,31 @@
-import 'package:flutter_boilerplate/features/history/model/history_log.dart';
-import 'package:flutter_boilerplate/features/history/service/history_service.dart';
+// lib/features/history/controller/history_controller.dart
+
 import 'package:get/get.dart';
+import '../model/history_log.dart';
+import '../service/history_service.dart';
 
 class HistoryController extends GetxController {
   final HistoryService historyService;
-  HistoryController({required this.historyService});
+  HistoryController({ required this.historyService });
 
-  List<HistoryLog> get logs => historyService.logs;
+  var logs = <HistoryLog>[].obs;
+  var isLoading = false.obs;
 
-  Future<void> addLog(HistoryLog log) async {
-    await historyService.addLog(log);
-    update();
+  Future<void> loadAll() async {
+    isLoading.value = true;
+    logs.value = await historyService.fetchAll();
+    isLoading.value = false;
   }
 
-  List<HistoryLog> logsForEntity(String entityType, String entityId) {
-    return historyService.logsForEntity(entityType, entityId);
+  Future<void> loadByEntity(String entity) async {
+    isLoading.value = true;
+    logs.value = await historyService.fetchByEntity(entity);
+    isLoading.value = false;
+  }
+
+  Future<void> loadByEntityId(String entity, int id) async {
+    isLoading.value = true;
+    logs.value = await historyService.fetchByEntityId(entity, id);
+    isLoading.value = false;
   }
 }
