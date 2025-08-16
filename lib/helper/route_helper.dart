@@ -33,7 +33,7 @@ class RouteHelper {
   static getHomeRoute(String name) => '$home?name=$name';
   static String getOrdersRoute() => orders;
   static String getOrderDetailRoute(String id) => '$orderDetail?id=$id';
-  static String getOrderHistoryRoute(String type, String id) => '$entityHistory?type=$type&id=$id';
+  static String getEntityHistoryRoute(String type, String id) => '$entityHistory?type=$type&id=$id';
 
   static List<GetPage> routes = [
     GetPage(name: initial, page: () => const SplashScreen()),
@@ -51,10 +51,6 @@ class RouteHelper {
     ),
     GetPage(
       name: entityHistory,
-      // page: () => EntityHistoryScreen(
-      //   entityType: Get.parameters['type']!,
-      //   entityId: Get.parameters['id']!,
-      // ),
       page: () => HistoryViewPage(
         entity: Get.parameters['type']!,
         entityId: int.parse(Get.parameters['id']!),

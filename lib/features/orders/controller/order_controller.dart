@@ -1,5 +1,3 @@
-// File: lib/features/orders/controller/order_controller.dart
-
 import 'package:flutter_boilerplate/features/finance/controller/assistant_finance_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
@@ -10,8 +8,7 @@ import '../../../helper/route_helper.dart';
 import '../../auth/service/auth_service.dart';
 import '../../finance/model/assistant.dart';
 import '../../finance/service/finance_service.dart';
-import '../../history/model/history_log.dart';
-import '../../history/service/history_service.dart';
+
 
 class OrderController extends GetxController {
   final OrderService orderService;
@@ -67,13 +64,7 @@ class OrderController extends GetxController {
 
   // Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item, bool isPurchased) async {
-    // 1) take a snapshot of "before"
-    final beforeList = await orderService.getItemsOfOrder(
-      item.orderId.toString(),
-    );
 
-    // 2) actually update and get the updated object
-    final updated = await orderService.updateOrderItem(item);
     if (item.actualCost != null) {
       // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
       await Get.find<AssistantFinanceController>().loadWalletForAssistant(
@@ -81,50 +72,15 @@ class OrderController extends GetxController {
       );
     }
 
-    // 3) log both before & after
-    // Get.find<HistoryService>().addLog(
-    //   HistoryLog(
-    //     id: DateTime.now().millisecondsSinceEpoch.toString(),
-    //     entityType: 'OrderItem',
-    //     entityId: updated.id.toString(),
-    //     action: 'updated',
-    //     changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
-    //     timestamp: DateTime.now(),
-    //     dataSnapshot: {
-    //       'before': beforeList.map((i) => i.toJson()).toList(),
-    //       'after': updated.toJson(),
-    //     },
-    //   ),
-    // );
 
-    // 4) reload your visible list
     loadItems(item.orderId.toString());
   }
 
-  //function: Assistant Credit payment for actual cost
-  // Future<void> addDebitForAssistant(int assistantId, double amount) async {
-  //   final finance = Finance(
-  //     userId: assistantId,
-  //     amount: amount,
-  //     type: 'debit',
-  //     createdAt: DateTime.now(),
-  //   );
-  //   await Get.find<AssistantFinanceService>().recordPayment(finance);
-  // }
+
 
   Future<void> completeOrder(String orderId) async {
     await orderService.completeOrder(orderId);
-    // Get.find<HistoryService>().addLog(
-    //   HistoryLog(
-    //     id: DateTime.now().millisecondsSinceEpoch.toString(),
-    //     entityType: 'Order',
-    //     entityId: orderId,
-    //     action: 'completed',
-    //     changedByUserId: Get.find<AuthService>().currentUser!.id.toString(),
-    //     timestamp: DateTime.now(),
-    //     dataSnapshot: {'after': getOrder(orderId)?.toJson()},
-    //   ),
-    // );
+
     update();
   }
 

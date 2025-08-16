@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
+import '../../helper/route_helper.dart';
 import '../auth/model/role.dart';
 import '../auth/service/auth_service.dart';
 
@@ -131,6 +132,13 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
       appBar: CustomAppBar(
         title: _isNew ? 'Add Item' : 'Edit Item',
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'View Audit Trail',
+            onPressed: () {
+              Get.toNamed(RouteHelper.getEntityHistoryRoute('Order_item', widget.item.id.toString()));
+            },
+          ),
           if(!_isNew && !_isPurchased)IconButton(onPressed: (){
             _confirmAndDelete();
           }, icon: Icon(Icons.delete, color: Colors.red,))

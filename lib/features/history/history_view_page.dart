@@ -1,5 +1,3 @@
-// lib/features/history/screens/history_view_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +17,7 @@ class HistoryViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.put(HistoryController(historyService: Get.find()));
-    final fmt  = DateFormat('yyyy-MM-dd HH:mm');
+    final fmt  = DateFormat('dd MMM yyyy, hh:mm a');
 
     // Load logs
     if (entityId != null) {
@@ -27,7 +25,7 @@ class HistoryViewPage extends StatelessWidget {
     } else {
       ctrl.loadByEntity(entity);
     }
-
+// here i want to create a page specially for history. here I want to show 4 tabs for history (all, order, order_item, payment) basically [order, order_item, payment] these 3 type of entity. I want to show them individually. different Page and all tab i want to show all history)
     return Scaffold(
       appBar: AppBar(title: Text('History: $entity')),
       body: Obx(() {

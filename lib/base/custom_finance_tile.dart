@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../features/finance/model/finance.dart';
+import '../helper/route_helper.dart';
 
 class CustomFinanceTile extends StatelessWidget {
   final Finance finance;
@@ -22,7 +23,9 @@ class CustomFinanceTile extends StatelessWidget {
         elevation: 1,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {/* open details */},
+          onTap: () {
+            Get.toNamed(RouteHelper.getEntityHistoryRoute('Payment', finance.id.toString()));
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Row(

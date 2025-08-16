@@ -74,7 +74,6 @@ class OrderRepo {
   Future<OrderItem> createOrderItem(OrderItem item) async {
     // 1) send JSON for creation (omit id/order_id)
     final res = await api.createItem(item.toJsonForCreate());
-    print(item.toJsonForCreate());
     if (!res.isOk || res.body is! Map<String, dynamic>) {
       throw Exception('Failed to create order item (${res.statusCode})');
     }

@@ -31,7 +31,7 @@ class OrderDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.history),
             tooltip: 'View Audit Trail',
             onPressed: () {
-              Get.toNamed(RouteHelper.getOrderHistoryRoute('Order', orderId));
+              Get.toNamed(RouteHelper.getEntityHistoryRoute('Order', orderId));
             },
           ),
         ],
