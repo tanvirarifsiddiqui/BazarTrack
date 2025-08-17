@@ -256,6 +256,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                 heroTag: 'assistant_add',
                 icon: const Icon(Icons.add),
                 label: const Text('Debit'),
+                backgroundColor: AppColors.primary,
                 onPressed: () => _showCreditDialog(context),
               )
               : null,

@@ -70,7 +70,9 @@ class OrderListScreen extends StatelessWidget {
                           vertical: 14,
                         ),
                         leading: CircleAvatar(
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
                           child: SvgPicture.asset(
                             'assets/icons/order_icon.svg',
                             width: 24,
@@ -123,12 +125,15 @@ class OrderListScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: const Text('Order'),
-        icon: const Icon(Icons.add),
-        onPressed: Get.find<OrderController>().onCreateOrderTapped,
-        backgroundColor: AppColors.primary,
-      ),
+      floatingActionButton:
+          isOwner
+              ? FloatingActionButton.extended(
+                label: const Text('Order'),
+                icon: const Icon(Icons.add),
+                onPressed: Get.find<OrderController>().onCreateOrderTapped,
+                backgroundColor: AppColors.primary,
+              )
+              : null,
     );
   }
 }

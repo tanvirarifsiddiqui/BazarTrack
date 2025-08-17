@@ -55,7 +55,8 @@ class BazarTrackApi {
 
   // History
   Future<Response> history() => client.getData(Endpoints.history);
-  Future<Response> historyByEntity(String entity, int id) => client.getData(Endpoints.historyByEntity(entity, id));
+  Future<Response> historyByEntityId(String entity, int id) => client.getData(Endpoints.historyByEntityId(entity, id));
+  Future<Response> historyByEntity(String entity) => client.getData(Endpoints.historyByEntity(entity));
   Future<Response> createHistory(Map<String, dynamic> data) => client.postData(Endpoints.history, data);
   Future<Response> deleteHistory(int id) => client.deleteData('${Endpoints.history}/$id');
 

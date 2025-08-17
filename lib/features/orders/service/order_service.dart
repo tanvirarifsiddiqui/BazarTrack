@@ -1,12 +1,8 @@
-// File: lib/features/orders/service/order_service.dart
-
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
-import 'package:flutter_boilerplate/features/history/model/history_log.dart';
-import 'package:flutter_boilerplate/features/history/service/history_service.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 
 class OrderService extends GetxController implements GetxService {
@@ -113,7 +109,7 @@ class OrderService extends GetxController implements GetxService {
 
   /// Update an existing Order + log
   Future<void> updateOrder(Order order) async {
-    final previous = orderRepo.getById(order.orderId!);
+    // final previous = orderRepo.getById(order.orderId!);
     await orderRepo.updateOrder(order);
 
     // Get.find<HistoryService>().addLog(
@@ -136,9 +132,9 @@ class OrderService extends GetxController implements GetxService {
 
   /// Assign an Order to a user + log
   Future<void> assignOrder(String orderId, int userId) async {
-    final previous = orderRepo.getById(orderId);
+    // final previous = orderRepo.getById(orderId);
     await orderRepo.assignOrder(orderId, userId);
-    final updatedOrder = orderRepo.getById(orderId);
+    // final updatedOrder = orderRepo.getById(orderId);
 
     // Get.find<HistoryService>().addLog(
     //   HistoryLog(
@@ -163,9 +159,9 @@ class OrderService extends GetxController implements GetxService {
     final userId = Get.find<AuthService>().currentUser?.id;
     if (userId == null) return false;
 
-    final previous = orderRepo.getById(orderId);
+    // final previous = orderRepo.getById(orderId);
     await orderRepo.assignOrder(orderId, int.parse(userId));
-    final updatedOrder = orderRepo.getById(orderId);
+    // final updatedOrder = orderRepo.getById(orderId);
 
     // Get.find<HistoryService>().addLog(
     //   HistoryLog(

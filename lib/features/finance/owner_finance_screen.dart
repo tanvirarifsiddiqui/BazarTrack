@@ -205,6 +205,7 @@ class OwnerFinancePage extends StatelessWidget {
         heroTag: 'owner_add',
         icon: const Icon(Icons.add),
         label: const Text('Credit'),
+        backgroundColor: AppColors.primary,
         onPressed: () {
           _showCreditDialog(context, Get.find<FinanceController>());
         },

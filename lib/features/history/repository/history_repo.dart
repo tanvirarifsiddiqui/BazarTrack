@@ -16,7 +16,7 @@ class HistoryRepo {
   }
 
   Future<List<HistoryLog>> getByEntity(String entity) async {
-    final res = await api.historyByEntity(entity, 0); // endpoint: /history/order
+    final res = await api.historyByEntity(entity); // endpoint: /history/order
     if (res.isOk && res.body is! Map<String, dynamic>) {
       final data = res.body;
       if (data is List) {
@@ -27,7 +27,7 @@ class HistoryRepo {
   }
 
   Future<List<HistoryLog>> getByEntityId(String entity, int id) async {
-    final res = await api.historyByEntity(entity, id); // endpoint: /history/order/30
+    final res = await api.historyByEntityId(entity, id); // endpoint: /history/order/30
     if (res.isOk && res.body is! Map<String, dynamic>) {
       final data = res.body;
 
