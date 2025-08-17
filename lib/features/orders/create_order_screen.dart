@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -15,8 +16,8 @@ class CreateOrderScreen extends StatelessWidget {
     int? selectedId;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('New Order'),
+      appBar: CustomAppBar(
+        title: 'New Order',
       ),
       body: SafeArea(
         child: GetBuilder<OrderController>(

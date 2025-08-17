@@ -21,6 +21,8 @@ class OrderController extends GetxController {
   bool isLoadingItems = false;
   var assistants = <Assistant>[].obs;
 
+  Future<List<Assistant>> getAllAssistants() => Get.find<FinanceService>().fetchAssistants(withBalance: true);
+
   @override
   void onInit() {
     super.onInit();

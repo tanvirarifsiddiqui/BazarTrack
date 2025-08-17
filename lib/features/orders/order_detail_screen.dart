@@ -10,6 +10,7 @@ import 'package:flutter_boilerplate/features/orders/controller/order_controller.
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
+import '../finance/model/assistant.dart';
 import 'edit_order_item_screen.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -61,18 +62,35 @@ class OrderDetailScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Summary',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 12),
-                          _buildInfoRow('Created by', order.createdBy.toString(), Icons.person),
-                          _buildInfoRow('Assigned to', order.assignedTo.toString(), Icons.group),
-                          _buildInfoRow('Status', order.status.toApi(), Icons.flag),
-                          _buildInfoRow('Created at', dateFmt.format(order.createdAt), Icons.schedule),
+                          _buildInfoRow(
+                            'Created by',
+                            order.createdBy.toString(),
+                            Icons.person,
+                          ),
+                          _buildInfoRow(
+                            'Assigned to',
+                            order.assignedTo.toString(),
+                            Icons.group,
+                          ),
+                          _buildInfoRow(
+                            'Status',
+                            order.status.toApi(),
+                            Icons.flag,
+                          ),
+                          _buildInfoRow(
+                            'Created at',
+                            dateFmt.format(order.createdAt),
+                            Icons.schedule,
+                          ),
                           _buildInfoRow(
                             'Completed at',
-                            order.completedAt != null ? dateFmt.format(order.completedAt!) : '-',
+                            order.completedAt != null
+                                ? dateFmt.format(order.completedAt!)
+                                : '-',
                             Icons.check_circle,
                           ),
                         ],
@@ -82,26 +100,37 @@ class OrderDetailScreen extends StatelessWidget {
 
                   // ITEMS HEADER
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 8,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Order Items',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).primaryColorDark,
                           ),
                         ),
-                        if(isOwner)CustomButton(
+                        if (isOwner)
+                          CustomButton(
                             icon: Icons.add,
                             height: 35,
                             width: 100,
                             buttonText: 'Add Item',
                             onPressed: () async {
-                              final newItem = OrderItem.empty(orderId: int.parse(orderId));
+                              final newItem = OrderItem.empty(
+                                orderId: int.parse(orderId),
+                              );
                               final created = await Get.to<OrderItem>(
-                                    () => EditOrderItemScreen(orderId: orderId, item: newItem),
+                                () => EditOrderItemScreen(
+                                  orderId: orderId,
+                                  item: newItem,
+                                ),
                               );
                               if (created != null) {
                                 orderCtrl.loadItems(orderId);
@@ -117,16 +146,25 @@ class OrderDetailScreen extends StatelessWidget {
                     child: FutureBuilder<List<OrderItem>>(
                       future: orderCtrl.getItemsOfOrder(orderId),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error loading items: ${snapshot.error}'));
+                          return Center(
+                            child: Text(
+                              'Error loading items: ${snapshot.error}',
+                            ),
+                          );
                         }
 
                         final items = snapshot.data ?? [];
                         if (items.isEmpty) {
-                          return const Center(child: Text('No items added yet.'));
+                          return const Center(
+                            child: Text('No items added yet.'),
+                          );
                         }
 
                         return ListView.separated(
@@ -148,7 +186,9 @@ class OrderDetailScreen extends StatelessWidget {
                                   if (item.estimatedCost != null)
                                     Text(
                                       'Est: ${NumberFormat.currency(symbol: '৳').format(item.estimatedCost)}',
-                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   if (item.actualCost != null)
                                     Text(
@@ -162,7 +202,10 @@ class OrderDetailScreen extends StatelessWidget {
                               ),
                               onTap: () async {
                                 final updated = await Get.to<OrderItem>(
-                                      () => EditOrderItemScreen(orderId: orderId, item: item),
+                                  () => EditOrderItemScreen(
+                                    orderId: orderId,
+                                    item: item,
+                                  ),
                                 );
                                 if (updated != null) {
                                   orderCtrl.update();
@@ -187,10 +230,13 @@ class OrderDetailScreen extends StatelessWidget {
                               width: MediaQuery.of(context).size.width * .45,
                               buttonText: 'Assign to me',
                               onPressed: () {
-                                try{
+                                try {
                                   orderCtrl.selfAssign(orderId);
-                                }catch(e){
-                                  Get.snackbar('Error', 'Could not Self Assign: $e');
+                                } catch (e) {
+                                  Get.snackbar(
+                                    'Error',
+                                    'Could not Self Assign: $e',
+                                  );
                                 }
                               },
                             ),
@@ -198,25 +244,129 @@ class OrderDetailScreen extends StatelessWidget {
 
                         if (isOwner) ...[
                           Expanded(
-                            child: CustomButton(
+                            child: // inside your widget tree
+                                CustomButton(
                               buttonText: 'Assign User',
                               icon: Icons.person,
                               onPressed: () async {
-                                final selectedAssistantId  = await showDialog<int>(
+                                // allow null because "None" option returns null
+                                final int?
+                                selectedAssistantId = await showDialog<int?>(
                                   context: context,
                                   builder: (ctx) {
-                                    return SimpleDialog(
-                                      title: const Text('Select Assistant'),
-                                      children: orderCtrl.assistants.map(
-                                              (assistant) => SimpleDialogOption(
-                                        onPressed: () => Navigator.pop(ctx, assistant.id),
-                                        child: Text(assistant.name),
-                                      )).toList(),
+                                    return FutureBuilder<List<Assistant>>(
+                                      future: orderCtrl.getAllAssistants(),
+                                      builder: (ctx2, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return SimpleDialog(
+                                            children: [
+                                              Center(
+                                                // center the loading in a small dialog
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    24.0,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: const [
+                                                      CircularProgressIndicator(),
+                                                      SizedBox(height: 12),
+                                                      Text(
+                                                        'Loading assistants...',
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+
+                                        if (snapshot.hasError) {
+                                          return SimpleDialog(
+                                            title: const Text(
+                                              'Select Assistant',
+                                            ),
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(
+                                                  12.0,
+                                                ),
+                                                child: Text(
+                                                  'Error loading assistants: ${snapshot.error}',
+                                                ),
+                                              ),
+                                              SimpleDialogOption(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      ctx,
+                                                      null,
+                                                    ),
+                                                child: const Text('Close'),
+                                              ),
+                                            ],
+                                          );
+                                        }
+
+                                        final assistants = snapshot.data ?? [];
+
+                                        return SimpleDialog(
+                                          title: const Text('Select Assistant'),
+                                          children: [
+                                            if (assistants.isEmpty)
+                                              const Padding(
+                                                padding: EdgeInsets.all(12),
+                                                child: Text(
+                                                  'No assistants available.',
+                                                ),
+                                              )
+                                            else
+                                              ...assistants.map((assistant) {
+                                                return SimpleDialogOption(
+                                                  onPressed:
+                                                      () => Navigator.pop(
+                                                        ctx,
+                                                        assistant.id,
+                                                      ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          assistant.name,
+                                                          style: Theme.of(context).textTheme.bodyLarge
+                                                              ?.copyWith(fontWeight: FontWeight.bold),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 12),
+                                                      Text('৳ ${
+                                                        assistant.balance
+                                                            ?.toString() ?? '0'
+                                                      }',
+                                                        style: Theme.of(context).textTheme.bodyLarge
+                                                            ?.copyWith(fontWeight: FontWeight.bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }),
+                                          ],
+                                        );
+                                      },
                                     );
                                   },
                                 );
+
                                 if (selectedAssistantId != null) {
-                                  orderCtrl.assignOrder(orderId, selectedAssistantId);
+                                  // call your controller method (await if it's async)
+                                  await orderCtrl.assignOrder(
+                                    orderId,
+                                    selectedAssistantId,
+                                  );
                                 }
                               },
                             ),
@@ -228,13 +378,14 @@ class OrderDetailScreen extends StatelessWidget {
                             child: CustomButton(
                               icon: Icons.done_all,
                               buttonText:
-                                order.status == OrderStatus.completed
-                                    ? 'Completed'
-                                    : 'Mark Complete',
+                                  order.status == OrderStatus.completed
+                                      ? 'Completed'
+                                      : 'Mark Complete',
 
-                              onPressed: order.status == OrderStatus.completed
-                                  ? null
-                                  : () => orderCtrl.completeOrder(orderId),
+                              onPressed:
+                                  order.status == OrderStatus.completed
+                                      ? null
+                                      : () => orderCtrl.completeOrder(orderId),
                             ),
                           ),
 
@@ -248,9 +399,10 @@ class OrderDetailScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: order.status == OrderStatus.completed
-                                    ? Colors.green
-                                    : Colors.orange,
+                                color:
+                                    order.status == OrderStatus.completed
+                                        ? Colors.green
+                                        : Colors.orange,
                               ),
                             ),
                           ),
