@@ -261,7 +261,7 @@ class OwnerFinancePage extends StatelessWidget {
                           )
                           .toList(),
                   onChanged: (v) => selectedId = v ?? selectedId,
-                  decoration: AppInputDecorations.financeInputDecoration(
+                  decoration: AppInputDecorations.generalInputDecoration(
                     label: 'Select Assistant',
                     prefixIcon: Icons.person_outline_rounded,
                   ),
@@ -269,7 +269,7 @@ class OwnerFinancePage extends StatelessWidget {
                 const SizedBox(height: 16),
                 TextField(
                   controller: amtCtrl,
-                  decoration: AppInputDecorations.financeInputDecoration(
+                  decoration: AppInputDecorations.generalInputDecoration(
                     label: 'Amount',
                     hint: 'Enter credit amount',
                     prefixIcon: Icons.currency_exchange_rounded,

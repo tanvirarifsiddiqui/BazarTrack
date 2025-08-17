@@ -15,6 +15,14 @@ class OrderController extends GetxController {
   final AuthService _auth = Get.find();
   Order? getOrder(String id) => orderService.getOrder(id);
 
+  // reactive list + loading flag
+  var orders       = <Order>[].obs;
+  var isLoading    = false.obs;
+
+  // current filters
+  var filterStatus     = Rxn<OrderStatus>();
+  var filterAssignedTo = Rxn<int>();
+
   List<OrderItem> newItems = [];
   int? assignedToUserId;
   List<OrderItem> items = [];
@@ -27,6 +35,31 @@ class OrderController extends GetxController {
   void onInit() {
     super.onInit();
     loadAssistants();
+    loadOrders();
+  }
+
+  Future<void> loadOrders() async {
+    isLoading.value = true;
+
+    final list = await orderService.getOrders(
+      status:     filterStatus.value,
+      assignedTo: filterAssignedTo.value,
+    );
+
+    orders.assignAll(list);
+    isLoading.value = false;
+  }
+
+  /// Called by the UI when user picks a new status
+  void setStatusFilter(OrderStatus? status) {
+    filterStatus.value = status;
+    loadOrders();
+  }
+
+  /// Optionally call this to filter unassigned vs a specific assistant
+  void setAssignedToFilter(int? userId) {
+    filterAssignedTo.value = userId;
+    loadOrders();
   }
 
   Future<void> loadAssistants() async {

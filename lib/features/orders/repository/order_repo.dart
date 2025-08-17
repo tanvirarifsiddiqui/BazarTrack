@@ -98,18 +98,19 @@ class OrderRepo {
   }
 
 
-  Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) async {
-    final res = await api.orders();
-    if (res.isOk && res.body is List) {
-      _cache
-        ..clear()
-        ..addAll((res.body as List).map((e) => Order.fromJson(e as Map<String, dynamic>)));
+  Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo,}) async {
+    final res = await api.orders(
+      status:     status?.toApi(),
+      assignedTo: assignedTo,
+    );
+
+    if (!res.isOk || res.body is! List) {
+      throw Exception('Failed to load orders');
     }
-    return _cache.where((o) {
-      if (status != null && o.status != status) return false;
-      if (assignedTo != null && o.assignedTo != assignedTo) return false;
-      return true;
-    }).toList();
+
+    return (res.body as List)
+        .map((e) => Order.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Order? getById(String id) => _cache.firstWhereOrNull((o) => o.orderId == id);

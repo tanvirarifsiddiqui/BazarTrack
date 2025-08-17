@@ -299,7 +299,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
               children: [
                 TextField(
                   controller: amtCtrl,
-                  decoration: AppInputDecorations.financeInputDecoration(
+                  decoration: AppInputDecorations.generalInputDecoration(
                     label: "Amount",
                     hint: 'Enter credit amount',
                     prefixIcon: Icons.currency_exchange_rounded,

@@ -1,12 +1,12 @@
 // File: lib/features/orders/model/order_status.dart
 
-enum OrderStatus { pending, inProgress, completed }
+enum OrderStatus { pending, assigned, completed }
 
 extension OrderStatusExtension on OrderStatus {
   static OrderStatus fromString(String value) {
     switch (value.toLowerCase()) {
-      case 'in_progress':
-        return OrderStatus.inProgress;
+      case 'assigned':
+        return OrderStatus.assigned;
       case 'completed':
         return OrderStatus.completed;
       default:
@@ -16,8 +16,8 @@ extension OrderStatusExtension on OrderStatus {
 
   String toApi() {
     switch (this) {
-      case OrderStatus.inProgress:
-        return 'in_progress';
+      case OrderStatus.assigned:
+        return 'assigned';
       case OrderStatus.completed:
         return 'completed';
       default:

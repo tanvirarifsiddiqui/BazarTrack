@@ -44,7 +44,7 @@ class CreateOrderScreen extends StatelessWidget {
                   )
                   ],
                   onChanged: (v) => ctrl.assignedToUserId = v ?? selectedId,
-                  decoration: AppInputDecorations.financeInputDecoration(
+                  decoration: AppInputDecorations.generalInputDecoration(
                     label: 'Select Assistant',
                     prefixIcon: Icons.person_outline_rounded,
                   ),

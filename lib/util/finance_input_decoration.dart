@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'colors.dart';
 
 class AppInputDecorations {
-  static InputDecoration financeInputDecoration({
+  static InputDecoration generalInputDecoration({
     required String label,
     String? hint,
     IconData? prefixIcon,

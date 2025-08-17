@@ -14,6 +14,7 @@ class OrderService extends GetxController implements GetxService {
     return await orderRepo.getOrders(status: status, assignedTo: assignedTo);
   }
 
+
   Future<List<OrderItem>> getItemsOfOrder(String orderId) async {
     return await orderRepo.getItemsOfOrder(orderId);
   }
