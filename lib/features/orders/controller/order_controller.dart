@@ -41,9 +41,13 @@ class OrderController extends GetxController {
     return orderService.getItemsOfOrder(orderId);
   }
 
-  void assignOrder(String orderId, String userId) {
-    orderService.assignOrder(orderId, int.parse(userId));
-    loadItems(orderId);
+  Future<void> assignOrder(String orderId, int userId) async {
+    try {
+      await orderService.assignOrder(orderId, userId);
+      update();
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to assign user: $e');
+    }
   }
 
   void loadItems(String orderId) async {

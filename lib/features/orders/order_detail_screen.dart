@@ -44,7 +44,7 @@ class OrderDetailScreen extends StatelessWidget {
               return const Center(child: Text('Order not found'));
             }
             final dateFmt = DateFormat('yyyy-MM-dd HH:mm');
-        
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -79,7 +79,7 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-        
+
                   // ITEMS HEADER
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -111,7 +111,7 @@ class OrderDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-        
+
                   // SCROLLABLE ITEMS LIST ONLY
                   Expanded(
                     child: FutureBuilder<List<OrderItem>>(
@@ -123,12 +123,12 @@ class OrderDetailScreen extends StatelessWidget {
                         if (snapshot.hasError) {
                           return Center(child: Text('Error loading items: ${snapshot.error}'));
                         }
-        
+
                         final items = snapshot.data ?? [];
                         if (items.isEmpty) {
                           return const Center(child: Text('No items added yet.'));
                         }
-        
+
                         return ListView.separated(
                           padding: const EdgeInsets.only(top: 4, bottom: 12),
                           itemCount: items.length,
@@ -174,7 +174,7 @@ class OrderDetailScreen extends StatelessWidget {
                       },
                     ),
                   ),
-        
+
                   // ACTION BUTTONS
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
@@ -195,30 +195,28 @@ class OrderDetailScreen extends StatelessWidget {
                               },
                             ),
                           ),
-        
+
                         if (isOwner) ...[
                           Expanded(
                             child: CustomButton(
                               buttonText: 'Assign User',
                               icon: Icons.person,
                               onPressed: () async {
-                                final userId = await showDialog<String>(
+                                final selectedAssistantId  = await showDialog<int>(
                                   context: context,
                                   builder: (ctx) {
-                                    final sample = ['2', '3', '4'];
                                     return SimpleDialog(
-                                      title: const Text('Select User'),
-                                      children: sample
-                                          .map((u) => SimpleDialogOption(
-                                        child: Text('User #$u'),
-                                        onPressed: () => Navigator.pop(ctx, u),
-                                      ))
-                                          .toList(),
+                                      title: const Text('Select Assistant'),
+                                      children: orderCtrl.assistants.map(
+                                              (assistant) => SimpleDialogOption(
+                                        onPressed: () => Navigator.pop(ctx, assistant.id),
+                                        child: Text(assistant.name),
+                                      )).toList(),
                                     );
                                   },
                                 );
-                                if (userId != null) {
-                                  orderCtrl.assignOrder(orderId, userId);
+                                if (selectedAssistantId != null) {
+                                  orderCtrl.assignOrder(orderId, selectedAssistantId);
                                 }
                               },
                             ),
@@ -233,13 +231,13 @@ class OrderDetailScreen extends StatelessWidget {
                                 order.status == OrderStatus.completed
                                     ? 'Completed'
                                     : 'Mark Complete',
-        
+
                               onPressed: order.status == OrderStatus.completed
                                   ? null
                                   : () => orderCtrl.completeOrder(orderId),
                             ),
                           ),
-        
+
                         if (isOwner)
                           Expanded(
                             child: Text(

@@ -41,7 +41,7 @@ class CreateOrderScreen extends StatelessWidget {
                       child: Text(a.name),
                     ),
                   )
-                      .toList(),],
+                  ],
                   onChanged: (v) => ctrl.assignedToUserId = v ?? selectedId,
                   decoration: AppInputDecorations.financeInputDecoration(
                     label: 'Select Assistant',
