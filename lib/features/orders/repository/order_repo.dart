@@ -113,7 +113,21 @@ class OrderRepo {
         .toList();
   }
 
-  Order? getById(String id) => _cache.firstWhereOrNull((o) => o.orderId == id);
+  Future<Order?> getOrderById(String id) async {
+    try {
+      final Response resp = await api.order(int.parse(id));
+      if (resp.statusCode == 200) {
+        // resp.data expected to be a Map / JSON object
+        return Order.fromJson(resp.body);
+      } else {
+        // handle non-200 as needed
+        throw Exception('Failed to load order: ${resp.statusCode}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 
   Future<void> updateOrder(Order order) async {
     final res = await api.updateOrder(int.parse(order.orderId!), order.toJson());
@@ -125,11 +139,11 @@ class OrderRepo {
   Future<void> assignOrder(String orderId, int userId) async {
     final res = await api.assignOrder(int.parse(orderId), {'user_id': userId});
     if (!res.isOk) throw Exception('Failed to assign order: ${res.statusCode}');
-    final order = getById(orderId);
-    if (order != null) {
-      order.assignedTo = userId.toString();
-      order.status = OrderStatus.pending;
-    }
+    // final order = getOrderById(orderId);
+    // if (order != null) {
+    //   order.assignedTo = userId.toString();
+    //   order.status = OrderStatus.pending;
+    // }
   }
 
   bool selfAssign(String orderId, int userId) {

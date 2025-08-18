@@ -13,7 +13,7 @@ import '../../finance/service/finance_service.dart';
 class OrderController extends GetxController {
   final OrderService orderService;
   final AuthService _auth = Get.find();
-  Order? getOrder(String id) => orderService.getOrder(id);
+  Future<Order?> getOrder(String id) => orderService.getOrderById(id);
 
   // reactive list + loading flag
   var orders       = <Order>[].obs;
@@ -103,16 +103,16 @@ class OrderController extends GetxController {
 
   // Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item, bool isPurchased) async {
+    await orderService.updateOrderItem(item);
 
-    if (item.actualCost != null) {
+    if (item.actualCost != null && isPurchased == false) {
       // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
+      print("True Access");
       await Get.find<AssistantFinanceController>().loadWalletForAssistant(
         int.parse(_auth.currentUser!.id),
       );
     }
-
-
-    loadItems(item.orderId.toString());
+    // loadItems(item.orderId.toString());
   }
 
 
