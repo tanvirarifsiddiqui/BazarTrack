@@ -46,7 +46,7 @@ class BazarTrackApi {
   Future<Response> deleteItem(int orderId, int id) => client.deleteData(Endpoints.orderItem(orderId, id));
 
   // Payments
-  Future<Response> payments() => client.getData(Endpoints.payments);
+  Future<Response> payments({Map<String, dynamic>? query}) => client.getData(Endpoints.payments, query: query);
   Future<Response> createPayment(Map<String, dynamic> data) => client.postData(Endpoints.payments, data);
 
   // Wallet

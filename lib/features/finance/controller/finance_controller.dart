@@ -22,15 +22,48 @@ class FinanceController extends GetxController {
   var isLoadingAssistants = false.obs;
 
   // Assistant wallet flows
-  var transactions       = <Finance>[].obs;
   var isLoadingWallet    = false.obs;
   final AuthService    auth = Get.find();
+
+  // Reactive list and loading flag
+  var payments    = <Finance>[].obs;
+  var isLoading   = false.obs;
+
+  // Filter parameters
+  var filterUserId = RxnInt();
+  var filterType   = RxnString();
+  var filterFrom   = Rxn<DateTime>();
+  var filterTo     = Rxn<DateTime>();
+
   @override
   void onInit() {
     super.onInit();
     loadAssistantsAndTransactions();
   }
 
+  Future<void> loadPayments() async {
+    isLoading.value = true;
+    final list = await service.fetchPayments(userId: filterUserId.value, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
+    payments.assignAll(list);
+    isLoading.value = false;
+  }
+
+  // Set any filter and reload
+  void setFilters({int? userId, String? type, DateTime? from, DateTime? to,}) {
+    filterUserId.value = userId;
+    filterType.value   = type;
+    filterFrom.value   = from;
+    filterTo.value     = to;
+    loadPayments();
+  }
+
+  void clearFilters() {
+    filterUserId.value = null;
+    filterType.value   = null;
+    filterFrom.value   = null;
+    filterTo.value     = null;
+    loadPayments();
+  }
 
 
   Future<void> loadAssistantsAndTransactions() async {
@@ -47,14 +80,14 @@ class FinanceController extends GetxController {
       type:      'credit',         // only owner can credit
       createdAt: DateTime.now(),
     );
-    final created = await service.recordPayment(f);
+    await service.recordPayment(f);
     // optionally refresh balance & list
     loadAssistantsAndTransactions();
   }
 
   Future<void> loadAllTransactions() async {
     isLoadingWallet.value = true;
-    transactions.value = await service.fetchPayments();
+    payments.value = await service.fetchPayments();
     isLoadingWallet.value = false;
   }
 

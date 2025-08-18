@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'assistant_finance_screen.dart';
 import 'components/assistant_row.dart';
 import 'controller/finance_controller.dart';
+import 'model/assistant.dart';
 
 class OwnerFinancePage extends StatelessWidget {
   const OwnerFinancePage({super.key});
@@ -25,6 +26,7 @@ class OwnerFinancePage extends StatelessWidget {
     final fmt = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final assistants = ctrl.assistants; // preloaded elsewhere
 
     return Scaffold(
       appBar: AppBar(
@@ -134,12 +136,16 @@ class OwnerFinancePage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Filter',
-                    icon: const Icon(Icons.filter_list_rounded),
-                    onPressed: () {
-                      //  Add filters (All / Credit / Debit) can be applied
-                    },
+                    icon: const Icon(Icons.filter_list),
+                    onPressed:
+                        () => _showFilterDialog(context, ctrl, assistants),
                   ),
+                  if (ctrl.filterUserId.value != null || ctrl.filterType.value != null || ctrl.filterFrom.value != null || ctrl.filterTo.value != null)
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: ctrl.clearFilters,
+                      tooltip: 'Clear Filters',
+                    ),
                 ],
               ),
             ),
@@ -151,7 +157,7 @@ class OwnerFinancePage extends StatelessWidget {
               child: RefreshIndicator(
                 onRefresh: () => ctrl.loadAssistantsAndTransactions(),
                 child: Obx(() {
-                  final tx = ctrl.transactions;
+                  final tx = ctrl.payments;
                   if (tx.isEmpty) {
                     // show an empty, scrollable view so pull-to-refresh works
                     return ListView(
@@ -210,6 +216,136 @@ class OwnerFinancePage extends StatelessWidget {
           _showCreditDialog(context, Get.find<FinanceController>());
         },
       ),
+    );
+  }
+
+  void _showFilterDialog(
+    BuildContext context,
+    FinanceController ctrl,
+    List<Assistant> assistants,
+  ) {
+    final userIds = [null, ...assistants.map((a) => a.id)];
+    final types = [null, 'credit', 'debit'];
+    final df = DateFormat('yyyy-MM-dd');
+
+    int? selectedUser = ctrl.filterUserId.value;
+    String? selectedType = ctrl.filterType.value;
+    DateTime? fromDate = ctrl.filterFrom.value;
+    DateTime? toDate = ctrl.filterTo.value;
+
+    showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Filter Transactions'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Assistant filter
+                  DropdownButtonFormField<int?>(
+                    value: selectedUser,
+                    decoration: const InputDecoration(labelText: 'Assistant'),
+                    items:
+                        userIds.map((uid) {
+                          final label =
+                              uid == null
+                                  ? 'All'
+                                  : assistants
+                                      .firstWhere((a) => a.id == uid)
+                                      .name;
+                          return DropdownMenuItem(
+                            value: uid,
+                            child: Text(label),
+                          );
+                        }).toList(),
+                    onChanged: (v) => selectedUser = v,
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Type filter
+                  DropdownButtonFormField<String?>(
+                    value: selectedType,
+                    decoration: const InputDecoration(labelText: 'Type'),
+                    items:
+                        types.map((t) {
+                          return DropdownMenuItem(
+                            value: t,
+                            child: Text(t == null ? 'All' : t.capitalizeFirst!),
+                          );
+                        }).toList(),
+                    onChanged: (v) => selectedType = v,
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Date range pickers
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            fromDate = await showDatePicker(
+                              context: context,
+                              initialDate: fromDate ?? DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            );
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'From',
+                            ),
+                            child: Text(
+                              fromDate != null ? df.format(fromDate!) : 'Any',
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            toDate = await showDatePicker(
+                              context: context,
+                              initialDate: toDate ?? DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now(),
+                            );
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(labelText: 'To'),
+                            child: Text(
+                              toDate != null ? df.format(toDate!) : 'Any',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ctrl.setFilters(
+                    userId: selectedUser,
+                    type: selectedType,
+                    from: fromDate,
+                    to: toDate,
+                  );
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Apply'),
+              ),
+            ],
+          ),
     );
   }
 

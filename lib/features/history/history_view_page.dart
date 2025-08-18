@@ -105,7 +105,7 @@ class HistoryViewPage extends StatelessWidget {
                 DataColumn(
                   label: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text('Field'),
+                    child: Text('Name'),
                   ),
                 ),
                 DataColumn(

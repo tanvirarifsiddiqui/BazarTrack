@@ -187,6 +187,7 @@ class OrderListScreen extends StatelessWidget {
       floatingActionButton: isOwner
           ? FloatingActionButton.extended(
         heroTag: 'add_order',
+        backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: const Text('Order'),
         onPressed: ctrl.onCreateOrderTapped,

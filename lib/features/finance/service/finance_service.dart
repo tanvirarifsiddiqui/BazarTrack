@@ -13,14 +13,16 @@ import '../repository/finance_repo.dart';
 
 class FinanceService extends GetxService {
   final FinanceRepo repo;
-  FinanceService({ required this.repo });
+  FinanceService({required this.repo});
 
-  Future<List<Assistant>> fetchAssistants({bool withBalance=false}) =>
+  Future<List<Assistant>> fetchAssistants({bool withBalance = false}) =>
       repo.getAssistants(withBalance: withBalance);
 
-  Future<List<Finance>> fetchPayments()        => repo.getPayments();
-  Future<Finance>       recordPayment(Finance f) => repo.createPayment(f);
+  Future<List<Finance>> fetchPayments({int? userId, String? type, DateTime? from, DateTime? to}) {
+    return repo.getPayments(userId: userId, type: type, from: from, to: to);
+  }
 
-  Future<double>        fetchBalance(int uid)   => repo.getWalletBalance(uid);
+  Future<void> recordPayment(Finance f) => repo.createPayment(f);
 
+  Future<double> fetchBalance(int uid) => repo.getWalletBalance(uid);
 }
