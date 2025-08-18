@@ -14,13 +14,16 @@ class AssistantFinanceController extends GetxController {
   var isLoadingAssistants = false.obs;
   bool get isOwner     => auth.currentUser?.role == UserRole.owner;
 
-
-
+  int? userId;
   // Assistant wallet flows
   var balance            = 0.0.obs;
   var transactions       = <Finance>[].obs;
   var isLoadingWallet    = false.obs;
 
+  // Filter parameters
+  var filterType   = RxnString();
+  var filterFrom   = Rxn<DateTime>();
+  var filterTo     = Rxn<DateTime>();
   // @override
   // void onInit() {
   //   super.onInit();
@@ -28,12 +31,35 @@ class AssistantFinanceController extends GetxController {
   //     _loadWalletForCurrentUser();
   // }
 
-  Future<void> loadWalletForAssistant(int assistantId) async {
+  Future<void> loadWalletForAssistant() async {
     isLoadingWallet.value = true;
-    balance.value      = await service.fetchBalance(assistantId);
-    transactions.value = await service.fetchTransactions(assistantId);
+    balance.value      = await service.fetchBalance(userId!);
+    transactions.value = await service.fetchTransactions(userId!);
     isLoadingWallet.value = false;
   }
+
+  Future<void> loadPayments() async {
+    isLoadingWallet.value = true;
+    final list = await service.fetchPayments(userId: userId, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
+    transactions.assignAll(list);
+    isLoadingWallet.value = false;
+  }
+
+  // Set any filter and reload
+  void setFilters({int? userId, String? type, DateTime? from, DateTime? to,}) {
+    filterType.value   = type;
+    filterFrom.value   = from;
+    filterTo.value     = to;
+    loadPayments();
+  }
+
+  void clearFilters() {
+    filterType.value   = null;
+    filterFrom.value   = null;
+    filterTo.value     = null;
+    loadPayments();
+  }
+
 
   Future<void> addDebitForAssistant(int assistantId, double amount) async {
     final f = Finance(
@@ -43,6 +69,6 @@ class AssistantFinanceController extends GetxController {
       createdAt: DateTime.now(),
     );
     await service.recordPayment(f);
-    await loadWalletForAssistant(assistantId);
+    await loadWalletForAssistant();
   }
 }

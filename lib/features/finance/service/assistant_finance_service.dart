@@ -6,7 +6,9 @@ class AssistantFinanceService extends GetxService {
   final AssistantFinanceRepo repo;
   AssistantFinanceService({ required this.repo });
 
-  Future<List<Finance>> fetchPayments()        => repo.getPayments();
+  Future<List<Finance>> fetchPayments({int? userId, String? type, DateTime? from, DateTime? to}) {
+    return repo.getPayments(userId: userId, type: type, from: from, to: to);
+  }
   Future<Finance>       recordPayment(Finance f) => repo.createPayment(f);
 
   Future<double>        fetchBalance(int uid)   => repo.getWalletBalance(uid);

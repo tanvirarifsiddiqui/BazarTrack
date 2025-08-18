@@ -1,4 +1,3 @@
-import 'package:flutter_boilerplate/features/finance/controller/assistant_finance_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
@@ -104,14 +103,12 @@ class OrderController extends GetxController {
   // Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item, bool isPurchased) async {
     await orderService.updateOrderItem(item);
-
-    if (item.actualCost != null && isPurchased == false) {
-      // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
-      print("True Access");
-      await Get.find<AssistantFinanceController>().loadWalletForAssistant(
-        int.parse(_auth.currentUser!.id),
-      );
-    }
+    // if (item.actualCost != null && isPurchased == false) {
+    //   // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
+    //   await Get.find<AssistantFinanceController>().loadWalletForAssistant(
+    //     int.parse(_auth.currentUser!.id),
+    //   );
+    // }
     // loadItems(item.orderId.toString());
   }
 

@@ -5,8 +5,14 @@ class AssistantFinanceRepo {
   final BazarTrackApi api;
   AssistantFinanceRepo({ required this.api });
 
-  Future<List<Finance>> getPayments() async {
-    final res = await api.payments();
+  Future<List<Finance>> getPayments({int? userId, String? type, DateTime? from, DateTime? to,}) async {
+    final query = <String, dynamic>{};
+    if (userId != null) query['user_id'] = userId;
+    if (type   != null) query['type']    = type;
+    if (from   != null) query['from']    = from.toIso8601String().split('T').first;
+    if (to     != null) query['to']      = to  .toIso8601String().split('T').first;
+
+    final res = await api.payments(query: query.isEmpty ? null : query);
     if (res.isOk && res.body is List) {
       return (res.body as List)
           .map((e) => Finance.fromJson(e as Map<String, dynamic>))
