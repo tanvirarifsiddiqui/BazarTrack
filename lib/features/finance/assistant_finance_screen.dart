@@ -277,20 +277,6 @@ class AssistantFinancePage extends StatelessWidget {
 
                     // Balance (observed)
                     Obx(() {
-                      if (ctrl.isLoadingWallet.value) {
-                        return SizedBox(
-                          width: 110,
-                          height: 36,
-                          child: Center(
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: theme.primaryColor),
-                            ),
-                          ),
-                        );
-                      }
-
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
