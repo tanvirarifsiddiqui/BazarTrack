@@ -34,6 +34,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 
+import '../features/dashboard/controller/analytics_controller.dart';
+import '../features/dashboard/repository/analytics_repo.dart';
+import '../features/dashboard/service/analytics_service.dart';
 import '../features/finance/service/assistant_finance_service.dart';
 
 Future<Map<String, Map<String, String>>> init() async {
@@ -52,6 +55,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => HistoryRepo(api: Get.find()));
   Get.lazyPut(() => FinanceRepo(api: Get.find()));
   Get.lazyPut(() => AssistantFinanceRepo(api: Get.find()));
+  Get.lazyPut(() => AnalyticsRepo(api: Get.find()));
+
 
 
   // Services
@@ -61,6 +66,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put(HistoryService(historyRepo: Get.find()), permanent: true);
   Get.put(FinanceService(repo: Get.find()));
   Get.put(AssistantFinanceService(repo: Get.find()));
+  Get.put(AnalyticsService(repo: Get.find()), permanent: true);
 
   // Controllers
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
@@ -73,6 +79,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => HistoryController(historyService: Get.find()), fenix: true);
   Get.lazyPut(() => FinanceController(service: Get.find()), fenix: true);
   Get.lazyPut(() => AssistantFinanceController(service: Get.find(), auth: Get.find(),), fenix: true);
+  Get.lazyPut(() => AnalyticsController(service: Get.find()), fenix: true);
 
 
   // Retrieving localized data

@@ -6,20 +6,33 @@
 // Time: 9:55 AM
 */
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
 
-/// 1. Stats Summary: Total, Assigned, In Progress, Completed
 class StatsSummary extends StatelessWidget {
+  final int totalOrders;
+  final int totalUsers;
+  final int totalPayments;
+  final double balance;
   final ThemeData theme;
-  const StatsSummary(this.theme, {super.key});
+
+  const StatsSummary({
+    Key? key,
+    required this.totalOrders,
+    required this.totalUsers,
+    required this.totalPayments,
+    required this.balance,
+    required this.theme,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final stats = [
-      _StatTile('Total Orders', '128', Icons.list_alt, theme.primaryColor),
-      _StatTile('Assigned', '76', Icons.person_add, Colors.orange),
-      _StatTile('In Progress', '32', Icons.autorenew, Colors.blue),
-      _StatTile('Completed', '20', Icons.check_circle, Colors.green),
+      _StatTile('Total Orders', totalOrders.toString(), Icons.shopping_cart, AppColors.primary,),
+      _StatTile('Users', totalUsers.toString(), Icons.group, Colors.orange,),
+      _StatTile('Total Payments', totalPayments.toString(), Icons.payments, Colors.teal,),
+      _StatTile('Total Balance', '৳${balance.toString()}', Icons.account_balance_wallet, Colors.green,),
     ];
+
 
     return GridView.count(
       crossAxisCount: 2,
@@ -32,6 +45,9 @@ class StatsSummary extends StatelessWidget {
     );
   }
 }
+
+// _StatTile unchanged from above
+
 
 class _StatTile extends StatelessWidget {
   final String title;
