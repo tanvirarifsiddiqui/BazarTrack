@@ -1,10 +1,10 @@
-// lib/features/dashboard/screens/owner_dashboard_details.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/dashboard/controller/analytics_controller.dart';
+import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 import 'package:get/get.dart';
 import 'components/reports_summary.dart';
 import 'components/stats_summary.dart';
+import 'components/wallet_summary.dart';
 
 class OwnerDashboardDetails extends StatelessWidget {
   const OwnerDashboardDetails({Key? key}) : super(key: key);
@@ -12,7 +12,9 @@ class OwnerDashboardDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<AnalyticsController>();
+    final financeCtrl = Get.find<FinanceController>();
     final theme = Theme.of(context);
+    final spacer = const SizedBox(height: 16);
 
     return Scaffold(
       body: Obx(() {
@@ -36,9 +38,12 @@ class OwnerDashboardDetails extends StatelessWidget {
                 balance:      dash.totalRevenue,
                 theme: theme,
               ),
-
-              const SizedBox(height: 24),
-
+              spacer,
+              WalletSummary(
+                theme: theme,
+                assistants: financeCtrl.assistants,
+              ),
+              spacer,
               ReportsSummary(reports: rep, theme: theme),
             ],
           ),
@@ -46,6 +51,5 @@ class OwnerDashboardDetails extends StatelessWidget {
       }),
     );
   }
-
 
 }

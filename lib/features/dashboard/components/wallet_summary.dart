@@ -7,17 +7,11 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class Assistant {
-  final String name;
-  final double balance; // e.g. paid out or total collected
-
-  Assistant({
-    required this.name,
-    required this.balance,
-  });
-}
+import '../../finance/model/assistant.dart';
+import '../assistant_dashboard_details_screen.dart';
 
 final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
 
@@ -82,7 +76,7 @@ class WalletSummary extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${assistants.length} assistants',
+                    '${assistants.length} ${assistants.length == 1? 'assistant': 'assistants'}',
                     style: textTheme.bodySmall?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -102,6 +96,9 @@ class WalletSummary extends StatelessWidget {
                         assistant: a,
                         theme: theme,
                         initials: _initials(a.name),
+                        onPressed: (){
+                          Get.to(() => AssistantDashboardDetails(assistantId: 3));
+                        }
                       ),
                       if (i < assistants.length - 1)
                         Padding(
@@ -124,12 +121,13 @@ class _AssistantRow extends StatelessWidget {
   final Assistant assistant;
   final ThemeData theme;
   final String initials;
+  final GestureTapCallback onPressed;
 
   const _AssistantRow({
     required this.assistant,
     required this.theme,
     required this.initials,
-    super.key,
+    required this.onPressed,
   });
 
   @override
@@ -137,60 +135,63 @@ class _AssistantRow extends StatelessWidget {
     final textTheme = theme.textTheme;
     final avatarColor = theme.primaryColor;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Avatar
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: avatarColor.withValues(alpha: 0.12),
-          child: Text(
-            initials,
-            style: textTheme.titleMedium?.copyWith(
-              color: avatarColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        // Name column now centered vertically so it lines up with the avatar
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // name (now visually centered relative to avatar)
-              Text(
-                assistant.name,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-            ],
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        // Balance (prominent)
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _takaFormat.format(assistant.balance),
-              style: textTheme.titleLarge?.copyWith(
-                color: theme.primaryColor,
+    return InkWell(
+      onTap: onPressed,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Avatar
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: avatarColor.withValues(alpha: 0.12),
+            child: Text(
+              initials,
+              style: textTheme.titleMedium?.copyWith(
+                color: avatarColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ],
-        ),
-      ],
+          ),
+
+          const SizedBox(width: 12),
+
+          // Name column now centered vertically so it lines up with the avatar
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // name (now visually centered relative to avatar)
+                Text(
+                  assistant.name,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Balance (prominent)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _takaFormat.format(assistant.balance),
+                style: textTheme.titleLarge?.copyWith(
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

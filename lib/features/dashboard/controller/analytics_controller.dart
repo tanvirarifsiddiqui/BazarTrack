@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../model/assistant_analytics.dart';
 import '../model/dashboard_metrics.dart';
 import '../model/monthly_report.dart';
 import '../service/analytics_service.dart';
@@ -10,11 +11,12 @@ class AnalyticsController extends GetxController {
   var dashboard = Rxn<DashboardMetrics>();
   var reports   = Rxn<ReportsData>();
   var isLoading = false.obs;
+  var analytics = Rxn<AssistantAnalytics>();
 
   @override
   void onInit() {
     super.onInit();
-    _loadAll();
+      _loadAll();
   }
 
   Future<void> _loadAll() async {
@@ -23,4 +25,5 @@ class AnalyticsController extends GetxController {
     reports.value   = await service.getReports();
     isLoading.value = false;
   }
+
 }

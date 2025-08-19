@@ -27,4 +27,5 @@ class Endpoints {
 
   static const analyticsDashboard = '${AppConstants.baseUrl}/api/analytics/dashboard';
   static const analyticsReports = '${AppConstants.baseUrl}/api/analytics/reports';
+  static String assistantAnalytics(int id) => '${AppConstants.baseUrl}/api/analytics/assistants/$id';
 }

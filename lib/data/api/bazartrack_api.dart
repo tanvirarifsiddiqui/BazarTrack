@@ -70,4 +70,5 @@ class BazarTrackApi {
   // Analytics
   Future<Response> dashboard() => client.getData(Endpoints.analyticsDashboard);
   Future<Response> reports() => client.getData(Endpoints.analyticsReports);
+  Future<Response> assistantAnalytics(int id) => client.getData(Endpoints.assistantAnalytics(id));
 }
