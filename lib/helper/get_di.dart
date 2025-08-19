@@ -15,10 +15,8 @@ import 'package:flutter_boilerplate/features/finance/controller/assistant_financ
 import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 
 import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
-import 'package:flutter_boilerplate/features/finance/controller/advance_controller.dart';
 import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
-import 'package:flutter_boilerplate/features/finance/service/advance_service.dart';
 import 'package:flutter_boilerplate/features/finance/service/finance_service.dart';
 
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -43,42 +41,42 @@ Future<Map<String, Map<String, String>>> init() async {
   // Core
   final sharedPreferences = await SharedPreferences.getInstance();
   Get.lazyPut(() => sharedPreferences);
-  Get.lazyPut(() => ApiClient(sharedPreferences: Get.find()));
-  Get.lazyPut(() => BazarTrackApi(client: Get.find()));
+  Get.lazyPut(() => ApiClient(sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => BazarTrackApi(client: Get.find<ApiClient>()));
 
   // Repository
-  Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find(), apiClient: Get.find()));
+  Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find<SharedPreferences>(), apiClient: Get.find<ApiClient>()));
   Get.lazyPut(() => LanguageRepo());
-  Get.lazyPut(() => AuthRepo(api: Get.find(), sharedPreferences: Get.find()));
-  Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find()));
-  Get.lazyPut(() => OrderRepo(api: Get.find()));
-  Get.lazyPut(() => HistoryRepo(api: Get.find()));
-  Get.lazyPut(() => FinanceRepo(api: Get.find()));
-  Get.lazyPut(() => AssistantFinanceRepo(api: Get.find()));
-  Get.lazyPut(() => AnalyticsRepo(api: Get.find()));
+  Get.lazyPut(() => AuthRepo(api: Get.find<BazarTrackApi>(), sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => OrderRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => FinanceRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => AssistantFinanceRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => AnalyticsRepo(api: Get.find<BazarTrackApi>()));
 
 
 
   // Services
-  Get.put(AuthService(authRepo: Get.find()),permanent: true);
-  Get.put(AdvanceService(advanceRepo: Get.find()), permanent: true);
-  Get.put(OrderService(orderRepo: Get.find()), permanent: true);
-  Get.put(HistoryService(historyRepo: Get.find()), permanent: true);
-  Get.put(FinanceService(repo: Get.find()));
-  Get.put(AssistantFinanceService(repo: Get.find()));
-  Get.put(AnalyticsService(repo: Get.find()), permanent: true);
+  Get.put(AuthService(authRepo: Get.find<AuthRepo>()),permanent: true);
+  // Get.put(AdvanceService(advanceRepo: Get.find()), permanent: true);
+  Get.put(OrderService(orderRepo: Get.find<OrderRepo>()), permanent: true);
+  Get.put(HistoryService(historyRepo: Get.find<HistoryRepo>()),);
+  Get.put(FinanceService(repo: Get.find<FinanceRepo>()));
+  Get.put(AssistantFinanceService(repo: Get.find<AssistantFinanceRepo>()));
+  Get.put(AnalyticsService(repo: Get.find<AnalyticsRepo>()),);
 
   // Controllers
-  Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
+  Get.lazyPut(() => ThemeController(sharedPreferences: Get.find<SharedPreferences>()));
   Get.lazyPut(() => SplashController(splashRepo: Get.find()));
   Get.lazyPut(() => LocalizationController(sharedPreferences: Get.find()));
   Get.lazyPut(() => LanguageController(sharedPreferences: Get.find()));
-  Get.lazyPut(() => AuthController(authService: Get.find()), fenix: true);
-  Get.lazyPut(() => AdvanceController(advanceService: Get.find()), fenix: true);
-  Get.lazyPut(() => OrderController(orderService: Get.find()), fenix: true);
-  Get.lazyPut(() => HistoryController(historyService: Get.find()), fenix: true);
-  Get.lazyPut(() => FinanceController(service: Get.find()), fenix: true);
-  Get.lazyPut(() => AssistantFinanceController(service: Get.find(), auth: Get.find(),), fenix: true);
+  Get.lazyPut(() => AuthController(authService: Get.find<AuthService>()), fenix: true);
+  // Get.lazyPut(() => AdvanceController(advanceService: Get.find()), fenix: true);
+  Get.lazyPut(() => OrderController(orderService: Get.find<OrderService>(), authService: Get.find<AuthService>(),financeService: Get.find<FinanceService>()), fenix: true);
+  Get.lazyPut(() => HistoryController(historyService: Get.find<HistoryService>()), fenix: true);
+  Get.lazyPut(() => FinanceController(service: Get.find<FinanceService>()), fenix: true);
+  Get.lazyPut(() => AssistantFinanceController(service: Get.find<AssistantFinanceService>()), fenix: true);
   Get.lazyPut(() => AnalyticsController(service: Get.find()), fenix: true);
 
 

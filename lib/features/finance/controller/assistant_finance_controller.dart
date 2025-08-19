@@ -1,18 +1,14 @@
 import 'package:flutter_boilerplate/features/finance/service/assistant_finance_service.dart';
 import 'package:get/get.dart';
-import '../../auth/model/role.dart';
 import '../model/finance.dart';
-import '../../auth/service/auth_service.dart';
 
 class AssistantFinanceController extends GetxController {
   final AssistantFinanceService service;
-  final AuthService    auth;
 
-  AssistantFinanceController({ required this.service, required this.auth });
+  AssistantFinanceController({ required this.service });
 
   // Owner flows
   var isLoadingAssistants = false.obs;
-  bool get isOwner     => auth.currentUser?.role == UserRole.owner;
 
   int? userId;
   // Assistant wallet flows

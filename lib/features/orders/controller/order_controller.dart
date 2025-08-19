@@ -11,7 +11,8 @@ import '../../finance/service/finance_service.dart';
 
 class OrderController extends GetxController {
   final OrderService orderService;
-  final AuthService _auth = Get.find();
+  final AuthService authService;
+  final FinanceService financeService;
   Future<Order?> getOrder(String id) => orderService.getOrderById(id);
 
   // reactive list + loading flag
@@ -27,9 +28,10 @@ class OrderController extends GetxController {
   List<OrderItem> items = [];
   bool isLoadingItems = false;
   var assistants = <Assistant>[].obs;
+  OrderController({required this.orderService, required this.authService, required this.financeService});
 
   Future<List<Assistant>> getAllAssistants() {
-    return Get.find<FinanceService>().fetchAssistants(withBalance: true);
+    return financeService.fetchAssistants(withBalance: true);
   }
 
   @override
@@ -64,10 +66,10 @@ class OrderController extends GetxController {
   }
 
   Future<void> loadAssistants() async {
-    assistants.value = await Get.find<FinanceService>().fetchAssistants();
+    assistants.value = await financeService.fetchAssistants();
   }
 
-  OrderController({required this.orderService});
+
 
   Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) {
     return orderService.getOrders(status: status, assignedTo: assignedTo);
@@ -99,7 +101,9 @@ class OrderController extends GetxController {
       // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
       // Get.find<AssistantFinanceController>().loadWalletForAssistant(int.parse(_auth.currentUser!.id));
     }
-    return orderService.createOrderItem(item);
+    final created = orderService.createOrderItem(item);
+    update();
+    return created;
   }
 
   // Update an existing item, log before/after, then refresh list
@@ -149,9 +153,8 @@ class OrderController extends GetxController {
       return;
     }
 
-    print('This is Assigned User Id: $assignedToUserId');
     final order = Order.create(
-      createdBy: _auth.currentUser!.id.toString(),
+      createdBy: authService.currentUser!.id.toString(),
       assignedTo: assignedToUserId?.toString(), // <-- null-safe for proper response
       status: OrderStatus.pending,
       createdAt: DateTime.now(),
@@ -168,7 +171,7 @@ class OrderController extends GetxController {
 
 
   Future<bool> selfAssign(String orderId) async {
-    final res = await orderService.selfAssign(orderId);
+    final res = await orderService.selfAssign(orderId, authService.currentUser!.id.toString());
     update();
     return res;
   }

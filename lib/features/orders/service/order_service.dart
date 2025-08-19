@@ -3,9 +3,8 @@ import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
-import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 
-class OrderService extends GetxController implements GetxService {
+class OrderService extends GetxService {
   final OrderRepo orderRepo;
 
   OrderService({required this.orderRepo});
@@ -38,8 +37,6 @@ class OrderService extends GetxController implements GetxService {
   Future<OrderItem> createOrderItem(OrderItem item) async {
     final created = await orderRepo.createOrderItem(item);
 
-    update();
-
     return created;
   }
 
@@ -52,8 +49,6 @@ class OrderService extends GetxController implements GetxService {
       final updatedItem = item.copyWith(orderId: serverId);
       await orderRepo.createOrderItem(updatedItem);
     }
-
-    update();
     return createdOrder;
   }
 
@@ -61,26 +56,16 @@ class OrderService extends GetxController implements GetxService {
   Future<void> updateOrder(Order order) async {
     // final previous = orderRepo.getById(order.orderId!);
     await orderRepo.updateOrder(order);
-
-    update();
   }
 
   /// Assign an Order to a user + log
   Future<void> assignOrder(String orderId, int userId) async {
     await orderRepo.assignOrder(orderId, userId);
-
-    update();
   }
 
   /// Self-assign the current user to an Order + log
-  Future<bool> selfAssign(String orderId) async {
-    final userId = Get.find<AuthService>().currentUser?.id;
-    if (userId == null) return false;
-
-    // final previous = orderRepo.getById(orderId);
+  Future<bool> selfAssign(String orderId, String userId) async {
     await orderRepo.assignOrder(orderId, int.parse(userId));
-
-    update();
     return true;
   }
 }

@@ -1,271 +1,158 @@
+// lib/features/dashboard/components/reports_chart_syncfusion.dart
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 
-// Models used by your project
 import '../model/assistant_analytics.dart';
 import '../model/monthly_report.dart';
 
-/// Reusable reports chart widget that displays orders (bar) and revenue (line)
-/// stacked vertically, with a structured table/summary below the charts.
-///
-/// Provides convenient factories to construct from your existing models
-/// (AssistantAnalytics and ReportsData).
-class ReportsChart extends StatelessWidget {
-  final List<String> months;
-  final List<int> orders;
-  final List<double> revenue;
+/// Reusable Syncfusion chart widget showing:
+/// - Orders as ColumnSeries (primary Y axis)
+/// - Revenue as LineSeries (secondary Y axis)
+/// X axis displays months formatted like "Aug 2025".
+class ReportsChartSyncfusion extends StatelessWidget {
+  final List<_ChartPoint> data;
   final ThemeData theme;
-
-  /// If true, the widget renders a combined DataTable below the charts
   final bool showTableBelow;
-
-  /// Optional custom widget to display below charts (used instead of the table)
   final Widget? customBelow;
 
-  const ReportsChart._({
+  const ReportsChartSyncfusion._({
     Key? key,
-    required this.months,
-    required this.orders,
-    required this.revenue,
+    required this.data,
     required this.theme,
     this.showTableBelow = true,
     this.customBelow,
   }) : super(key: key);
 
-  /// Build from AssistantAnalytics
-  factory ReportsChart.fromAssistantAnalytics(AssistantAnalytics data, ThemeData theme,
+  /// Factory: build from your AssistantAnalytics model
+  factory ReportsChartSyncfusion.fromAssistantAnalytics(
+      AssistantAnalytics analytics, ThemeData theme,
       {bool showTableBelow = true, Widget? customBelow}) {
-    final monthsList = _unionMonths(
-      data.ordersByMonth.map((e) => e.month).toList(),
-      data.revenueByMonth.map((e) => e.month).toList(),
+    final points = _mergeMonthlyData(
+      analytics.ordersByMonth,
+      analytics.revenueByMonth,
     );
-
-    final idxMap = {for (var i = 0; i < monthsList.length; i++) monthsList[i]: i};
-
-    final orders = List<int>.generate(monthsList.length, (i) => 0);
-    for (final m in data.ordersByMonth) {
-      final idx = idxMap[m.month] ?? 0;
-      orders[idx] = m.count;
-    }
-
-    final revenue = List<double>.generate(monthsList.length, (i) => 0.0);
-    for (final r in data.revenueByMonth) {
-      final idx = idxMap[r.month] ?? 0;
-      revenue[idx] = r.revenue.toDouble();
-    }
-
-    return ReportsChart._(
-      months: monthsList,
-      orders: orders,
-      revenue: revenue,
+    return ReportsChartSyncfusion._(
+      data: points,
       theme: theme,
       showTableBelow: showTableBelow,
       customBelow: customBelow,
     );
   }
 
-  /// Build from ReportsData (the owner report structure)
-  factory ReportsChart.fromReportsData(ReportsData reports, ThemeData theme,
+  /// Factory: build from ReportsData (owner)
+  factory ReportsChartSyncfusion.fromReportsData(
+      ReportsData reports, ThemeData theme,
       {bool showTableBelow = true, Widget? customBelow}) {
-    final monthsList = _unionMonths(
-      reports.ordersByMonth.map((e) => e.month).toList(),
-      reports.revenueByMonth.map((e) => e.month).toList(),
+    final points = _mergeMonthlyData(
+      reports.ordersByMonth,
+      reports.revenueByMonth,
     );
-
-    final idxMap = {for (var i = 0; i < monthsList.length; i++) monthsList[i]: i};
-
-    final orders = List<int>.generate(monthsList.length, (i) => 0);
-    for (final m in reports.ordersByMonth) {
-      final idx = idxMap[m.month] ?? 0;
-      orders[idx] = m.count;
-    }
-
-    final revenue = List<double>.generate(monthsList.length, (i) => 0.0);
-    for (final r in reports.revenueByMonth) {
-      final idx = idxMap[r.month] ?? 0;
-      revenue[idx] = r.revenue.toDouble();
-    }
-
-    return ReportsChart._(
-      months: monthsList,
-      orders: orders,
-      revenue: revenue,
+    return ReportsChartSyncfusion._(
+      data: points,
       theme: theme,
       showTableBelow: showTableBelow,
       customBelow: customBelow,
     );
   }
 
-  // --- Helpers ---
-  static List<String> _unionMonths(List<String> a, List<String> b) {
-    final out = <String>[];
-    for (final s in a) {
-      if (!out.contains(s)) out.add(s);
-    }
-    for (final s in b) {
-      if (!out.contains(s)) out.add(s);
-    }
-    return out;
-  }
-
-  List<String> _monthLabels(List<String> months) {
-    return months.map((m) {
-      if (m.length <= 4) return m;
-      try {
-        final parsed = DateFormat('yyyy-MM').parseLoose(m);
-        return DateFormat.MMM().format(parsed);
-      } catch (_) {
-        return m.length <= 3 ? m : m.substring(0, 3);
-      }
-    }).toList();
-  }
-
-  Widget _bottomTitleWidget(double value, TitleMeta meta, List<String> labels, TextStyle? style) {
-    final idx = value.toInt();
-    if (idx < 0 || idx >= labels.length) return const SizedBox.shrink();
-    return SideTitleWidget(
-      meta: meta,
-      child: Transform.translate(
-        offset: const Offset(0, 6),
-        child: Text(labels[idx], style: style),
-      ),
-    );
-  }
-
+  // ---------- Build ----------
   @override
   Widget build(BuildContext context) {
-    final labels = _monthLabels(months);
-    final textSmall = theme.textTheme.bodySmall;
-    final duration = const Duration(milliseconds: 400);
+    final dateFmt = DateFormat('MMM yyyy'); // -> "Aug 2025"
 
-    // Build bar groups
-    final barGroups = List.generate(months.length, (i) {
-      return BarChartGroupData(x: i, barRods: [
-        BarChartRodData(
-          toY: orders[i].toDouble(),
-          width: 18,
-          borderRadius: BorderRadius.circular(6),
-          color: theme.colorScheme.primary,
-        )
-      ]);
-    });
+    // defensive: empty view
+    if (data.isEmpty) {
+      return Center(
+        child: Text('No data available', style: theme.textTheme.bodyMedium),
+      );
+    }
 
-    final spots = List.generate(months.length, (i) => FlSpot(i.toDouble(), revenue[i]));
-
-    final maxOrder = orders.isNotEmpty ? orders.reduce((a, b) => a > b ? a : b).toDouble() : 0.0;
-    final maxRevenue = revenue.isNotEmpty ? revenue.reduce((a, b) => a > b ? a : b) : 0.0;
-
-    final orderTop = (maxOrder * 1.2).clamp(5.0, double.infinity);
+    // Compute nice axis ranges (small padding)
+    final maxOrders = data.map((e) => e.orders).fold<int>(0, (a, b) => a > b ? a : b);
+    final maxRevenue = data.map((e) => e.revenue).fold<double>(0.0, (a, b) => a > b ? a : b);
+    final orderTop = (maxOrders * 1.2).clamp(5.0, double.infinity);
     final revenueTop = (maxRevenue * 1.2).clamp(5.0, double.infinity);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Orders by Month', style: theme.textTheme.titleLarge),
-        const SizedBox(height: 8),
+        // Chart
         SizedBox(
-          height: 220,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceBetween,
-                maxY: orderTop,
-                barGroups: barGroups,
-                gridData: FlGridData(show: true),
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      interval: orderTop / 4,
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 36,
-                      getTitlesWidget: (value, meta) =>
-                          _bottomTitleWidget(value, meta, labels, textSmall),
-                    ),
-                  ),
-                ),
-                barTouchData: BarTouchData(enabled: true),
-              ),
-              duration: duration,
-              curve: Curves.easeInOut,
+          height: 360,
+          child: SfCartesianChart(
+            legend: Legend(isVisible: true, position: LegendPosition.top),
+            tooltipBehavior: TooltipBehavior(enable: true, header: ''),
+            primaryXAxis: DateTimeAxis(
+              intervalType: DateTimeIntervalType.months,
+              // show label like "Aug 2025"
+              dateFormat: dateFmt,
+              edgeLabelPlacement: EdgeLabelPlacement.shift,
+              majorGridLines: const MajorGridLines(width: 0.5),
             ),
+            primaryYAxis: NumericAxis(
+              name: 'ordersAxis',
+              title: AxisTitle(text: 'Orders'),
+              minimum: 0,
+              maximum: orderTop,
+              interval: (orderTop / 4).ceilToDouble(),
+              opposedPosition: false,
+            ),
+            axes: <ChartAxis>[
+              NumericAxis(
+                name: 'revenueAxis',
+                title: AxisTitle(text: 'Revenue'),
+                minimum: 0,
+                maximum: revenueTop,
+                interval: (revenueTop / 4),
+                opposedPosition: true,
+                numberFormat: NumberFormat.simpleCurrency(decimalDigits: 2),
+              ),
+            ],
+
+            // <-- Corrected series type here -->
+            series: <CartesianSeries<_ChartPoint, DateTime>>[
+              ColumnSeries<_ChartPoint, DateTime>(
+                dataSource: data,
+                xValueMapper: (pt, _) => pt.month,
+                yValueMapper: (pt, _) => pt.orders,
+                name: 'Orders',
+                width: 0.6,
+                dataLabelSettings: const DataLabelSettings(isVisible: false),
+                enableTooltip: true,
+                color: theme.colorScheme.primary,
+              ),
+
+              LineSeries<_ChartPoint, DateTime>(
+                dataSource: data,
+                xValueMapper: (pt, _) => pt.month,
+                yValueMapper: (pt, _) => pt.revenue,
+                yAxisName: 'revenueAxis',
+                name: 'Revenue',
+                markerSettings: MarkerSettings(isVisible: true),
+                enableTooltip: true,
+                width: 2,
+                color: theme.colorScheme.secondary,
+                dataLabelSettings: const DataLabelSettings(isVisible: false),
+              ),
+            ],
+            zoomPanBehavior: ZoomPanBehavior(enablePinching: true, enablePanning: true),
           ),
         ),
 
-        const SizedBox(height: 24),
-        Text('Revenue by Month', style: theme.textTheme.titleLarge),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 220,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: LineChart(
-              LineChartData(
-                minY: 0,
-                maxY: revenueTop,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: spots,
-                    isCurved: true,
-                    dotData: FlDotData(show: true),
-                    barWidth: 3,
-                    color: theme.colorScheme.secondary,
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: theme.colorScheme.secondary.withValues(alpha: 0.15),
-                    ),
-                  ),
-                ],
-                gridData: FlGridData(show: true),
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      interval: revenueTop / 4,
-                    ),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 36,
-                      getTitlesWidget: (value, meta) =>
-                          _bottomTitleWidget(value, meta, labels, textSmall),
-                    ),
-                  ),
-                ),
-                lineTouchData: LineTouchData(enabled: true),
-              ),
-              duration: duration,
-              curve: Curves.easeInOut,
-            ),
-          ),
-        ),
+        const SizedBox(height: 12),
 
-        const SizedBox(height: 16),
-
-        // Structured information below the chart: either custom widget or auto table
+        // Structured info below (custom or auto table)
         if (customBelow != null) ...[
           customBelow!,
         ] else if (showTableBelow) ...[
-          const SizedBox(height: 8),
-          _buildCombinedTable(),
+          _buildCombinedTable(dateFmt),
         ],
       ],
     );
   }
 
-  Widget _buildCombinedTable() {
-    final formatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
-
+  Widget _buildCombinedTable(DateFormat dateFmt) {
     return DataTable(
       columnSpacing: 16,
       columns: const [
@@ -273,13 +160,69 @@ class ReportsChart extends StatelessWidget {
         DataColumn(label: Text('Orders')),
         DataColumn(label: Text('Revenue')),
       ],
-      rows: List.generate(months.length, (i) {
+      rows: data.map((pt) {
         return DataRow(cells: [
-          DataCell(Text(months[i])),
-          DataCell(Text(orders[i].toString())),
-          DataCell(Text(formatter.format(revenue[i]))),
+          DataCell(Text(dateFmt.format(pt.month))),
+          DataCell(Text(pt.orders.toString())),
+          DataCell(Text(NumberFormat.simpleCurrency(decimalDigits: 2).format(pt.revenue))),
         ]);
-      }),
+      }).toList(),
     );
   }
+
+  // ---------- Static helpers ----------
+  static List<_ChartPoint> _mergeMonthlyData(
+      List<MonthlyCount> orders,
+      List<MonthlyRevenue> revenue,
+      ) {
+    // union preserving order of appearance
+    final months = <String>[];
+    for (final o in orders) {
+      if (!months.contains(o.month)) months.add(o.month);
+    }
+    for (final r in revenue) {
+      if (!months.contains(r.month)) months.add(r.month);
+    }
+
+    // parse months to DateTime and build maps
+    DateTime? parseMonth(String m) {
+      // Accept "yyyy-MM" and "yyyy-MM-dd"
+      try {
+        if (m.length == 7) return DateFormat('yyyy-MM').parseLoose(m);
+        return DateFormat('yyyy-MM-dd').parseLoose(m);
+      } catch (_) {
+        // last fallback: try full parse
+        try {
+          return DateTime.parse(m);
+        } catch (_) {
+          return null;
+        }
+      }
+    }
+
+    final orderMap = {for (var o in orders) o.month: o.count};
+    final revenueMap = {for (var r in revenue) r.month: r.revenue};
+
+    final points = <_ChartPoint>[];
+    for (final m in months) {
+      final dt = parseMonth(m) ?? DateTime.now();
+      final o = orderMap[m] ?? 0;
+      final rev = (revenueMap[m] ?? 0).toDouble();
+      points.add(_ChartPoint(month: dt, orders: o, revenue: rev));
+    }
+    return points;
+  }
+}
+
+/// Small immutable model used by the chart
+class _ChartPoint {
+  final DateTime month;
+  final int orders;
+  final double revenue;
+
+  const _ChartPoint({
+    required this.month,
+    required this.orders,
+    required this.revenue,
+  });
 }

@@ -5,7 +5,7 @@ import 'package:flutter_boilerplate/features/auth/model/user.dart';
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 import 'package:get/get.dart';
 
-class AuthService extends GetxController implements GetxService {
+class AuthService extends GetxService {
   final AuthRepo authRepo;
   AuthService({required this.authRepo}) {
     loadUser();
@@ -25,7 +25,6 @@ class AuthService extends GetxController implements GetxService {
   Future<void> signUp(UserModel user) async {
     await authRepo.signUp(jsonEncode(user.toJson()));
     _currentUser = user;
-    update();
   }
 
 // Returns true if login succeeded
@@ -33,7 +32,6 @@ class AuthService extends GetxController implements GetxService {
     final response = await authRepo.login(email, password);
     if (response.isOk) {
       loadUser();
-      update();
       return true;
     }
     return false;
@@ -50,6 +48,5 @@ class AuthService extends GetxController implements GetxService {
   Future<void> saveUser(UserModel user) async {
     _currentUser = user;
     await authRepo.saveUser(jsonEncode(user.toJson()));
-    update();
   }
 }

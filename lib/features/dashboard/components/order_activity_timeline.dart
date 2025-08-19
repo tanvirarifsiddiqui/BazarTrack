@@ -31,6 +31,7 @@ class OrderActivityTimeline extends StatelessWidget {
           children: [
             Text('Order Activity', style: theme.textTheme.titleLarge),
             const SizedBox(height: 12),
+
             Column(
               children:
               activities.map((act) {

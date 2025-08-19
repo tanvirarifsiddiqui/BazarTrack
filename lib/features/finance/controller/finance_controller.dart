@@ -7,7 +7,6 @@
 */
 
 import 'package:get/get.dart';
-import '../../auth/service/auth_service.dart';
 import '../model/finance.dart';
 import '../model/assistant.dart';
 import '../service/finance_service.dart';
@@ -23,7 +22,6 @@ class FinanceController extends GetxController {
 
   // Assistant wallet flows
   var isLoadingWallet    = false.obs;
-  final AuthService    auth = Get.find();
 
   // Reactive list and loading flag
   var payments    = <Finance>[].obs;

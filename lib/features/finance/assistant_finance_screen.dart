@@ -6,10 +6,12 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/util/finance_input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../util/colors.dart';
+import '../auth/model/role.dart';
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
 import 'model/finance.dart';
@@ -210,12 +212,14 @@ class AssistantFinancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AssistantFinanceController ctrl = Get.find<AssistantFinanceController>();
-    ctrl.userId = assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
+    final AuthController auth = Get.find<AuthController>();
+    final isOwner = auth.currentUser?.role == UserRole.owner;
+    ctrl.userId = assistant?.id ?? int.parse(auth.currentUser!.id);
 
     final numFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
     final theme = Theme.of(context);
-    final displayName = assistant?.name ?? ctrl.auth.currentUser!.name;
-    final selectedId = assistant?.id ?? int.parse(ctrl.auth.currentUser!.id);
+    final displayName = assistant?.name ?? auth.currentUser!.name;
+    final selectedId = assistant?.id ?? int.parse(auth.currentUser!.id);
 
     // We trigger initial load only when there are no transactions and not loading.
     // Use Obx to observe controller state and call load once when needed.
@@ -375,7 +379,7 @@ class AssistantFinancePage extends StatelessWidget {
       ),
 
       // FAB visible for Assistant only (if controller exposes isOwner as bool)
-      floatingActionButton: !ctrl.isOwner
+      floatingActionButton: isOwner
           ? FloatingActionButton.extended(
         heroTag: 'assistant_add',
         icon: const Icon(Icons.add),

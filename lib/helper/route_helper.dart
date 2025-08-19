@@ -1,6 +1,5 @@
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
-import 'package:flutter_boilerplate/features/finance/advance_screen.dart';
 import 'package:flutter_boilerplate/features/auth/signup_screen.dart';
 import 'package:flutter_boilerplate/features/history/history_view_page.dart';
 import 'package:flutter_boilerplate/features/orders/create_order_screen.dart';
@@ -9,8 +8,6 @@ import 'package:flutter_boilerplate/features/splash/splash_screen.dart';
 import 'package:flutter_boilerplate/features/orders/order_list_screen.dart';
 import 'package:flutter_boilerplate/features/orders/order_detail_screen.dart';
 import 'package:get/get.dart';
-
-import '../features/history/entity_history_screen.dart';
 
 class RouteHelper {
   static const String initial = '/';
@@ -42,7 +39,6 @@ class RouteHelper {
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: ownerDashboard, page: () => const OwnerDashboard()),
     GetPage(name: assistantDashboard, page: () =>  AssistantDashboard()),
-    GetPage(name: advance, page: () => const AdvanceScreen()),
     GetPage(name: orders, page: () => const OrderListScreen()),
     GetPage(name: orderCreate, page: () => CreateOrderScreen()),
     GetPage(
