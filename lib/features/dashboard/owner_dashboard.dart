@@ -4,7 +4,6 @@ import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
-
 import '../finance/owner_finance_screen.dart';
 import '../orders/order_list_screen.dart';
 import 'owner_dashboard_details_screen.dart';
