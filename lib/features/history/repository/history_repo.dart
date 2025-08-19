@@ -40,7 +40,7 @@ class HistoryRepo {
 
   Future<HistoryLog> create(HistoryLog log) async {
     final res = await api.createHistory(log.toJson());
-    if (res.isOk && res.body is! Map<String, dynamic>) {
+    if (res.isOk && res.body is Map<String, dynamic>) {
       return HistoryLog.fromJson(res.body as Map<String, dynamic>);
     }
     throw Exception('Failed to create history log');

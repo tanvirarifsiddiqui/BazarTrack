@@ -1,7 +1,7 @@
 /*
-// Title: Finance Controller
+// Title: Finance Controller (fixed error handling & loading states)
 // Description: Business Logic for Finance Feature
-// Author: Md. Tanvir Arif Siddiqui
+// Author: Md. Tanvir Arif Siddiqui (patched)
 // Date: August 10, 2025
 // Time: 05:17 PM
 */
@@ -14,24 +14,23 @@ import '../service/finance_service.dart';
 class FinanceController extends GetxController {
   final FinanceService service;
 
-  FinanceController({ required this.service, });
+  FinanceController({
+    required this.service,
+  });
 
   // Owner flows
-  var assistants          = <Assistant>[].obs;
+  var assistants = <Assistant>[].obs;
   var isLoadingAssistants = false.obs;
 
-  // Assistant wallet flows
-  var isLoadingWallet    = false.obs;
-
   // Reactive list and loading flag
-  var payments    = <Finance>[].obs;
-  var isLoading   = false.obs;
+  var payments = <Finance>[].obs;
+  var isLoading = false.obs;
 
   // Filter parameters
   var filterUserId = RxnInt();
-  var filterType   = RxnString();
-  var filterFrom   = Rxn<DateTime>();
-  var filterTo     = Rxn<DateTime>();
+  var filterType = RxnString();
+  var filterFrom = Rxn<DateTime>();
+  var filterTo = Rxn<DateTime>();
 
   @override
   void onInit() {
@@ -39,64 +38,115 @@ class FinanceController extends GetxController {
     loadAssistantsAndTransactions();
   }
 
+  // Helper to show errors to user & optionally log
+  void _showError(String title, Object error, [StackTrace? st]) {
+    // You can replace this with any other error UI you prefer
+    Get.snackbar(title, error.toString(), snackPosition: SnackPosition.BOTTOM);
+    // print / log if required
+    // print('$title: $error\n$st');
+  }
+
   Future<void> loadPayments() async {
     isLoading.value = true;
-    final list = await service.fetchPayments(userId: filterUserId.value, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
-    payments.assignAll(list);
-    isLoading.value = false;
+    try {
+      final list = await service.fetchPayments(
+        userId: filterUserId.value,
+        type: filterType.value,
+        from: filterFrom.value,
+        to: filterTo.value,
+      );
+      payments.assignAll(list);
+    } catch (e, st) {
+      // Clear stale data to avoid showing outdated UI state
+      payments.clear();
+      _showError('Failed to load payments', e, st);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // Set any filter and reload
-  void setFilters({int? userId, String? type, DateTime? from, DateTime? to,}) {
+  // Note: kept as void to avoid changing call sites; loadPayments handles async.
+  void setFilters({
+    int? userId,
+    String? type,
+    DateTime? from,
+    DateTime? to,
+  }) {
     filterUserId.value = userId;
-    filterType.value   = type;
-    filterFrom.value   = from;
-    filterTo.value     = to;
-    loadPayments();
+    filterType.value = type;
+    filterFrom.value = from;
+    filterTo.value = to;
+    loadPayments(); // loadPayments has its own error handling
   }
 
   void clearFilters() {
     filterUserId.value = null;
-    filterType.value   = null;
-    filterFrom.value   = null;
-    filterTo.value     = null;
+    filterType.value = null;
+    filterFrom.value = null;
+    filterTo.value = null;
     loadPayments();
   }
 
-
   Future<void> loadAssistantsAndTransactions() async {
     isLoadingAssistants.value = true;
-    assistants.value = await service.fetchAssistants(withBalance: true);
-    loadAllTransactions();
-    isLoadingAssistants.value = false;
+    try {
+      final list = await service.fetchAssistants(withBalance: true);
+      assistants.assignAll(list);
+      // Await transactions load so any exception bubbles here and is handled
+      await loadPayments();
+    } catch (e, st) {
+      assistants.clear();
+      _showError('Failed to load assistants', e, st);
+    } finally {
+      isLoadingAssistants.value = false;
+    }
   }
 
   Future<void> addPaymentFor(int assistantId, double amount) async {
     final f = Finance(
-      userId:    assistantId,
-      amount:    amount,
-      type:      'credit',         // only owner can credit
+      userId: assistantId,
+      amount: amount,
+      type: 'credit', // only owner can credit
       createdAt: DateTime.now(),
     );
-    await service.recordPayment(f);
-    // optionally refresh balance & list
-    loadAssistantsAndTransactions();
+
+    try {
+      // Record payment
+      await service.recordPayment(f);
+      // refresh balance & list; await to catch any errors here too
+      await loadAssistantsAndTransactions();
+    } catch (e, st) {
+      _showError('Failed to add payment', e, st);
+    }
   }
 
-  Future<void> loadAllTransactions() async {
-    isLoadingWallet.value = true;
-    payments.value = await service.fetchPayments();
-    isLoadingWallet.value = false;
-  }
+  // Future<void> loadAllTransactions() async {
+  //   isLoading.value = true;
+  //   try {
+  //     final list = await service.fetchPayments();
+  //     payments.value = list;
+  //   } catch (e, st) {
+  //     payments.clear();
+  //     _showError('Failed to load transactions', e, st);
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
   Future<void> addCreditForAssistant(int assistantId, double amount) async {
     final f = Finance(
-      userId:    assistantId,
-      amount:    amount,
-      type:      'credit',
+      userId: assistantId,
+      amount: amount,
+      type: 'credit',
       createdAt: DateTime.now(),
     );
-    await service.recordPayment(f);
-    await loadAssistantsAndTransactions();
+
+    try {
+      await service.recordPayment(f);
+      await loadAssistantsAndTransactions();
+    } catch (e, st) {
+      _showError('Failed to add credit', e, st);
+    }
   }
 }
