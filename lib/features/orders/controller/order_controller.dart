@@ -8,31 +8,33 @@ import '../../auth/service/auth_service.dart';
 import '../../finance/model/assistant.dart';
 import '../../finance/service/finance_service.dart';
 
-
 class OrderController extends GetxController {
   final OrderService orderService;
   final AuthService authService;
   final FinanceService financeService;
+
+  OrderController({
+    required this.orderService,
+    required this.authService,
+    required this.financeService,
+  });
+
   Future<Order?> getOrder(String id) => orderService.getOrderById(id);
 
-  // reactive list + loading flag
-  var orders       = <Order>[].obs;
-  var isLoading    = false.obs;
-
-  // current filters
-  var filterStatus     = Rxn<OrderStatus>();
+  // reactive states
+  var orders = <Order>[].obs;
+  var isLoading = false.obs;
+  var filterStatus = Rxn<OrderStatus>();
   var filterAssignedTo = Rxn<int>();
-
-  List<OrderItem> newItems = [];
-  int? assignedToUserId;
-  List<OrderItem> items = [];
-  bool isLoadingItems = false;
   var assistants = <Assistant>[].obs;
-  OrderController({required this.orderService, required this.authService, required this.financeService});
 
-  Future<List<Assistant>> getAllAssistants() {
-    return financeService.fetchAssistants(withBalance: true);
-  }
+  // new order states
+  var newItems = <OrderItem>[].obs;
+  var assignedToUserId = Rxn<int>();
+
+  // existing order details
+  var items = <OrderItem>[].obs;
+  var isLoadingItems = false.obs;
 
   @override
   void onInit() {
@@ -43,23 +45,19 @@ class OrderController extends GetxController {
 
   Future<void> loadOrders() async {
     isLoading.value = true;
-
     final list = await orderService.getOrders(
-      status:     filterStatus.value,
+      status: filterStatus.value,
       assignedTo: filterAssignedTo.value,
     );
-
     orders.assignAll(list);
     isLoading.value = false;
   }
 
-  /// Called by the UI when user picks a new status
   void setStatusFilter(OrderStatus? status) {
     filterStatus.value = status;
     loadOrders();
   }
 
-  /// Optionally call this to filter unassigned vs a specific assistant
   void setAssignedToFilter(int? userId) {
     filterAssignedTo.value = userId;
     loadOrders();
@@ -69,61 +67,34 @@ class OrderController extends GetxController {
     assistants.value = await financeService.fetchAssistants();
   }
 
-
-
   Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) {
     return orderService.getOrders(status: status, assignedTo: assignedTo);
-  }
-
-  Future<List<OrderItem>> getItemsOfOrder(String orderId) {
-    return orderService.getItemsOfOrder(orderId);
   }
 
   Future<void> assignOrder(String orderId, int userId) async {
     try {
       await orderService.assignOrder(orderId, userId);
-      update();
     } catch (e) {
       Get.snackbar('Error', 'Failed to assign user: $e');
     }
   }
 
-  void loadItems(String orderId) async {
-    isLoadingItems = true;
-    update(); // show loader
-    items = await orderService.getItemsOfOrder(orderId);
-    isLoadingItems = false;
-    update(); // refresh list
+  Future<void> loadItems(String orderId) async {
+    isLoadingItems.value = true;
+    items.value = await orderService.getItemsOfOrder(orderId);
+    isLoadingItems.value = false;
   }
 
   Future<OrderItem> createOrderItem(OrderItem item) {
-    if (item.actualCost != null && item.status == OrderItemStatus.purchased) {
-      // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
-      // Get.find<AssistantFinanceController>().loadWalletForAssistant(int.parse(_auth.currentUser!.id));
-    }
-    final created = orderService.createOrderItem(item);
-    update();
-    return created;
+    return orderService.createOrderItem(item);
   }
 
-  // Update an existing item, log before/after, then refresh list
   Future<void> updateOrderItem(OrderItem item, bool isPurchased) async {
     await orderService.updateOrderItem(item);
-    // if (item.actualCost != null && isPurchased == false) {
-    //   // addDebitForAssistant(int.parse(_auth.currentUser!.id), item.actualCost!);
-    //   await Get.find<AssistantFinanceController>().loadWalletForAssistant(
-    //     int.parse(_auth.currentUser!.id),
-    //   );
-    // }
-    // loadItems(item.orderId.toString());
   }
-
-
 
   Future<void> completeOrder(String orderId) async {
     await orderService.completeOrder(orderId);
-
-    update();
   }
 
   Future<void> deleteOrderItem(OrderItem item) async {
@@ -132,19 +103,25 @@ class OrderController extends GetxController {
   }
 
   void onCreateOrderTapped() {
-    newItems = [];
-    assignedToUserId = null;
+    newItems.clear();
+    assignedToUserId.value = null;
     Get.toNamed(RouteHelper.orderCreate);
   }
 
   void addItem() {
     newItems.add(OrderItem.empty(orderId: 0));
-    update(['newOrder']);
   }
 
   void removeItem(int index) {
     newItems.removeAt(index);
-    update(['newOrder']);
+  }
+
+  Future<List<Assistant>> getAllAssistants() {
+    return financeService.fetchAssistants(withBalance: true);
+  }
+
+  Future<List<OrderItem>> getItemsOfOrder(String orderId) {
+    return orderService.getItemsOfOrder(orderId);
   }
 
   Future<void> saveNewOrder() async {
@@ -155,24 +132,21 @@ class OrderController extends GetxController {
 
     final order = Order.create(
       createdBy: authService.currentUser!.id.toString(),
-      assignedTo: assignedToUserId?.toString(), // <-- null-safe for proper response
+      assignedTo: assignedToUserId.value?.toString(),
       status: OrderStatus.pending,
       createdAt: DateTime.now(),
     );
 
     try {
       final created = await orderService.createOrderWithItems(order, newItems);
-      update();
+      loadOrders();
       Get.back(result: created);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save order: $e');
     }
   }
 
-
   Future<bool> selfAssign(String orderId) async {
-    final res = await orderService.selfAssign(orderId, authService.currentUser!.id.toString());
-    update();
-    return res;
+    return orderService.selfAssign(orderId, authService.currentUser!.id.toString());
   }
 }
