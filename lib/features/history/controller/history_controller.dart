@@ -1,12 +1,12 @@
 // lib/features/history/controller/history_controller.dart
 
+import 'package:flutter_boilerplate/features/history/repository/history_repo.dart';
 import 'package:get/get.dart';
 import '../model/history_log.dart';
-import '../service/history_service.dart';
 
 class HistoryController extends GetxController {
-  final HistoryService historyService;
-  HistoryController({ required this.historyService });
+  final HistoryRepo historyRepo;
+  HistoryController({ required this.historyRepo });
 
   // Reactive lists for each tab
   var allLogs        = <HistoryLog>[].obs;
@@ -34,37 +34,37 @@ class HistoryController extends GetxController {
 
   Future<void> loadAll() async {
     isLoadingAll.value = true;
-    allLogs.value     = await historyService.fetchAll();
+    allLogs.value     = await historyRepo.getAll();
     isLoadingAll.value = false;
   }
 
   Future<void> loadOrders() async {
     isLoadingOrder.value = true;
-    orderLogs.value      = await historyService.fetchByEntity('order');
+    orderLogs.value      = await historyRepo.getByEntity('order');
     isLoadingOrder.value = false;
   }
 
   Future<void> loadItems() async {
     isLoadingItem.value = true;
-    itemLogs.value      = await historyService.fetchByEntity('order_item');
+    itemLogs.value      = await historyRepo.getByEntity('order_item');
     isLoadingItem.value = false;
   }
 
   Future<void> loadPayments() async {
     isLoadingPayment.value = true;
-    paymentLogs.value      = await historyService.fetchByEntity('payment');
+    paymentLogs.value      = await historyRepo.getByEntity('payment');
     isLoadingPayment.value = false;
   }
 
   Future<void> loadByEntity(String entity) async {
     isLoading.value = true;
-    logs.value = await historyService.fetchByEntity(entity);
+    logs.value = await historyRepo.getByEntity(entity);
     isLoading.value = false;
   }
 
   Future<void> loadByEntityId(String entity, int id) async {
     isLoading.value = true;
-    logs.value = await historyService.fetchByEntityId(entity, id);
+    logs.value = await historyRepo.getByEntityId(entity, id);
     isLoading.value = false;
   }
 }

@@ -1,13 +1,13 @@
+import 'package:flutter_boilerplate/features/dashboard/repository/analytics_repo.dart';
 import 'package:get/get.dart';
 import '../model/assistant_analytics.dart';
-import '../service/analytics_service.dart';
 
 class AssistantAnalyticsController extends GetxController {
-  final AnalyticsService service;
+  final AnalyticsRepo analyticsRepo;
   final int assistantId;
 
   AssistantAnalyticsController({
-    required this.service,
+    required this.analyticsRepo,
     required this.assistantId,
   });
 
@@ -22,7 +22,7 @@ class AssistantAnalyticsController extends GetxController {
 
   Future<void> _load() async {
     isLoading.value = true;
-    analytics.value = await service.getAssistantAnalytics(assistantId);
+    analytics.value = await analyticsRepo.fetchAssistantAnalytics(assistantId);
     isLoading.value = false;
   }
 }

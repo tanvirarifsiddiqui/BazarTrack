@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/dashboard/controller/assistant_analytics_controller.dart';
-import 'package:flutter_boilerplate/features/dashboard/service/analytics_service.dart';
+import 'package:flutter_boilerplate/features/dashboard/repository/analytics_repo.dart';
 import 'package:get/get.dart';
 import 'components/assistant_reports_chart.dart';
 import 'components/assistant_stats_summary.dart';
@@ -14,7 +14,7 @@ class AssistantDashboardDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl  = Get.put(AssistantAnalyticsController(service: Get.find<AnalyticsService>(), assistantId: assistantId));
+    final ctrl  = Get.put(AssistantAnalyticsController(analyticsRepo: Get.find<AnalyticsRepo>(), assistantId: assistantId));
     final theme = Theme.of(context);
     const spacer = SizedBox(height: 16);
 

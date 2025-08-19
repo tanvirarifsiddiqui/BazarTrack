@@ -1,11 +1,11 @@
-import 'package:flutter_boilerplate/features/finance/service/assistant_finance_service.dart';
+import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:get/get.dart';
 import '../model/finance.dart';
 
 class AssistantFinanceController extends GetxController {
-  final AssistantFinanceService service;
+  final AssistantFinanceRepo assistantFinanceRepo;
 
-  AssistantFinanceController({ required this.service });
+  AssistantFinanceController({ required this.assistantFinanceRepo });
 
   // Owner flows
   var isLoadingAssistants = false.obs;
@@ -29,14 +29,14 @@ class AssistantFinanceController extends GetxController {
 
   Future<void> loadWalletForAssistant() async {
     isLoadingWallet.value = true;
-    balance.value      = await service.fetchBalance(userId!);
-    transactions.value = await service.fetchTransactions(userId!);
+    balance.value      = await assistantFinanceRepo.getWalletBalance(userId!);
+    transactions.value = await assistantFinanceRepo.getWalletTransactions(userId!);
     isLoadingWallet.value = false;
   }
 
   Future<void> loadPayments() async {
     isLoadingWallet.value = true;
-    final list = await service.fetchPayments(userId: userId, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
+    final list = await assistantFinanceRepo.getPayments(userId: userId, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
     transactions.assignAll(list);
     isLoadingWallet.value = false;
   }
@@ -64,7 +64,7 @@ class AssistantFinanceController extends GetxController {
       type:      'debit',
       createdAt: DateTime.now(),
     );
-    await service.recordPayment(f);
+    await assistantFinanceRepo.createPayment(f);
     await loadWalletForAssistant();
   }
 }

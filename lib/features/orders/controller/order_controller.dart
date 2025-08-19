@@ -1,25 +1,25 @@
+import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
-import 'package:flutter_boilerplate/features/orders/service/order_service.dart';
+import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:get/get.dart';
 import '../../../helper/route_helper.dart';
 import '../../auth/service/auth_service.dart';
 import '../../finance/model/assistant.dart';
-import '../../finance/service/finance_service.dart';
 
 class OrderController extends GetxController {
-  final OrderService orderService;
+  final OrderRepo orderRepo;
   final AuthService authService;
-  final FinanceService financeService;
+  final FinanceRepo financeRepo;
 
   OrderController({
-    required this.orderService,
+    required this.orderRepo,
     required this.authService,
-    required this.financeService,
+    required this.financeRepo,
   });
 
-  Future<Order?> getOrder(String id) => orderService.getOrderById(id);
+  Future<Order?> getOrder(String id) => orderRepo.getOrderById(id);
 
   // reactive states
   var orders = <Order>[].obs;
@@ -39,13 +39,13 @@ class OrderController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadAssistants();
+    getAllAssistants();
     loadOrders();
   }
 
   Future<void> loadOrders() async {
     isLoading.value = true;
-    final list = await orderService.getOrders(
+    final list = await orderRepo.getOrders(
       status: filterStatus.value,
       assignedTo: filterAssignedTo.value,
     );
@@ -63,17 +63,13 @@ class OrderController extends GetxController {
     loadOrders();
   }
 
-  Future<void> loadAssistants() async {
-    assistants.value = await financeService.fetchAssistants();
-  }
-
   Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) {
-    return orderService.getOrders(status: status, assignedTo: assignedTo);
+    return orderRepo.getOrders(status: status, assignedTo: assignedTo);
   }
 
   Future<void> assignOrder(String orderId, int userId) async {
     try {
-      await orderService.assignOrder(orderId, userId);
+      await orderRepo.assignOrder(orderId, userId);
     } catch (e) {
       Get.snackbar('Error', 'Failed to assign user: $e');
     }
@@ -81,24 +77,24 @@ class OrderController extends GetxController {
 
   Future<void> loadItems(String orderId) async {
     isLoadingItems.value = true;
-    items.value = await orderService.getItemsOfOrder(orderId);
+    items.value = await orderRepo.getItemsOfOrder(orderId);
     isLoadingItems.value = false;
   }
 
   Future<OrderItem> createOrderItem(OrderItem item) {
-    return orderService.createOrderItem(item);
+    return orderRepo.createOrderItem(item);
   }
 
   Future<void> updateOrderItem(OrderItem item, bool isPurchased) async {
-    await orderService.updateOrderItem(item);
+    await orderRepo.updateOrderItem(item);
   }
 
   Future<void> completeOrder(String orderId) async {
-    await orderService.completeOrder(orderId);
+    await orderRepo.completeOrder(orderId);
   }
 
   Future<void> deleteOrderItem(OrderItem item) async {
-    await orderService.deleteOrderItem(item);
+    await orderRepo.deleteOrderItem(item.orderId, item.id!);
     loadItems(item.orderId.toString());
   }
 
@@ -117,11 +113,11 @@ class OrderController extends GetxController {
   }
 
   Future<List<Assistant>> getAllAssistants() {
-    return financeService.fetchAssistants(withBalance: true);
+    return financeRepo.getAssistants(withBalance: true);
   }
 
   Future<List<OrderItem>> getItemsOfOrder(String orderId) {
-    return orderService.getItemsOfOrder(orderId);
+    return orderRepo.getItemsOfOrder(orderId);
   }
 
   Future<void> saveNewOrder() async {
@@ -138,7 +134,7 @@ class OrderController extends GetxController {
     );
 
     try {
-      final created = await orderService.createOrderWithItems(order, newItems);
+      final created = await orderRepo.createOrderWithItems(order, newItems);
       loadOrders();
       Get.back(result: created);
     } catch (e) {
@@ -147,6 +143,6 @@ class OrderController extends GetxController {
   }
 
   Future<bool> selfAssign(String orderId) async {
-    return orderService.selfAssign(orderId, authService.currentUser!.id.toString());
+    return orderRepo.selfAssign(orderId, int.parse(authService.currentUser!.id));
   }
 }

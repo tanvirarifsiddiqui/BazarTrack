@@ -17,14 +17,11 @@ import 'package:flutter_boilerplate/features/finance/controller/finance_controll
 import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
-import 'package:flutter_boilerplate/features/finance/service/finance_service.dart';
 
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
-import 'package:flutter_boilerplate/features/orders/service/order_service.dart';
 import 'package:flutter_boilerplate/features/history/repository/history_repo.dart';
 import 'package:flutter_boilerplate/features/history/controller/history_controller.dart';
-import 'package:flutter_boilerplate/features/history/service/history_service.dart';
 
 import 'package:flutter_boilerplate/util/app_constants.dart';
 import 'package:flutter_boilerplate/data/model/response/language_model.dart';
@@ -34,8 +31,6 @@ import 'package:get/get.dart';
 
 import '../features/dashboard/controller/analytics_controller.dart';
 import '../features/dashboard/repository/analytics_repo.dart';
-import '../features/dashboard/service/analytics_service.dart';
-import '../features/finance/service/assistant_finance_service.dart';
 
 Future<Map<String, Map<String, String>>> init() async {
   // Core
@@ -60,11 +55,11 @@ Future<Map<String, Map<String, String>>> init() async {
   // Services
   Get.put(AuthService(authRepo: Get.find<AuthRepo>()),permanent: true);
   // Get.put(AdvanceService(advanceRepo: Get.find()), permanent: true);
-  Get.put(OrderService(orderRepo: Get.find<OrderRepo>()), permanent: true);
-  Get.put(HistoryService(historyRepo: Get.find<HistoryRepo>()),);
-  Get.put(FinanceService(repo: Get.find<FinanceRepo>()));
-  Get.put(AssistantFinanceService(repo: Get.find<AssistantFinanceRepo>()));
-  Get.put(AnalyticsService(repo: Get.find<AnalyticsRepo>()),);
+  // Get.put(OrderService(orderRepo: Get.find<OrderRepo>()), permanent: true);
+  // Get.put(HistoryService(historyRepo: Get.find<HistoryRepo>()),);
+  // Get.put(FinanceService(repo: Get.find<FinanceRepo>()));
+  // Get.put(AssistantFinanceService(repo: Get.find<AssistantFinanceRepo>()));
+  // Get.put(AnalyticsService(repo: Get.find<AnalyticsRepo>()),);
 
   // Controllers
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find<SharedPreferences>()));
@@ -73,11 +68,11 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => LanguageController(sharedPreferences: Get.find()));
   Get.lazyPut(() => AuthController(authService: Get.find<AuthService>()), fenix: true);
   // Get.lazyPut(() => AdvanceController(advanceService: Get.find()), fenix: true);
-  Get.lazyPut(() => OrderController(orderService: Get.find<OrderService>(), authService: Get.find<AuthService>(),financeService: Get.find<FinanceService>()), fenix: true);
-  Get.lazyPut(() => HistoryController(historyService: Get.find<HistoryService>()), fenix: true);
-  Get.lazyPut(() => FinanceController(service: Get.find<FinanceService>()), fenix: true);
-  Get.lazyPut(() => AssistantFinanceController(service: Get.find<AssistantFinanceService>()), fenix: true);
-  Get.lazyPut(() => AnalyticsController(service: Get.find()), fenix: true);
+  Get.lazyPut(() => OrderController(orderRepo: Get.find<OrderRepo>(), authService: Get.find<AuthService>(),financeRepo: Get.find<FinanceRepo>()), fenix: true);
+  Get.lazyPut(() => HistoryController(historyRepo: Get.find<HistoryRepo>()), fenix: true);
+  Get.lazyPut(() => FinanceController(financeRepo: Get.find<FinanceRepo>()), fenix: true);
+  Get.lazyPut(() => AssistantFinanceController(assistantFinanceRepo: Get.find<AssistantFinanceRepo>()), fenix: true);
+  Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find()), fenix: true);
 
 
   // Retrieving localized data

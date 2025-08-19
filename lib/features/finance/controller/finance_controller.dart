@@ -6,16 +6,16 @@
 // Time: 05:17 PM
 */
 
+import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
 import 'package:get/get.dart';
 import '../model/finance.dart';
 import '../model/assistant.dart';
-import '../service/finance_service.dart';
 
 class FinanceController extends GetxController {
-  final FinanceService service;
+  final FinanceRepo financeRepo;
 
   FinanceController({
-    required this.service,
+    required this.financeRepo,
   });
 
   // Owner flows
@@ -49,7 +49,7 @@ class FinanceController extends GetxController {
   Future<void> loadPayments() async {
     isLoading.value = true;
     try {
-      final list = await service.fetchPayments(
+      final list = await financeRepo.getPayments(
         userId: filterUserId.value,
         type: filterType.value,
         from: filterFrom.value,
@@ -91,7 +91,7 @@ class FinanceController extends GetxController {
   Future<void> loadAssistantsAndTransactions() async {
     isLoadingAssistants.value = true;
     try {
-      final list = await service.fetchAssistants(withBalance: true);
+      final list = await financeRepo.getAssistants(withBalance: true);
       assistants.assignAll(list);
       // Await transactions load so any exception bubbles here and is handled
       await loadPayments();
@@ -104,7 +104,7 @@ class FinanceController extends GetxController {
   }
 
   Future<void> addPaymentFor(int assistantId, double amount) async {
-    final f = Finance(
+    final finance = Finance(
       userId: assistantId,
       amount: amount,
       type: 'credit', // only owner can credit
@@ -113,7 +113,7 @@ class FinanceController extends GetxController {
 
     try {
       // Record payment
-      await service.recordPayment(f);
+      await financeRepo.createPayment(finance);
       // refresh balance & list; await to catch any errors here too
       await loadAssistantsAndTransactions();
     } catch (e, st) {
@@ -135,7 +135,7 @@ class FinanceController extends GetxController {
   // }
 
   Future<void> addCreditForAssistant(int assistantId, double amount) async {
-    final f = Finance(
+    final finance = Finance(
       userId: assistantId,
       amount: amount,
       type: 'credit',
@@ -143,7 +143,7 @@ class FinanceController extends GetxController {
     );
 
     try {
-      await service.recordPayment(f);
+      await financeRepo.createPayment(finance);
       await loadAssistantsAndTransactions();
     } catch (e, st) {
       _showError('Failed to add credit', e, st);

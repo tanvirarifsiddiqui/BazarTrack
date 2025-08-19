@@ -2,11 +2,11 @@ import 'package:get/get.dart';
 import '../model/assistant_analytics.dart';
 import '../model/dashboard_metrics.dart';
 import '../model/monthly_report.dart';
-import '../service/analytics_service.dart';
+import '../repository/analytics_repo.dart';
 
 class AnalyticsController extends GetxController {
-  final AnalyticsService service;
-  AnalyticsController({ required this.service });
+  final AnalyticsRepo analyticsRepo;
+  AnalyticsController({ required this.analyticsRepo });
 
   var dashboard = Rxn<DashboardMetrics>();
   var reports   = Rxn<ReportsData>();
@@ -21,8 +21,8 @@ class AnalyticsController extends GetxController {
 
   Future<void> _loadAll() async {
     isLoading.value = true;
-    dashboard.value = await service.getDashboard();
-    reports.value   = await service.getReports();
+    dashboard.value = await analyticsRepo.fetchDashboard();
+    reports.value   = await analyticsRepo.fetchReports();
     isLoading.value = false;
   }
 
