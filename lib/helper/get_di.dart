@@ -47,7 +47,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()));
   Get.lazyPut(() => FinanceRepo(api: Get.find<BazarTrackApi>()));
   Get.lazyPut(() => AssistantFinanceRepo(api: Get.find<BazarTrackApi>()),fenix: true);
-  Get.lazyPut(() => AnalyticsRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => AnalyticsRepo(api: Get.find<BazarTrackApi>()),fenix: true);
 
 
 
@@ -85,4 +85,5 @@ Future<Map<String, Map<String, String>>> init() async {
     languages['${languageModel.languageCode}_${languageModel.countryCode}'] = jsonData;
   }
   return languages;
+
 }

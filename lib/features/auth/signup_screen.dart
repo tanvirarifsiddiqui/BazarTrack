@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/base/custom_text_field.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/auth/model/user.dart';
+import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
 import 'package:get/get.dart';
@@ -28,13 +29,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: CustomAppBar(title: 'Sign Up'),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
+    return Scaffold(
+      appBar: CustomAppBar(title: 'Sign Up'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
           child: Column(
             children: [
+              AuthHeader('Welcome Back'),
               CustomTextField(
                 controller: _nameController,
                 hintText: 'Name',

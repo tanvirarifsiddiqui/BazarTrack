@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
-import 'package:flutter_boilerplate/features/dashboard/owner_dashboard_details_screen.dart';
+import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
+import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
@@ -23,7 +24,7 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
 
   // Titles for AppBar (use .tr for translations if desired)
   final List<String> _titles = [
-    'owners_dashboard',
+    'assistants_dashboard',
     'view_orders',
     'finance',
     'history',
@@ -35,8 +36,9 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
   @override
   void initState() {
     super.initState();
+    final auth = Get.find<AuthService>();
     _screens = [
-      const OwnerDashboardDetails(),
+      AssistantDashboardDetails(assistantId: int.parse(auth.currentUser!.id)),
       const OrderListScreen(),
       const AssistantFinancePage(),
       const HistoryCenterPage(),

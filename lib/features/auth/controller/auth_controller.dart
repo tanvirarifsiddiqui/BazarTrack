@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 class AuthController extends GetxController {
   final AuthService authService;
+
+  var isLoading = false.obs;
   AuthController({required this.authService});
 
   UserModel? get currentUser => authService.currentUser;
