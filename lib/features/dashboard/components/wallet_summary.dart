@@ -89,15 +89,15 @@ class WalletSummary extends StatelessWidget {
               // list of assistants (in same card)
               Column(
                 children: List.generate(assistants.length, (i) {
-                  final a = assistants[i];
+                  final assistant = assistants[i];
                   return Column(
                     children: [
                       _AssistantRow(
-                        assistant: a,
+                        assistant: assistant,
                         theme: theme,
-                        initials: _initials(a.name),
+                        initials: _initials(assistant.name),
                         onPressed: (){
-                          Get.to(() => AssistantDashboardDetails(assistantId: 3));
+                          Get.to(() => AssistantDashboardDetails(assistant: assistant));
                         }
                       ),
                       if (i < assistants.length - 1)

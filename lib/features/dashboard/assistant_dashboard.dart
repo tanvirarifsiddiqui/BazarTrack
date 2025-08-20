@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
+import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,7 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
     super.initState();
     final auth = Get.find<AuthService>();
     _screens = [
-      AssistantDashboardDetails(assistantId: int.parse(auth.currentUser!.id)),
+      AssistantDashboardDetails(assistant: Assistant(id: int.parse(auth.currentUser!.id), name: auth.currentUser!.name)),
       const OrderListScreen(),
       const AssistantFinancePage(),
       const HistoryCenterPage(),

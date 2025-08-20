@@ -13,7 +13,6 @@ import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/finance/controller/assistant_finance_controller.dart';
 import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 
-import 'package:flutter_boilerplate/features/finance/repository/advance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
 
@@ -42,10 +41,10 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find<SharedPreferences>(), apiClient: Get.find<ApiClient>()));
   Get.lazyPut(() => LanguageRepo());
   Get.lazyPut(() => AuthRepo(api: Get.find<BazarTrackApi>(), sharedPreferences: Get.find<SharedPreferences>()));
-  Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find<SharedPreferences>()));
-  Get.lazyPut(() => OrderRepo(api: Get.find<BazarTrackApi>()));
-  Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()));
-  Get.lazyPut(() => FinanceRepo(api: Get.find<BazarTrackApi>()));
+  // Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => OrderRepo(api: Get.find<BazarTrackApi>()),fenix: true);
+  Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()),fenix: true);
+  Get.lazyPut(() => FinanceRepo(api: Get.find<BazarTrackApi>()),fenix: true);
   Get.lazyPut(() => AssistantFinanceRepo(api: Get.find<BazarTrackApi>()),fenix: true);
   Get.lazyPut(() => AnalyticsRepo(api: Get.find<BazarTrackApi>()),fenix: true);
 
