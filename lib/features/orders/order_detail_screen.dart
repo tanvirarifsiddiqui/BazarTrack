@@ -85,7 +85,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         context: context,
         builder: (ctx) {
           return FutureBuilder<List<Assistant>>(
-            future: orderCtrl.getAllAssistants(),
+            future: orderCtrl.getAllAssistantsWithCurrentBalance(),
             builder: (ctx2, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SimpleDialog(

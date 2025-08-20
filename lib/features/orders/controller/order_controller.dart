@@ -112,7 +112,11 @@ class OrderController extends GetxController {
     newItems.removeAt(index);
   }
 
-  Future<List<Assistant>> getAllAssistants() {
+  Future<void> getAllAssistants() async {
+    assistants.value =await financeRepo.getAssistants(withBalance: true);
+  }
+
+  Future<List<Assistant>> getAllAssistantsWithCurrentBalance() {
     return financeRepo.getAssistants(withBalance: true);
   }
 
