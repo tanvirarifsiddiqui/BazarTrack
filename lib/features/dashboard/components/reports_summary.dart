@@ -34,8 +34,8 @@ class ReportsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReportsChartSyncfusion.fromReportsData(reports, theme);
-    // return ReportsChartSyncfusion.fromReportsData(_dummyReports, theme);
+    // return ReportsChartSyncfusion.fromReportsData(reports, theme);
+    return ReportsChartSyncfusion.fromReportsData(_dummyReports, theme);
   }
 
 }
