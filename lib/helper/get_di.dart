@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter_boilerplate/controller/language_controller.dart';
 import 'package:flutter_boilerplate/controller/localization_controller.dart';
 import 'package:flutter_boilerplate/controller/splash_controller.dart';
@@ -47,7 +46,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => OrderRepo(api: Get.find<BazarTrackApi>()));
   Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()));
   Get.lazyPut(() => FinanceRepo(api: Get.find<BazarTrackApi>()));
-  Get.lazyPut(() => AssistantFinanceRepo(api: Get.find<BazarTrackApi>()));
+  Get.lazyPut(() => AssistantFinanceRepo(api: Get.find<BazarTrackApi>()),fenix: true);
   Get.lazyPut(() => AnalyticsRepo(api: Get.find<BazarTrackApi>()));
 
 
@@ -73,7 +72,6 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => FinanceController(financeRepo: Get.find<FinanceRepo>()), fenix: true);
   Get.lazyPut(() => AssistantFinanceController(assistantFinanceRepo: Get.find<AssistantFinanceRepo>()), fenix: true);
   Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find()), fenix: true);
-
 
   // Retrieving localized data
   Map<String, Map<String, String>> languages = {};
