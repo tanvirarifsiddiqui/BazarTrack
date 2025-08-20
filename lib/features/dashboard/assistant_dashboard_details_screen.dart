@@ -16,7 +16,7 @@ class AssistantDashboardDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctrl  = Get.put(AssistantAnalyticsController(analyticsRepo: Get.find<AnalyticsRepo>(), assistantId: assistantId));
     final theme = Theme.of(context);
-    const spacer = SizedBox(height: 16);
+    const spacer = SizedBox(height: 10);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Assistant Dashboard")),

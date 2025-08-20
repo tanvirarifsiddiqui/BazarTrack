@@ -14,52 +14,76 @@ class AssistantStatsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _StatCard(
-          label: 'Total Orders',
-          value: totalOrders.toString(),
-          color: theme.primaryColor,
-        ),
-        const SizedBox(width: 12),
-        _StatCard(
-          label: 'Total Revenue',
-          value: totalRevenue.toStringAsFixed(2),
-          color: Colors.green,
-        ),
-      ],
+    final stats = [
+      _StatTile(
+        'Total Orders',
+        totalOrders.toString(),
+        Icons.shopping_cart,
+        theme.primaryColor,
+      ),
+      _StatTile(
+        'Total Revenue',
+        '৳${totalRevenue.toStringAsFixed(2)}',
+        Icons.account_balance_wallet,
+        Colors.green,
+      ),
+    ];
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 2.5,
+      children: stats,
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String label;
+class _StatTile extends StatelessWidget {
+  final String title;
   final String value;
+  final IconData icon;
   final Color color;
 
-  const _StatCard({
-    Key? key,
-    required this.label,
-    required this.value,
-    required this.color,
-  }) : super(key: key);
+  const _StatTile(this.title, this.value, this.icon, this.color);
 
   @override
   Widget build(BuildContext context) {
-    final txt = Theme.of(context).textTheme;
-    return Expanded(
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          child: Column(
-            children: [
-              Text(value, style: txt.titleLarge?.copyWith(color: color)),
-              const SizedBox(height: 4),
-              Text(label, style: txt.bodySmall),
-            ],
-          ),
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center, // Center vertically
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withValues(alpha: 0.1),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Center vertically
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: textTheme.titleSmall,
+                    overflow: TextOverflow.ellipsis, // Prevents overflow
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: textTheme.titleMedium,
+                    overflow: TextOverflow.ellipsis, // Prevents overflow
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -14,7 +14,7 @@ class OwnerDashboardDetails extends StatelessWidget {
     final ctrl = Get.find<AnalyticsController>();
     final financeCtrl = Get.find<FinanceController>();
     final theme = Theme.of(context);
-    final spacer = const SizedBox(height: 16);
+    final spacer = const SizedBox(height: 10);
 
     return Scaffold(
       body: Obx(() {
@@ -26,11 +26,10 @@ class OwnerDashboardDetails extends StatelessWidget {
         final rep  = ctrl.reports.value!;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-
               StatsSummary(
                 totalOrders:    dash.totalOrders,
                 totalUsers:     dash.totalUsers,

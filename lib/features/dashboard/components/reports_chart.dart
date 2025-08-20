@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
-
 import '../model/assistant_analytics.dart';
 import '../model/monthly_report.dart';
 
@@ -47,126 +46,138 @@ class ReportsChartSyncfusion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monthLabelFmt = DateFormat('MMM yyyy'); // "Aug 2025"
-    final currencyFmt = NumberFormat.simpleCurrency(decimalDigits: 0);
+    // Month label uses only the month abbreviation (Jan, Feb, Mar)
+    final monthOnlyFmt = DateFormat('MMM');
+    final monthAndYearFmt = DateFormat('MMM yyyy');
+    final currencyFmt = NumberFormat.simpleCurrency(decimalDigits: 0,name:"৳");
 
     if (_data.isEmpty) {
       return Center(child: Text('No data available', style: theme.textTheme.bodyMedium));
     }
 
-    // Only months present in API — ensure chronological order
     final points = List<_ChartPoint>.from(_data)..sort((a, b) => a.month.compareTo(b.month));
 
-    // Totals for the small visualization above the chart
-    final totalOrders = points.fold<int>(0, (sum, p) => sum + p.orders);
-    final totalRevenue = points.fold<double>(0.0, (sum, p) => sum + p.revenue);
+    // Build simple month labels (MMM) for each data point (keeps one label per point)
+    final labels = points.map((p) => monthOnlyFmt.format(p.month)).toList(growable: false);
 
-    // Axis maxima (20% headroom) but with sensible minimums
+    // Compute year range text (single line), e.g. "2025" or "2024 — 2025"
+    final int startYear = points.first.month.year;
+    final int endYear = points.last.month.year;
+    final String yearRangeText = (startYear == endYear) ? '$startYear' : '$startYear — $endYear';
+
+    // axis maxima (20% headroom)
     final maxOrders = points.map((p) => p.orders).fold<int>(0, (a, b) => a > b ? a : b);
     final maxRevenue = points.map((p) => p.revenue).fold<double>(0.0, (a, b) => a > b ? a : b);
     final orderTop = ((maxOrders == 0) ? 5.0 : (maxOrders * 1.2)).clamp(5.0, double.infinity);
     final revenueTop = ((maxRevenue == 0.0) ? 5.0 : (maxRevenue * 1.2)).clamp(5.0, double.infinity);
 
-    // X axis bounds: use exact first and last months from data to avoid extra ticks
-    DateTime minX = DateTime(points.first.month.year, points.first.month.month, 1);
-    DateTime maxX = DateTime(points.last.month.year, points.last.month.month, 1);
-
-    // If only one month present, extend maxX by one month so axis renders nicely
-    if (minX.isAtSameMomentAs(maxX)) {
-      maxX = DateTime(maxX.year + (maxX.month == 12 ? 1 : 0), (maxX.month % 12) + 1, 1);
-    }
-
-    // Label interval logic to prevent crowding
+    // Label interval logic: show at most ~6 labels to avoid crowding
     final visibleLabelCount = 6;
-    final interval = (points.length <= visibleLabelCount) ? 1 : (points.length / visibleLabelCount).ceil();
+    final labelInterval = (labels.length <= visibleLabelCount) ? 1 : (labels.length / visibleLabelCount).ceil();
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // --- Chart card ---
         Card(
           elevation: 2,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             child: SizedBox(
-              height: 340,
-              child: SfCartesianChart(
-                plotAreaBorderWidth: 0,
-                legend: Legend(isVisible: true, position: LegendPosition.top, overflowMode: LegendItemOverflowMode.wrap),
-                tooltipBehavior: TooltipBehavior(enable: true, format: 'point.x : point.y'),
+              height: 350,
+              child: Column(
+                children: [
+                  SfCartesianChart(
+                    margin: const EdgeInsets.all(8),
+                    plotAreaBorderWidth: 0,
+                    plotAreaBackgroundColor: Colors.blue.shade50,
+                    legend: Legend(isVisible: true, position: LegendPosition.top, overflowMode: LegendItemOverflowMode.wrap),
+                    tooltipBehavior: TooltipBehavior(enable: true),
 
-                primaryXAxis: DateTimeAxis(
-                  dateFormat: monthLabelFmt,
-                  intervalType: DateTimeIntervalType.months,
-                  interval: interval.toDouble(),
-                  labelRotation: (points.length > 8) ? -30 : 0,
-                  minimum: minX,     // <-- important: explicitly set minimum
-                  maximum: maxX,     // <-- important: explicitly set maximum
-                  edgeLabelPlacement: EdgeLabelPlacement.shift,
-                  majorGridLines: const MajorGridLines(width: 0.0),
-                ),
+                    // CategoryAxis: exact categories for each point; label shows only month (MMM)
+                    primaryXAxis: CategoryAxis(
+                      labelRotation: (labels.length > 8) ? -30 : 0,
+                      interval: labelInterval.toDouble(),
+                      majorGridLines: const MajorGridLines(width: 0),
+                    ),
 
-                primaryYAxis: NumericAxis(
-                  name: 'ordersAxis',
-                  title: AxisTitle(text: 'Orders'),
-                  minimum: 0,
-                  maximum: orderTop,
-                  interval: (orderTop / 4).ceilToDouble(),
-                  majorGridLines: const MajorGridLines(width: 0.5),
-                ),
+                    // Left Y: Orders
+                    primaryYAxis: NumericAxis(
+                      name: 'ordersAxis',
+                      title: AxisTitle(text: 'Orders'),
+                      minimum: 0,
+                      maximum: orderTop,
+                      interval: (orderTop / 4).ceilToDouble(),
+                      majorGridLines: const MajorGridLines(width: 0.5),
+                    ),
 
-                axes: <ChartAxis>[
-                  NumericAxis(
-                    name: 'revenueAxis',
-                    title: AxisTitle(text: 'Revenue'),
-                    minimum: 0,
-                    maximum: revenueTop,
-                    interval: (revenueTop / 4),
-                    opposedPosition: true,
-                    numberFormat: NumberFormat.simpleCurrency(decimalDigits: 0),
-                    majorGridLines: const MajorGridLines(width: 0.0),
+                    // Right Y: Revenue
+                    axes: <ChartAxis>[
+                      NumericAxis(
+                        name: 'revenueAxis',
+                        title: AxisTitle(text: 'Revenue'),
+                        minimum: 0,
+                        maximum: revenueTop,
+                        interval: (revenueTop / 4),
+                        opposedPosition: true,
+                        numberFormat: NumberFormat.simpleCurrency(decimalDigits: 0, name:"৳"),
+                        majorGridLines: const MajorGridLines(width: 0.0),
+                      ),
+                    ],
+
+                    // Series using category (String) X values (month abbreviations)
+                    series: <CartesianSeries<_ChartPoint, String>>[
+                      ColumnSeries<_ChartPoint, String>(
+                        dataSource: points,
+                        xValueMapper: (pt, _) => monthOnlyFmt.format(pt.month),
+                        yValueMapper: (pt, _) => pt.orders,
+                        name: 'Orders',
+                        width: 0.6,
+                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                        color: theme.colorScheme.primary,
+                        enableTooltip: true,
+                        animationDuration: 600,
+                      ),
+                      LineSeries<_ChartPoint, String>(
+                        dataSource: points,
+                        xValueMapper: (pt, _) => monthOnlyFmt.format(pt.month),
+                        yValueMapper: (pt, _) => pt.revenue,
+                        yAxisName: 'revenueAxis',
+                        name: 'Revenue',
+                        width: 2.2,
+                        color: theme.colorScheme.secondary,
+                        markerSettings: MarkerSettings(isVisible: true),
+                        enableTooltip: true,
+                        animationDuration: 750,
+                      ),
+                    ],
+
+                    zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
+                  ),
+                  // Centered year range below the chart (single line)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6.0, bottom: 8.0),
+                    child: Center(
+                      child: Text(
+                        yearRangeText,
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
                 ],
-
-                series: <CartesianSeries<_ChartPoint, DateTime>>[
-                  ColumnSeries<_ChartPoint, DateTime>(
-                    dataSource: points,
-                    xValueMapper: (pt, _) => pt.month,
-                    yValueMapper: (pt, _) => pt.orders,
-                    name: 'Orders',
-                    width: 0.6,
-                    borderRadius: const BorderRadius.all(Radius.circular(6)),
-                    color: theme.colorScheme.primary,
-                    enableTooltip: true,
-                    animationDuration: 700,
-                  ),
-                  LineSeries<_ChartPoint, DateTime>(
-                    dataSource: points,
-                    xValueMapper: (pt, _) => pt.month,
-                    yValueMapper: (pt, _) => pt.revenue,
-                    yAxisName: 'revenueAxis',
-                    name: 'Revenue',
-                    width: 2.5,
-                    color: theme.colorScheme.secondary,
-                    markerSettings: MarkerSettings(isVisible: true, borderWidth: 1.5),
-                    enableTooltip: true,
-                    animationDuration: 900,
-                  ),
-                ],
-
-                zoomPanBehavior: ZoomPanBehavior(enablePanning: true, enablePinching: true),
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 12),
+
+        const SizedBox(height: 16),
 
         if (customBelow != null) ...[
           customBelow!,
         ] else if (showTableBelow) ...[
-          _buildCombinedTable(points, monthLabelFmt, currencyFmt),
+          _buildCombinedTable(points, monthAndYearFmt, currencyFmt),
         ],
       ],
     );
@@ -174,8 +185,8 @@ class ReportsChartSyncfusion extends StatelessWidget {
 
   Widget _buildCombinedTable(List<_ChartPoint> pts, DateFormat monthLabelFmt, NumberFormat currencyFmt) {
     return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
       child: DataTable(
         columnSpacing: 12,

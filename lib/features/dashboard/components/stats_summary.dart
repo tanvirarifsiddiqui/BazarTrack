@@ -30,9 +30,8 @@ class StatsSummary extends StatelessWidget {
       _StatTile('Total Orders', totalOrders.toString(), Icons.shopping_cart, AppColors.primary,),
       _StatTile('Users', totalUsers.toString(), Icons.group, Colors.orange,),
       _StatTile('Total Payments', totalPayments.toString(), Icons.payments, Colors.teal,),
-      _StatTile('Total Balance', '৳${balance.toString()}', Icons.account_balance_wallet, Colors.green,),
+      _StatTile('Total Revenue', '৳${balance.toString()}', Icons.account_balance_wallet, Colors.green,),
     ];
-
 
     return GridView.count(
       crossAxisCount: 2,
@@ -48,15 +47,12 @@ class StatsSummary extends StatelessWidget {
 
 // _StatTile unchanged from above
 
-
 class _StatTile extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
   final Color color;
-
   const _StatTile(this.title, this.value, this.icon, this.color);
-
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -79,14 +75,14 @@ class _StatTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    value,
-                    style: textTheme.titleMedium,
+                    title,
+                    style: textTheme.titleSmall,
                     overflow: TextOverflow.ellipsis, // Prevents overflow
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    title,
-                    style: textTheme.titleSmall,
+                    value,
+                    style: textTheme.titleMedium,
                     overflow: TextOverflow.ellipsis, // Prevents overflow
                   ),
                 ],
