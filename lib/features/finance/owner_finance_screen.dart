@@ -30,13 +30,13 @@ class OwnerFinancePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assistants Wallets'),
+        title: const Text('Assistant Wallets'),
         centerTitle: true,
         actions: [
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => ctrl.loadAssistantsAndTransactions(),
+            onPressed: () => ctrl.clearFilters(),
           ),
         ],
       ),
@@ -155,7 +155,7 @@ class OwnerFinancePage extends StatelessWidget {
             // Transactions list (scrollable & refreshable)
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () => ctrl.loadAssistantsAndTransactions(),
+                onRefresh: () async => ctrl.clearFilters(),
                 child: Obx(() {
                   final tx = ctrl.payments;
                   if (tx.isEmpty) {

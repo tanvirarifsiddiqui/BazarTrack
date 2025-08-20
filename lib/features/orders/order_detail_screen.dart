@@ -249,7 +249,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           const SizedBox(height: 12),
                           _buildInfoRow(
                             'Created by',
-                            order.createdBy.toString() ?? '-',
+                            order.createdBy.toString(),
                             Icons.person,
                           ),
                           _buildInfoRow(
@@ -264,6 +264,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ),
                           _buildInfoRow(
                             'Created at',
+                            // ignore: unnecessary_null_comparison
                             order.createdAt != null ? dateFmt.format(order.createdAt) : '-',
                             Icons.schedule,
                           ),
@@ -328,8 +329,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             final item = items[idx];
                             return ListTile(
                               leading: const Icon(Icons.shopping_basket),
-                              title: Text(item.productName ?? '-'),
-                              subtitle: Text('${item.quantity ?? '-'} ${item.unit ?? ''} • ${item.status.toApi()}'),
+                              title: Text(item.productName),
+                              subtitle: Text('${item.quantity} ${item.unit} • ${item.status.toApi()}'),
                               trailing: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,

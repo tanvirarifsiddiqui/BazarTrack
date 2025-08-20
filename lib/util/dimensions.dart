@@ -9,6 +9,10 @@ class Dimensions {
   static double fontSizeExtraLarge = Get.context!.width >= 1300 ? 22 : 18;
   static double fontSizeOverLarge = Get.context!.width >= 1300 ? 28 : 24;
 
+  //modification
+  static const double scaffoldPadding = 12.0;
+
+  //default
   static const double paddingSizeExtraSmall = 5.0;
   static const double paddingSizeSmall = 10.0;
   static const double paddingSizeDefault = 15.0;

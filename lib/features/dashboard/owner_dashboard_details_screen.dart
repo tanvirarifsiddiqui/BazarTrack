@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/dashboard/controller/analytics_controller.dart';
 import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
+import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
 import 'components/reports_summary.dart';
 import 'components/stats_summary.dart';
@@ -26,7 +27,7 @@ class OwnerDashboardDetails extends StatelessWidget {
         final rep  = ctrl.reports.value!;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(Dimensions.scaffoldPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

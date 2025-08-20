@@ -14,12 +14,5 @@ final ThemeData appTheme = ThemeData(
     ),
     contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
   ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      minimumSize: Size(double.infinity, 48),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-    ),
-  ),
+
 );
