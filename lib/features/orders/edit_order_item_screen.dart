@@ -206,7 +206,9 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
                         textInputAction: TextInputAction.next,
                         keyboardType: TextInputType.number,
                         decoration: AppInputDecorations.generalInputDecoration(
+                          prefixIcon: Icons.confirmation_number,
                           label: 'Quantity',
+
                         ),
                         validator: (v) {
                           final n = int.tryParse(v ?? '');
@@ -227,6 +229,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
                         textInputAction: TextInputAction.next,
                         decoration: AppInputDecorations.generalInputDecoration(
                           label: 'Unit',
+                          prefixIcon: Icons.straighten,
                         ),
                         validator: (v) =>
                         v == null || v.trim().isEmpty ? 'Required' : null,
