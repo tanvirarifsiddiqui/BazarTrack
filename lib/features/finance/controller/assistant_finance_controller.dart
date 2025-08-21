@@ -20,12 +20,14 @@ class AssistantFinanceController extends GetxController {
   var filterType   = RxnString();
   var filterFrom   = Rxn<DateTime>();
   var filterTo     = Rxn<DateTime>();
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   if (isAssistant)
-  //     _loadWalletForCurrentUser();
-  // }
+
+  bool get hasFilter => filterType.value != null || filterFrom.value  != null || filterTo.value != null;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadPayments();
+  }
 
   Future<void> loadWalletForAssistant() async {
     isLoadingWallet.value = true;
@@ -37,12 +39,13 @@ class AssistantFinanceController extends GetxController {
   Future<void> loadPayments() async {
     isLoadingWallet.value = true;
     final list = await assistantFinanceRepo.getPayments(userId: userId, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
+    balance.value = await assistantFinanceRepo.getWalletBalance(userId!);
     transactions.assignAll(list);
     isLoadingWallet.value = false;
   }
 
   // Set any filter and reload
-  void setFilters({int? userId, String? type, DateTime? from, DateTime? to,}) {
+  void setFilters({String? type, DateTime? from, DateTime? to,}) {
     filterType.value   = type;
     filterFrom.value   = from;
     filterTo.value     = to;
@@ -55,7 +58,6 @@ class AssistantFinanceController extends GetxController {
     filterTo.value     = null;
     loadPayments();
   }
-
 
   Future<void> addDebitForAssistant(int assistantId, double amount) async {
     final f = Finance(

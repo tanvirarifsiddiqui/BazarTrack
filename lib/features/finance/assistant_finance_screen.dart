@@ -1,206 +1,318 @@
-/*
-// Title: Assistant Finance Page (stateless, filters working)
-// Description: Assistant wallet + transactions (static header, scrollable transactions)
-// Author: Md. Tanvir Arif Siddiqui (refactor)
-// Date: August 18, 2025
-*/
+// lib/features/finance/screens/assistant_finance_page.dart
+
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
-import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../../util/colors.dart';
+
+import '../../../util/input_decoration.dart';
+import '../../../util/colors.dart';
+import '../../base/custom_app_bar.dart';
+import '../../base/custom_finance_tile.dart';
+import '../auth/controller/auth_controller.dart';
 import '../auth/model/role.dart';
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
-import 'model/finance.dart';
-import 'package:flutter_boilerplate/base/custom_finance_tile.dart';
 
 class AssistantFinancePage extends StatelessWidget {
   final Assistant? assistant;
   const AssistantFinancePage({super.key, this.assistant});
 
-  String _initials(String name) {
+  String _getInitials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
-        .toUpperCase();
+    if (parts.length == 1) return parts.first[0].toUpperCase();
+    return (parts.first[0] + parts.last[0]).toUpperCase();
   }
 
-  void _showFilterDialog(BuildContext context, AssistantFinanceController ctrl) {
-    // copy current controller values to local variables so dialog can edit them
-    String? selectedType = ctrl.filterType.value;
-    DateTime? fromDate = ctrl.filterFrom.value;
-    DateTime? toDate = ctrl.filterTo.value;
+  @override
+  Widget build(BuildContext context) {
+    final ctrl    = Get.find<AssistantFinanceController>();
+    final auth    = Get.find<AuthController>();
+    final role    = auth.currentUser?.role;
+    final isOwner = role == UserRole.owner;
+    final userId  = assistant?.id ?? int.parse(auth.currentUser!.id);
+    ctrl.userId   = userId;
 
-    final df = DateFormat('yyyy-MM-dd');
+    final displayName = assistant?.name ?? auth.currentUser!.name;
+    final numFmt      = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
+    final theme       = Theme.of(context);
+    final ts          = theme.textTheme;
 
-    showDialog<void>(
-      context: context,
-      builder: (ctx) {
-        // use StatefulBuilder to manage local dialog state (so UI updates inside dialog)
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Filter Transactions'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Type filter
-                    DropdownButtonFormField<String?>(
-                      value: selectedType,
-                      decoration: const InputDecoration(labelText: 'Type'),
-                      items: [null, 'credit', 'debit'].map((t) {
-                        return DropdownMenuItem<String?>(
-                          value: t,
-                          child: Text(t == null ? 'All' : t.capitalizeFirst!),
-                        );
-                      }).toList(),
-                      onChanged: (v) => setState(() => selectedType = v),
-                    ),
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: "$displayName’s Wallet",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
+            onPressed: ctrl.clearFilters,
+          ),
+        ],
+      ),
 
-                    const SizedBox(height: 8),
-
-                    // Date range pickers
-                    Row(
+      body: RefreshIndicator(
+        onRefresh: () async => ctrl.clearFilters(),
+        child: CustomScrollView(
+          slivers: [
+            // ─── SUMMARY CARD ────────────────────────
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              sliver: SliverToBoxAdapter(
+                child: Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: fromDate ?? DateTime.now(),
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime.now(),
-                              );
-                              if (picked != null) {
-                                setState(() => fromDate = picked);
-                              }
-                            },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(labelText: 'From'),
-                              child: Text(fromDate != null ? df.format(fromDate!) : 'Any'),
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                          child: Text(
+                            _getInitials(displayName),
+                            style: ts.titleLarge?.copyWith(
+                              color: theme.primaryColor,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 16),
                         Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: toDate ?? DateTime.now(),
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime.now(),
-                              );
-                              if (picked != null) {
-                                setState(() => toDate = picked);
-                              }
-                            },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(labelText: 'To'),
-                              child: Text(toDate != null ? df.format(toDate!) : 'Any'),
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                displayName,
+                                style: ts.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Current balance',
+                                style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                              ),
+                            ],
                           ),
                         ),
+                        Obx(() {
+                          if (ctrl.isLoadingWallet.value) {
+                            return SizedBox(
+                              width: 110,
+                              height: 36,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: theme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                numFmt.format(ctrl.balance.value),
+                                style: ts.headlineSmall?.copyWith(
+                                  color: theme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Available',
+                                style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                              ),
+                            ],
+                          );
+                        }),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    // quick clear inside dialog
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => setState(() {
-                            selectedType = null;
-                            fromDate = null;
-                            toDate = null;
-                          }),
-                          child: const Text('Clear'),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
+            ),
+
+            // ─── TRANSACTIONS HEADER ─────────────────
+            Obx((){
+              return SliverPersistentHeader(
+                pinned: true,
+                delegate: _HeaderDelegate(
+                  child: _TransactionsHeader(
+                    onFilter: () => _showFilterDialog(context, ctrl),
+                    showClear: ctrl.hasFilter,
+                    onClear: ctrl.clearFilters,
+                  ),
+                  height: 56, // your full header height
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // apply to controller and reload
-                    ctrl.setFilters(type: selectedType, from: fromDate, to: toDate);
-                    Navigator.pop(ctx);
-                  },
-                  child: const Text('Apply'),
+              );
+            }),
+
+
+            // ─── TRANSACTIONS LIST ───────────────────
+            Obx(() {
+              if (ctrl.isLoadingWallet.value) {
+                return const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              final tx = ctrl.transactions;
+              if (tx.isEmpty) {
+                return SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _EmptyState(
+                    icon: Icons.receipt_long,
+                    message: 'No transactions yet.',
+                  ),
+                );
+              }
+
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (_, i) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                    child: CustomFinanceTile(finance: tx[i], numFormat: numFmt),
+                  ),
+                  childCount: tx.length,
                 ),
-              ],
-            );
-          },
-        );
-      },
+              );
+            }),
+          ],
+        ),
+      ),
+
+      floatingActionButton: isOwner
+          ? FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: const Text('Debit'),
+        backgroundColor: AppColors.primary,
+        onPressed: () => _showDebitDialog(context, ctrl, userId),
+      )
+          : null,
     );
   }
 
-  void _showDebitDialog(BuildContext context, AssistantFinanceController ctrl, int selectedId) {
-    final amtCtrl = TextEditingController();
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+  Future<void> _showFilterDialog(
+      BuildContext context, AssistantFinanceController ctrl) {
+    String?   type   = ctrl.filterType.value;
+    DateTime? from   = ctrl.filterFrom.value;
+    DateTime? to     = ctrl.filterTo.value;
+    final df = DateFormat('yyyy-MM-dd');
 
-    showDialog<void>(
+    return showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-        contentPadding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Filter Transactions'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String?>(
+                initialValue: type,
+                decoration: AppInputDecorations.generalInputDecoration(
+                    label: 'Type', prefixIcon: Icons.swap_horiz),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('All')),
+                  const DropdownMenuItem(value: 'credit', child: Text('Credit')),
+                  const DropdownMenuItem(value: 'debit', child: Text('Debit')),
+                ],
+                onChanged: (v) => setState(() => type = v),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      controller: TextEditingController(text: from != null ? df.format(from!) : 'Any'),
+                      decoration: AppInputDecorations.generalInputDecoration(
+                          label: 'From', prefixIcon: Icons.calendar_today),
+                      onTap: () async {
+                        final dt = await showDatePicker(
+                          context: ctx,
+                          initialDate: from ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (dt != null) setState(() => from = dt);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextFormField(
+                      readOnly: true,
+                      controller: TextEditingController(text: to != null ? df.format(to!) : 'Any'),
+                      decoration: AppInputDecorations.generalInputDecoration(
+                          label: 'To', prefixIcon: Icons.calendar_today),
+                      onTap: () async {
+                        final dt = await showDatePicker(
+                          context: ctx,
+                          initialDate: to ?? DateTime.now(),
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (dt != null) setState(() => to = dt);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                ctrl.setFilters(type: type, from: from, to: to);
+                Navigator.pop(ctx);
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDebitDialog(
+      BuildContext context, AssistantFinanceController ctrl, int userId) {
+    final amtCtrl = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Row(
           children: [
-            const Icon(Icons.account_balance_wallet_rounded, size: 28, color: AppColors.primary),
+            const Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
             const SizedBox(width: 8),
-            Text('Debit Expense', style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text('Debit Expense', style: Theme.of(ctx).textTheme.titleLarge),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: amtCtrl,
-              decoration: AppInputDecorations.generalInputDecoration(
-                label: "Amount",
-                hint: 'Enter debit amount',
-                prefixIcon: Icons.currency_exchange_rounded,
-              ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            ),
-          ],
+        content: TextFormField(
+          controller: amtCtrl,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: AppInputDecorations.generalInputDecoration(
+              label: 'Amount', prefixIcon: Icons.currency_exchange_rounded),
         ),
         actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.textButtonTextColor,
-              textStyle: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
+            icon: const Icon(Icons.check_circle_outline_rounded),
             label: const Text('Save'),
             onPressed: () {
-              final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
+              final amt = double.tryParse(amtCtrl.text.trim()) ?? 0;
               if (amt > 0) {
-                ctrl.addDebitForAssistant(selectedId, amt).then((_) {
-                  Navigator.pop(context);
-                });
+                ctrl.addDebitForAssistant(userId, amt)
+                    .then((_) => Navigator.pop(ctx));
               }
             },
           ),
@@ -208,186 +320,99 @@ class AssistantFinancePage extends StatelessWidget {
       ),
     );
   }
+}
+
+
+class _HeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+
+  _HeaderDelegate({
+    required this.child,
+    this.height = 56,
+  });
+
+  @override
+  double get maxExtent => height;
+
+  // allow it to shrink down to zero
+  @override
+  double get minExtent => 0;
+
+  @override
+  Widget build(
+      BuildContext context,
+      double shrinkOffset,
+      bool overlapsContent,
+      ) {
+    // how tall to be right now
+    final visibleHeight = math.max(0.0, maxExtent - shrinkOffset);
+
+    return SizedBox(
+      height: visibleHeight,
+      child: Material(
+        elevation: overlapsContent ? 4 : 0,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _HeaderDelegate old) {
+    return child != old.child || height != old.height;
+  }
+}
+
+
+/// Transactions list header with filter & clear
+class _TransactionsHeader extends StatelessWidget {
+  final VoidCallback onFilter;
+  final bool showClear;
+  final VoidCallback onClear;
+
+  const _TransactionsHeader({
+    required this.onFilter,
+    required this.showClear,
+    required this.onClear,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final AssistantFinanceController ctrl = Get.find<AssistantFinanceController>();
-    final AuthController auth = Get.find<AuthController>();
-    final isOwner = auth.currentUser?.role == UserRole.owner;
-    ctrl.userId = assistant?.id ?? int.parse(auth.currentUser!.id);
-
-    final numFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
-    final theme = Theme.of(context);
-    final displayName = assistant?.name ?? auth.currentUser!.name;
-    final selectedId = assistant?.id ?? int.parse(auth.currentUser!.id);
-
-    // We trigger initial load only when there are no transactions and not loading.
-    // Use Obx to observe controller state and call load once when needed.
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("$displayName's Wallet"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            tooltip: 'Refresh',
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => ctrl.clearFilters(),
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    final ts = Theme.of(context).textTheme;
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
         children: [
-          // Header card
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      // replaced with withOpacity for safe API
-                      backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
-                      child: Text(
-                        _initials(displayName),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            displayName,
-                            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Current balance',
-                            style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Balance (observed)
-                    Obx(() {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            numFormat.format(ctrl.balance.value),
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text('Available', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Transactions header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text('Transactions', style: theme.textTheme.titleLarge),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () => _showFilterDialog(context, ctrl),
-                ),
-                // show clear icon only when any filter is active
-                Obx(() {
-                  final hasFilter = ctrl.filterType.value != null || ctrl.filterFrom.value != null || ctrl.filterTo.value != null;
-                  if (!hasFilter) return const SizedBox.shrink();
-                  return IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      ctrl.clearFilters();
-                    },
-                    tooltip: 'Clear Filters',
-                  );
-                }),
-              ],
-            ),
-          ),
-
-          // Transactions list
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async => ctrl.clearFilters(),
-              child: Obx(() {
-                // trigger initial load if needed (only when transactions empty & not loading)
-                if (ctrl.transactions.isEmpty && ctrl.isLoadingWallet.value == false) {
-                  // schedule a microtask so it doesn't happen during build
-                  Future.microtask(() => ctrl.loadWalletForAssistant());
-                }
-
-                final List<Finance> tx = ctrl.transactions;
-
-                if (tx.isEmpty && ctrl.isLoadingWallet.value == false) {
-                  return ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      const SizedBox(height: 40),
-                      Center(
-                        child: Column(
-                          children: [
-                            Icon(Icons.receipt_long, size: 56, color: Colors.grey[300]),
-                            const SizedBox(height: 12),
-                            Text('No transactions yet', style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
-                            const SizedBox(height: 200),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                }
-
-                return ctrl.isLoadingWallet.value
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: tx.length,
-                  itemBuilder: (_, i) => CustomFinanceTile(finance: tx[i], numFormat: numFormat),
-                );
-              }),
-            ),
-          ),
+          Text('Transactions', style: ts.titleLarge),
+          const Spacer(),
+          IconButton(icon: const Icon(Icons.filter_list), onPressed: onFilter),
+          if (showClear)
+            IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
         ],
       ),
+    );
+  }
+}
 
-      // FAB visible for Assistant only (if controller exposes isOwner as bool)
-      floatingActionButton: isOwner
-          ? FloatingActionButton.extended(
-        heroTag: 'assistant_add',
-        icon: const Icon(Icons.add),
-        label: const Text('Debit'),
-        backgroundColor: AppColors.primary,
-        onPressed: () => _showDebitDialog(context, ctrl, selectedId),
-      )
-          : null,
+/// Centered empty state
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  const _EmptyState({required this.icon, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final ts = Theme.of(context).textTheme;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 56, color: Colors.grey[300]),
+          const SizedBox(height: 12),
+          Text(message, style: ts.bodyMedium?.copyWith(color: Colors.grey[600])),
+        ],
+      ),
     );
   }
 }

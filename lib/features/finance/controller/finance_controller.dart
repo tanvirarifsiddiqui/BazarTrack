@@ -38,12 +38,15 @@ class FinanceController extends GetxController {
     loadAssistantsAndTransactions();
   }
 
-  // Helper to show errors to user & optionally log
+  bool get hasActiveFilters =>
+      filterUserId.value != null ||
+          filterType.value   != null ||
+          filterFrom.value   != null ||
+          filterTo.value     != null;
+
   void _showError(String title, Object error, [StackTrace? st]) {
-    // You can replace this with any other error UI you prefer
     Get.snackbar(title, error.toString(), snackPosition: SnackPosition.BOTTOM);
-    // print / log if required
-    // print('$title: $error\n$st');
+
   }
 
   Future<void> loadPayments() async {

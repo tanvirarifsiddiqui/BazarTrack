@@ -6,7 +6,6 @@ import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dar
 import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
-import 'package:flutter_boilerplate/features/auth/signup_screen.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:get/get.dart';
 
@@ -84,12 +83,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   }
                 },
               ),
-              TextButton(
-                onPressed: () {
-                  Get.to(const SignUpScreen());
-                },
-                child: const Text('Sign Up'),
-              ),
+              // TextButton(
+              //   onPressed: () {
+              //     Get.to(const SignUpScreen());
+              //   },
+              //   child: const Text('Sign Up'),
+              // ),
             ],
           ),
         ),
