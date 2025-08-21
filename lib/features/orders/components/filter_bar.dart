@@ -20,30 +20,35 @@ class FilterBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         children: [
+          // Only one Expanded here
           Expanded(
-            child: Expanded(
-              child: Obx(() {
-                return DropdownButtonFormField<OrderStatus?>(
-                  value: ctrl.filterStatus.value,
-                  decoration: AppInputDecorations.generalInputDecoration(
-                    label: 'Status',
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('All')),
-                    ...OrderStatus.values.map((s) {
-                      final label = s.toString().split('.').last.capitalizeFirst!;
-                      return DropdownMenuItem(
-                        value: s,
-                        child: Text(label),
-                      );
-                    })
-                  ],
-                  onChanged: ctrl.setStatusFilter,
-                );
-              }),
-            ),
+            child: Obx(() {
+              return DropdownButtonFormField<OrderStatus?>(
+                value: ctrl.filterStatus.value,
+                decoration: AppInputDecorations.generalInputDecoration(
+                  label: 'Status',
+                ),
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('All')),
+                  ...OrderStatus.values.map((s) {
+                    final label = s
+                        .toString()
+                        .split('.')
+                        .last
+                        .capitalizeFirst!;
+                    return DropdownMenuItem(
+                      value: s,
+                      child: Text(label),
+                    );
+                  }),
+                ],
+                onChanged: ctrl.setStatusFilter,
+              );
+            }),
           ),
+
           if (isOwner) const SizedBox(width: 12),
+
           if (isOwner)
             Expanded(
               child: Obx(() {
@@ -59,7 +64,7 @@ class FilterBar extends StatelessWidget {
                         value: a.id,
                         child: Text(a.name),
                       ),
-                    ),
+                    )
                   ],
                   onChanged: ctrl.setAssignedToFilter,
                 );

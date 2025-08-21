@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
+import 'package:flutter_boilerplate/util/app_format.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
 import 'controller/history_controller.dart';
 import 'model/history_log_item.dart';
 
@@ -19,7 +18,7 @@ class HistoryViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.put(HistoryController(historyRepo: Get.find()));
-    final fmt  = DateFormat('dd MMM yyyy, hh:mm a');
+    final fmt  = AppFormats.appDateTimeFormat;
 
     // Load logs
     if (entityId != null) {

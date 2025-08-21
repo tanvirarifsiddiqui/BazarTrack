@@ -11,6 +11,7 @@ class Dimensions {
 
   //modification
   static const double scaffoldPadding = 12.0;
+  static const double scaffoldIndependent = 16.0;
 
   //default
   static const double paddingSizeExtraSmall = 5.0;
