@@ -1,4 +1,3 @@
-// File: lib/features/orders/screens/order_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';

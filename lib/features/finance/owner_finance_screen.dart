@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_finance_tile.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
-import 'package:flutter_boilerplate/util/finance_input_decoration.dart';
+import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 

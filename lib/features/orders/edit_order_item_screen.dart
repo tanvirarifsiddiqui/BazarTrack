@@ -1,54 +1,68 @@
-// lib/features/orders/screens/edit_order_item_screen.dart
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/base/custom_app_bar.dart';
+import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
-import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
-import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 
+import 'package:flutter_boilerplate/base/custom_app_bar.dart';
+import '../../util/input_decoration.dart';
 import '../../helper/route_helper.dart';
-import '../auth/model/role.dart';
 import '../auth/service/auth_service.dart';
+import '../auth/model/role.dart';
+import 'controller/order_controller.dart';
+import 'model/order_item.dart';
 
 class EditOrderItemScreen extends StatefulWidget {
-
   final String orderId;
   final OrderItem item;
 
   const EditOrderItemScreen({
-    super.key,
+    Key? key,
     required this.orderId,
     required this.item,
-  });
+  }) : super(key: key);
 
   @override
   _EditOrderItemScreenState createState() => _EditOrderItemScreenState();
 }
 
 class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers
   late final TextEditingController _productCtrl;
   late final TextEditingController _quantityCtrl;
   late final TextEditingController _unitCtrl;
   late final TextEditingController _estCostCtrl;
   late final TextEditingController _actualCostCtrl;
-  late OrderItemStatus _status;
 
-  final OrderController _controller = Get.find<OrderController>();
+  // Focus nodes
+  final _productFocus = FocusNode();
+  final _quantityFocus = FocusNode();
+  final _unitFocus = FocusNode();
+  final _estCostFocus = FocusNode();
+  final _actualCostFocus = FocusNode();
+
+  // State
+  late OrderItemStatus _status;
+  late bool _isPurchased;
   bool _saving = false;
-  bool _isPurchased = false;
+
   bool get _isNew => widget.item.id == null;
+
+  final _controller = Get.find<OrderController>();
+  final _auth       = Get.find<AuthService>();
 
   @override
   void initState() {
     super.initState();
-    final orderItem = widget.item;
-    _isPurchased = orderItem.status == OrderItemStatus.purchased;
-    _productCtrl   = TextEditingController(text: orderItem.productName);
-    _quantityCtrl  = TextEditingController(text: orderItem.quantity.toString());
-    _unitCtrl      = TextEditingController(text: orderItem.unit);
-    _estCostCtrl   = TextEditingController(text: orderItem.estimatedCost?.toString() ?? '');
-    _actualCostCtrl  = TextEditingController(text: orderItem.actualCost?.toString() ?? '');
-    _status        = orderItem.status;
+    final itm = widget.item;
+    _isPurchased   = itm.status == OrderItemStatus.purchased;
+    _status        = itm.status;
+    _productCtrl   = TextEditingController(text: itm.productName);
+    _quantityCtrl  = TextEditingController(text: itm.quantity.toString());
+    _unitCtrl      = TextEditingController(text: itm.unit);
+    _estCostCtrl   = TextEditingController(text: itm.estimatedCost?.toString() ?? '');
+    _actualCostCtrl= TextEditingController(text: itm.actualCost?.toString() ?? '');
   }
 
   @override
@@ -58,66 +72,72 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
     _unitCtrl.dispose();
     _estCostCtrl.dispose();
     _actualCostCtrl.dispose();
+    _productFocus.dispose();
+    _quantityFocus.dispose();
+    _unitFocus.dispose();
+    _estCostFocus.dispose();
+    _actualCostFocus.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() => _saving = true);
 
-    final qty = int.tryParse(_quantityCtrl.text.trim()) ?? widget.item.quantity;
-    final est = double.tryParse(_estCostCtrl.text.trim());
-    final actualCost = double.tryParse(_actualCostCtrl.text.trim());
+    final qty    = int.tryParse(_quantityCtrl.text.trim()) ?? widget.item.quantity;
+    final est    = double.tryParse(_estCostCtrl.text.trim());
+    final actual = double.tryParse(_actualCostCtrl.text.trim());
 
-    // Build a copy with new values
     final updated = widget.item.copyWith(
-      orderId: _isNew ? int.parse(widget.orderId) : widget.item.orderId,
-      productName:   _productCtrl.text.trim(),
-      quantity:      qty,
-      unit:          _unitCtrl.text.trim(),
+      orderId:      int.parse(widget.orderId),
+      productName:  _productCtrl.text.trim(),
+      quantity:     qty,
+      unit:         _unitCtrl.text.trim(),
       estimatedCost: est,
-      actualCost: actualCost,
+      actualCost:    actual,
       status:        _status,
-      // For new items, assign the correct orderId
-      // orderId:       _isNew ? int.parse(widget.orderId) : widget.item.orderId,
     );
 
     try {
       if (_isNew) {
-        // CREATE
-        final created =
-        await _controller.createOrderItem(updated);
+        final created = await _controller.createOrderItem(updated);
         Get.back(result: created);
       } else {
-        // UPDATE
         await _controller.updateOrderItem(updated, _isPurchased);
         Get.back(result: updated);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Could not save item: $e');
+      Get.snackbar('Error', 'Could not save item: $e',
+          snackPosition: SnackPosition.BOTTOM);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
 
-  Future<void> _confirmAndDelete() async {
-    final shouldDelete = await showDialog<bool>(
+  Future<void> _confirmDelete() async {
+    final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Delete Item?'),
-        content: Text('Are you sure you want to delete this item?'),
+        title: const Text('Delete Item?'),
+        content: const Text('Are you sure you want to delete this item?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true),  child: Text('Delete', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Get.back(result: false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
 
-    if (shouldDelete != true) return;
+    if (ok != true) return;
 
     try {
       await _controller.deleteOrderItem(widget.item);
-      Get.back(); // pop the edit screen
-      Get.snackbar('Deleted', 'Item has been removed', snackPosition: SnackPosition.BOTTOM);
+      Get.back(); // pop edit screen
+      Get.snackbar('Deleted', 'Item removed',
+          snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
       Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
@@ -125,8 +145,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Get.find<AuthService>();
-    final isAssistant = auth.currentUser?.role == UserRole.assistant;
+    final isAssistant = _auth.currentUser?.role == UserRole.assistant;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -134,85 +153,174 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'View Audit Trail',
+            tooltip: 'Audit Trail',
             onPressed: () {
-              Get.toNamed(RouteHelper.getEntityHistoryRoute('Order_item', widget.item.id.toString()));
+              Get.toNamed(
+                RouteHelper.getEntityHistoryRoute(
+                  'Order_item', widget.item.id.toString(),
+                ),
+              );
             },
           ),
-          if(!_isNew && !_isPurchased)IconButton(onPressed: (){
-            _confirmAndDelete();
-          }, icon: Icon(Icons.delete, color: Colors.red,))
+          if (!_isNew && !_isPurchased)
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              tooltip: 'Delete Item',
+              onPressed: _confirmDelete,
+            ),
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _productCtrl,
-                decoration: const InputDecoration(labelText: 'Product Name'),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _quantityCtrl,
-                      decoration: const InputDecoration(labelText: 'Quantity'),
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _unitCtrl,
-                      decoration: const InputDecoration(labelText: 'Unit'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _estCostCtrl,
-                decoration: const InputDecoration(labelText: 'Estimated Cost'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-              ),
-              const SizedBox(height: 12),
-              if(isAssistant && !_isPurchased)...[
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // PRODUCT NAME
                 TextFormField(
-                  controller: _actualCostCtrl,
-                  decoration: const InputDecoration(labelText: 'Actual Cost'),
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  controller: _productCtrl,
+                  focusNode: _productFocus,
+                  textInputAction: TextInputAction.next,
+                  decoration: AppInputDecorations.generalInputDecoration(
+                    label: 'Product Name',
+                    prefixIcon: Icons.shopping_basket,
+                  ),
+                  validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Required' : null,
+                  onFieldSubmitted: (_) =>
+                      FocusScope.of(context).requestFocus(_quantityFocus),
                 ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 16),
+
+                // QUANTITY & UNIT
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                        controller: _quantityCtrl,
+                        focusNode: _quantityFocus,
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.number,
+                        decoration: AppInputDecorations.generalInputDecoration(
+                          label: 'Quantity',
+                        ),
+                        validator: (v) {
+                          final n = int.tryParse(v ?? '');
+                          return n == null || n <= 0
+                              ? 'Enter a valid number'
+                              : null;
+                        },
+                        onFieldSubmitted: (_) =>
+                            FocusScope.of(context).requestFocus(_unitFocus),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: _unitCtrl,
+                        focusNode: _unitFocus,
+                        textInputAction: TextInputAction.next,
+                        decoration: AppInputDecorations.generalInputDecoration(
+                          label: 'Unit',
+                        ),
+                        validator: (v) =>
+                        v == null || v.trim().isEmpty ? 'Required' : null,
+                        onFieldSubmitted: (_) =>
+                            FocusScope.of(context).requestFocus(_estCostFocus),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // ESTIMATED COST
+                TextFormField(
+                  controller: _estCostCtrl,
+                  focusNode: _estCostFocus,
+                  textInputAction:
+                  isAssistant ? TextInputAction.next : TextInputAction.done,
+                  keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+                  decoration: AppInputDecorations.generalInputDecoration(
+                    label: 'Estimated Cost',
+                    prefixText: '৳ ',
+                  ),
+                  validator: (v) {
+                    final c = double.tryParse(v ?? '');
+                    return (c == null || c < 0)
+                        ? 'Invalid cost'
+                        : null;
+                  },
+                  onFieldSubmitted: (_) {
+                    if (isAssistant && !_isPurchased) {
+                      FocusScope.of(context).requestFocus(_actualCostFocus);
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                // ACTUAL COST (Assistant only, if not purchased)
+                if (isAssistant && !_isPurchased) ...[
+                  TextFormField(
+                    controller: _actualCostCtrl,
+                    focusNode: _actualCostFocus,
+                    textInputAction: TextInputAction.done,
+                    keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                    decoration: AppInputDecorations.generalInputDecoration(
+                      label: 'Actual Cost',
+                      prefixIcon: Icons.money_off,
+                    ),
+                    validator: (v) {
+                      final c = double.tryParse(v ?? '');
+                      return (c == null || c < 0)
+                          ? 'Invalid cost'
+                          : null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // STATUS DROPDOWN
+                if (!_isPurchased)
+                  DropdownButtonFormField<OrderItemStatus>(
+                    value: _status,
+                    decoration: AppInputDecorations.generalInputDecoration(
+                      label: 'Status',
+                    ),
+                    items: OrderItemStatus.values.map((s) {
+                      final label = s
+                          .toString()
+                          .split('.')
+                          .last
+                          .capitalizeFirst!;
+                      return DropdownMenuItem(
+                        value: s,
+                        child: Text(label),
+                      );
+                    }).toList(),
+                    onChanged: (v) {
+                      if (v != null) setState(() => _status = v);
+                    },
+                  ),
+
+                const SizedBox(height: 24),
+
+                // SAVE BUTTON
+                CustomButton(
+                  icon: Icons.save,
+                  buttonText: _isNew ? 'Add Item' : 'Save Changes',
+                  onPressed: _saving ? null : _save,
+                ),
               ],
-              if(!_isPurchased)DropdownButtonFormField<OrderItemStatus>(
-                value: _status,
-                decoration: const InputDecoration(labelText: 'Status'),
-                items: OrderItemStatus.values
-                    .map((status) => DropdownMenuItem(
-                  value: status,
-                  child: Text(status.toApi()),
-                ))
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) setState(() => _status = v);
-                },
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                icon: _saving
-                    ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-                    : const Icon(Icons.save),
-                label: Text(_isNew ? 'Add Item' : 'Save Item'),
-                onPressed: _saving ? null : _save,
-              ),
-            ],
+            ),
           ),
         ),
       ),

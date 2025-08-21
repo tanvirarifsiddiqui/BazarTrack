@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
-import '../../util/finance_input_decoration.dart';
+import '../../util/input_decoration.dart';
 
 class CreateOrderScreen extends StatelessWidget {
   const CreateOrderScreen({super.key});

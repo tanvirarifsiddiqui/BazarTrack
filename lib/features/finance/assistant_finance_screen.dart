@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
-import 'package:flutter_boilerplate/util/finance_input_decoration.dart';
+import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../util/colors.dart';

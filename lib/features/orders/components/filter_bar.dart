@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../util/finance_input_decoration.dart';
+import '../../../util/input_decoration.dart';
 import '../controller/order_controller.dart';
 import '../model/order_status.dart';
 

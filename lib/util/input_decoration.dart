@@ -5,12 +5,14 @@ class AppInputDecorations {
   static InputDecoration generalInputDecoration({
     required String label,
     String? hint,
-    IconData? prefixIcon,
+    IconData? prefixIcon, String? prefixText,
   }) {
     return InputDecoration(
       labelText: label,
       hintText: hint,
       prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+      prefixText: prefixText,
+      prefixStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
       ),
