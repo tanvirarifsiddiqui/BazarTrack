@@ -21,7 +21,7 @@ class AssistantFinanceController extends GetxController {
   var filterFrom   = Rxn<DateTime>();
   var filterTo     = Rxn<DateTime>();
 
-  bool get hasFilter => filterType.value != null || filterFrom.value  != null || filterTo.value != null;
+  var hasFilter = false.obs;
 
   @override
   void onInit() {
@@ -49,6 +49,7 @@ class AssistantFinanceController extends GetxController {
     filterType.value   = type;
     filterFrom.value   = from;
     filterTo.value     = to;
+    hasFilter.value = filterType.value != null || filterFrom.value  != null || filterTo.value != null;
     loadPayments();
   }
 
@@ -56,6 +57,7 @@ class AssistantFinanceController extends GetxController {
     filterType.value   = null;
     filterFrom.value   = null;
     filterTo.value     = null;
+    hasFilter.value = false;
     loadPayments();
   }
 

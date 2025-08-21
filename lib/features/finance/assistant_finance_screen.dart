@@ -1,11 +1,6 @@
-// lib/features/finance/screens/assistant_finance_page.dart
-
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../../../util/input_decoration.dart';
 import '../../../util/colors.dart';
 import '../../base/custom_app_bar.dart';
@@ -27,12 +22,12 @@ class AssistantFinancePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl    = Get.find<AssistantFinanceController>();
-    final auth    = Get.find<AuthController>();
-    final role    = auth.currentUser?.role;
-    final isOwner = role == UserRole.owner;
-    final userId  = assistant?.id ?? int.parse(auth.currentUser!.id);
-    ctrl.userId   = userId;
+    final ctrl        = Get.find<AssistantFinanceController>();
+    final auth        = Get.find<AuthController>();
+    final role        = auth.currentUser?.role;
+    final isOwner     = role == UserRole.owner;
+    final userId      = assistant?.id ?? int.parse(auth.currentUser!.id);
+    ctrl.userId       = userId; // triggers wallet load
 
     final displayName = assistant?.name ?? auth.currentUser!.name;
     final numFmt      = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
@@ -40,7 +35,7 @@ class AssistantFinancePage extends StatelessWidget {
     final ts          = theme.textTheme;
 
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: isOwner?CustomAppBar(
         title: "$displayName’s Wallet",
         actions: [
           IconButton(
@@ -49,8 +44,7 @@ class AssistantFinancePage extends StatelessWidget {
             onPressed: ctrl.clearFilters,
           ),
         ],
-      ),
-
+      ): null,
       body: RefreshIndicator(
         onRefresh: () async => ctrl.clearFilters(),
         child: CustomScrollView(
@@ -70,7 +64,8 @@ class AssistantFinancePage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 28,
-                          backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                          backgroundColor:
+                          theme.primaryColor.withValues(alpha: 0.12),
                           child: Text(
                             _getInitials(displayName),
                             style: ts.titleLarge?.copyWith(
@@ -86,12 +81,14 @@ class AssistantFinancePage extends StatelessWidget {
                             children: [
                               Text(
                                 displayName,
-                                style: ts.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                style: ts.titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w700),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Current balance',
-                                style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                style: ts.bodySmall
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                             ],
                           ),
@@ -126,7 +123,8 @@ class AssistantFinancePage extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 'Available',
-                                style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                style: ts.bodySmall
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                             ],
                           );
@@ -139,20 +137,17 @@ class AssistantFinancePage extends StatelessWidget {
             ),
 
             // ─── TRANSACTIONS HEADER ─────────────────
-            Obx((){
-              return SliverPersistentHeader(
-                pinned: true,
-                delegate: _HeaderDelegate(
-                  child: _TransactionsHeader(
-                    onFilter: () => _showFilterDialog(context, ctrl),
-                    showClear: ctrl.hasFilter,
-                    onClear: ctrl.clearFilters,
-                  ),
-                  height: 56, // your full header height
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _HeaderDelegate(
+                height: 56,
+                child: _TransactionsHeader(
+                  onFilter: () => _showFilterDialog(context, ctrl),
+                  onClear: ctrl.clearFilters,
+                  showClear: ctrl.hasFilter,
                 ),
-              );
-            }),
-
+              ),
+            ),
 
             // ─── TRANSACTIONS LIST ───────────────────
             Obx(() {
@@ -161,7 +156,6 @@ class AssistantFinancePage extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
-
               final tx = ctrl.transactions;
               if (tx.isEmpty) {
                 return SliverFillRemaining(
@@ -172,12 +166,13 @@ class AssistantFinancePage extends StatelessWidget {
                   ),
                 );
               }
-
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
                       (_, i) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                    child: CustomFinanceTile(finance: tx[i], numFormat: numFmt),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 2),
+                    child: CustomFinanceTile(
+                        finance: tx[i], numFormat: numFmt),
                   ),
                   childCount: tx.length,
                 ),
@@ -186,7 +181,6 @@ class AssistantFinancePage extends StatelessWidget {
           ],
         ),
       ),
-
       floatingActionButton: isOwner
           ? FloatingActionButton.extended(
         icon: const Icon(Icons.add),
@@ -322,58 +316,44 @@ class AssistantFinancePage extends StatelessWidget {
   }
 }
 
-
+// ──────────────────────────────────────────────────────────────
+// SliverPersistentHeaderDelegate never shrinks to ensure header
+// stays pinned at exactly its full height.
 class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final double height;
 
-  _HeaderDelegate({
-    required this.child,
-    this.height = 56,
-  });
+  _HeaderDelegate({required this.child, required this.height});
 
   @override
   double get maxExtent => height;
 
-  // allow it to shrink down to zero
   @override
-  double get minExtent => 0;
+  double get minExtent => height;  // <-- keep full height
 
   @override
   Widget build(
-      BuildContext context,
-      double shrinkOffset,
-      bool overlapsContent,
-      ) {
-    // how tall to be right now
-    final visibleHeight = math.max(0.0, maxExtent - shrinkOffset);
-
-    return SizedBox(
-      height: visibleHeight,
-      child: Material(
+      BuildContext context, double shrinkOffset, bool overlapsContent) =>
+      Material(
         elevation: overlapsContent ? 4 : 0,
-        child: child,
-      ),
-    );
-  }
+        child: SizedBox(height: height, child: child),
+      );
 
   @override
-  bool shouldRebuild(covariant _HeaderDelegate old) {
-    return child != old.child || height != old.height;
-  }
+  bool shouldRebuild(covariant _HeaderDelegate old) =>
+      old.child != child || old.height != height;
 }
 
-
-/// Transactions list header with filter & clear
+// ─── HEADER WIDGET ────────────────────────────────────────────
 class _TransactionsHeader extends StatelessWidget {
   final VoidCallback onFilter;
-  final bool showClear;
   final VoidCallback onClear;
+  final RxBool showClear;
 
   const _TransactionsHeader({
     required this.onFilter,
-    required this.showClear,
     required this.onClear,
+    required this.showClear,
   });
 
   @override
@@ -387,15 +367,19 @@ class _TransactionsHeader extends StatelessWidget {
           Text('Transactions', style: ts.titleLarge),
           const Spacer(),
           IconButton(icon: const Icon(Icons.filter_list), onPressed: onFilter),
-          if (showClear)
-            IconButton(icon: const Icon(Icons.clear), onPressed: onClear),
+          Obx(() {
+            if (showClear.value) {
+              return IconButton(icon: const Icon(Icons.clear), onPressed: onClear);
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );
   }
 }
 
-/// Centered empty state
+// ─── EMPTY STATE ──────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   final IconData icon;
   final String message;
