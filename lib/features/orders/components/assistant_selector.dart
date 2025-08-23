@@ -14,7 +14,7 @@ class AssistantSelector extends StatelessWidget {
           () => DropdownButtonFormField<int?>(
         borderRadius: BorderRadius.circular(12),
 
-        value: ctrl.assignedToUserId.value,
+        initialValue: ctrl.assignedToUserId.value,
         items: [
           const DropdownMenuItem(value: null, child: Text("None")),
           ...ctrl.assistants
@@ -23,7 +23,7 @@ class AssistantSelector extends StatelessWidget {
         onChanged: (v) => ctrl.assignedToUserId.value = v,
         decoration: AppInputDecorations.generalInputDecoration(
           label: 'Select Assistant',
-          prefixIcon: Icons.person_outline_rounded,
+          prefixIcon: Icons.person,
         ),
       ),
     );

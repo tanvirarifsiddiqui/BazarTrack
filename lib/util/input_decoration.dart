@@ -10,9 +10,9 @@ class AppInputDecorations {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+      prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.primary,) : null,
       prefixText: prefixText,
-      prefixStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+      prefixStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppColors.primary),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
       ),

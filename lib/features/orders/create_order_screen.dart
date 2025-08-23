@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -71,19 +72,21 @@ class CreateOrderScreen extends StatelessWidget {
     );
   }
 
-
   Future<OrderItem?> _showItemDialog(
-      BuildContext context, [
-        OrderItem? existing,
-      ]) {
+    BuildContext context, [
+    OrderItem? existing,
+  ]) {
     final isNew = existing == null;
-    final item = existing?.copyWith() ??
+    final item =
+        existing?.copyWith() ??
         OrderItem.empty(orderId: 0); // you’ll set real orderId later
 
     final productCtrl = TextEditingController(text: item.productName);
     final quantityCtrl = TextEditingController(text: item.quantity.toString());
     final unitCtrl = TextEditingController(text: item.unit);
-    final estCtrl = TextEditingController(text: item.estimatedCost?.toString() ?? '');
+    final estCtrl = TextEditingController(
+      text: item.estimatedCost?.toString() ?? '',
+    );
 
     return showModalBottomSheet<OrderItem>(
       context: context,
@@ -91,15 +94,39 @@ class CreateOrderScreen extends StatelessWidget {
       builder: (_) {
         return Padding(
           padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16, right: 16, top: 16
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 8,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                isNew ? 'Add Item' : 'Edit Item',
-                style: Theme.of(context).textTheme.titleLarge,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isNew ? 'Add New Item' : 'Edit Item',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          productCtrl.clear();
+                          quantityCtrl.clear();
+                          unitCtrl.clear();
+                          estCtrl.clear();
+                        },
+                        icon: Icon(Icons.refresh, color: AppColors.primary),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: Icon(Icons.clear),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
 
@@ -107,7 +134,9 @@ class CreateOrderScreen extends StatelessWidget {
               TextFormField(
                 controller: productCtrl,
                 decoration: AppInputDecorations.generalInputDecoration(
-                    label: 'Product Name', prefixIcon: Icons.shopping_basket),
+                  label: 'Product Name',
+                  prefixIcon: Icons.shopping_basket,
+                ),
               ),
               const SizedBox(height: 12),
 
@@ -120,7 +149,9 @@ class CreateOrderScreen extends StatelessWidget {
                       controller: quantityCtrl,
                       keyboardType: TextInputType.number,
                       decoration: AppInputDecorations.generalInputDecoration(
-                          label: 'Quantity', prefixIcon: Icons.confirmation_number),
+                        label: 'Quantity',
+                        prefixIcon: Icons.confirmation_number,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -129,7 +160,9 @@ class CreateOrderScreen extends StatelessWidget {
                     child: TextFormField(
                       controller: unitCtrl,
                       decoration: AppInputDecorations.generalInputDecoration(
-                          label: 'Unit', prefixIcon: Icons.straighten),
+                        label: 'Unit',
+                        prefixIcon: Icons.straighten,
+                      ),
                     ),
                   ),
                 ],
@@ -139,10 +172,11 @@ class CreateOrderScreen extends StatelessWidget {
               // Estimated Cost
               TextFormField(
                 controller: estCtrl,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: AppInputDecorations.generalInputDecoration(
                   label: 'Estimated Cost',
-                  prefixIcon: Icons.attach_money,
                   prefixText: '৳ ',
                 ),
               ),
@@ -150,18 +184,15 @@ class CreateOrderScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Row(
                 children: [
+
                   Expanded(
-                    child: OutlinedButton(
-                      child: const Text('Cancel'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      child: Text(isNew ? 'Add' : 'Save'),
+                    child: CustomButton(
+                      buttonText: isNew ? 'Add item to Order' : 'Save',
+                      icon: isNew ? Icons.add : Icons.check,
                       onPressed: () {
-                        final qty = int.tryParse(quantityCtrl.text.trim()) ?? item.quantity;
+                        final qty =
+                            int.tryParse(quantityCtrl.text.trim()) ??
+                            item.quantity;
                         final est = double.tryParse(estCtrl.text.trim());
                         final updated = item.copyWith(
                           productName: productCtrl.text.trim(),
@@ -206,8 +237,10 @@ class OrderItemsList extends StatelessWidget {
             item: items[idx],
             onDelete: () => ctrl.removeItem(idx),
             onEdit: () async {
-              final updated = await CreateOrderScreen()
-                  ._showItemDialog(context, items[idx]);
+              final updated = await CreateOrderScreen()._showItemDialog(
+                context,
+                items[idx],
+              );
               if (updated != null) {
                 ctrl.newItems[idx] = updated;
               }

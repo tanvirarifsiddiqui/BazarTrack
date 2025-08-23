@@ -15,7 +15,7 @@ class CustomButton extends StatelessWidget {
   final IconData? icon;
   const CustomButton({
     super.key, this.onPressed, required this.buttonText, this.transparent = false, this.margin, this.width,
-    this.height, this.fontSize, this.radius = 5, this.icon,
+    this.height, this.fontSize, this.radius = 12, this.icon,
   });
 
   @override
