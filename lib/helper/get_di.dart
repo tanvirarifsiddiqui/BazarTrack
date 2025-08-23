@@ -33,14 +33,14 @@ import '../features/dashboard/repository/analytics_repo.dart';
 Future<Map<String, Map<String, String>>> init() async {
   // Core
   final sharedPreferences = await SharedPreferences.getInstance();
-  Get.lazyPut(() => sharedPreferences);
+  Get.lazyPut(() => sharedPreferences,fenix: true);
   Get.lazyPut(() => ApiClient(sharedPreferences: Get.find<SharedPreferences>()));
   Get.lazyPut(() => BazarTrackApi(client: Get.find<ApiClient>()));
 
   // Repository
   Get.lazyPut(() => SplashRepo(sharedPreferences: Get.find<SharedPreferences>(), apiClient: Get.find<ApiClient>()));
-  Get.lazyPut(() => LanguageRepo());
   Get.lazyPut(() => AuthRepo(api: Get.find<BazarTrackApi>(), sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => LanguageRepo());
   // Get.lazyPut(() => AdvanceRepo(sharedPreferences: Get.find<SharedPreferences>()));
   Get.lazyPut(() => OrderRepo(api: Get.find<BazarTrackApi>()),fenix: true);
   Get.lazyPut(() => HistoryRepo(api: Get.find<BazarTrackApi>()),fenix: true);
@@ -60,11 +60,11 @@ Future<Map<String, Map<String, String>>> init() async {
   // Get.put(AnalyticsService(repo: Get.find<AnalyticsRepo>()),);
 
   // Controllers
-  Get.lazyPut(() => ThemeController(sharedPreferences: Get.find<SharedPreferences>()));
+  Get.lazyPut(() => AuthController(authService: Get.find<AuthService>()), fenix: true);
   Get.lazyPut(() => SplashController(splashRepo: Get.find()));
+  Get.lazyPut(() => ThemeController(sharedPreferences: Get.find<SharedPreferences>()));
   Get.lazyPut(() => LocalizationController(sharedPreferences: Get.find()));
   Get.lazyPut(() => LanguageController(sharedPreferences: Get.find()));
-  Get.lazyPut(() => AuthController(authService: Get.find<AuthService>()), fenix: true);
   // Get.lazyPut(() => AdvanceController(advanceService: Get.find()), fenix: true);
   Get.lazyPut(() => OrderController(orderRepo: Get.find<OrderRepo>(), authService: Get.find<AuthService>(),financeRepo: Get.find<FinanceRepo>()), fenix: true);
   Get.lazyPut(() => HistoryController(historyRepo: Get.find<HistoryRepo>()), fenix: true);

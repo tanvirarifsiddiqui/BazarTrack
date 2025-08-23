@@ -5,6 +5,7 @@ import '../../../util/input_decoration.dart';
 import '../../../util/colors.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_finance_tile.dart';
+import '../../base/empty_state.dart';
 import '../auth/controller/auth_controller.dart';
 import '../auth/model/role.dart';
 import 'controller/assistant_finance_controller.dart';
@@ -24,11 +25,11 @@ class AssistantFinancePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ctrl        = Get.find<AssistantFinanceController>();
     final auth        = Get.find<AuthController>();
-    final role        = auth.currentUser?.role;
-    final isOwner     = role == UserRole.owner;
     final userId      = assistant?.id ?? int.parse(auth.currentUser!.id);
     ctrl.userId       = userId;
-
+    ctrl.loadPayments();
+    final role        = auth.currentUser?.role;
+    final isOwner     = role == UserRole.owner;
     final displayName = assistant?.name ?? auth.currentUser!.name;
     final numFmt      = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
     final theme       = Theme.of(context);
@@ -160,7 +161,7 @@ class AssistantFinancePage extends StatelessWidget {
               if (tx.isEmpty) {
                 return SliverFillRemaining(
                   hasScrollBody: false,
-                  child: _EmptyState(
+                  child: EmptyState(
                     icon: Icons.receipt_long,
                     message: 'No transactions yet.',
                   ),
@@ -316,9 +317,6 @@ class AssistantFinancePage extends StatelessWidget {
   }
 }
 
-// ──────────────────────────────────────────────────────────────
-// SliverPersistentHeaderDelegate never shrinks to ensure header
-// stays pinned at exactly its full height.
 class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
   final double height;
@@ -373,28 +371,6 @@ class _TransactionsHeader extends StatelessWidget {
             }
             return const SizedBox.shrink();
           }),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── EMPTY STATE ──────────────────────────────────────────────
-class _EmptyState extends StatelessWidget {
-  final IconData icon;
-  final String message;
-  const _EmptyState({required this.icon, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    final ts = Theme.of(context).textTheme;
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 56, color: Colors.grey[300]),
-          const SizedBox(height: 12),
-          Text(message, style: ts.bodyMedium?.copyWith(color: Colors.grey[600])),
         ],
       ),
     );

@@ -5,7 +5,7 @@ import '../model/finance.dart';
 class AssistantFinanceController extends GetxController {
   final AssistantFinanceRepo assistantFinanceRepo;
 
-  AssistantFinanceController({ required this.assistantFinanceRepo });
+  AssistantFinanceController({ required this.assistantFinanceRepo, });
 
   // Owner flows
   var isLoadingAssistants = false.obs;
@@ -21,12 +21,12 @@ class AssistantFinanceController extends GetxController {
   var filterFrom   = Rxn<DateTime>();
   var filterTo     = Rxn<DateTime>();
 
+
   var hasFilter = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadPayments();
   }
 
   Future<void> loadWalletForAssistant() async {
@@ -38,7 +38,7 @@ class AssistantFinanceController extends GetxController {
 
   Future<void> loadPayments() async {
     isLoadingWallet.value = true;
-    final list = await assistantFinanceRepo.getPayments(userId: userId, type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
+    final list = await assistantFinanceRepo.getPayments(userId: userId , type:   filterType.value, from:   filterFrom.value, to:     filterTo.value,);
     balance.value = await assistantFinanceRepo.getWalletBalance(userId!);
     transactions.assignAll(list);
     isLoadingWallet.value = false;
