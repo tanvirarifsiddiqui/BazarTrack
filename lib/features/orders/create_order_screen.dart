@@ -18,6 +18,7 @@ class CreateOrderScreen extends StatelessWidget {
     final ctrl = Get.find<OrderController>();
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(title: 'New Order'),
       body: Column(
         children: [
