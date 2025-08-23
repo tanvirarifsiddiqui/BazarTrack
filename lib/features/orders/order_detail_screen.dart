@@ -13,7 +13,7 @@ import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
 import '../finance/model/assistant.dart';
-import 'edit_order_item_screen.dart';
+import 'components/edit_order_item_bottomsheet.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   final String orderId;
@@ -58,27 +58,71 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Future<void> _onAddItem() async {
     final newItem = OrderItem.empty(orderId: int.parse(widget.orderId));
-    final created = await Get.to<OrderItem>(
-      () => EditOrderItemScreen(orderId: widget.orderId, item: newItem),
+    final created = await showModalBottomSheet<OrderItem?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final kb = MediaQuery.of(ctx).viewInsets.bottom;
+        final initialHeight = 400.0;
+        final bigHeight = MediaQuery.of(ctx).size.height * 0.75;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          height: kb > 0 ? bigHeight : initialHeight,
+          child: EditOrderItemBottomSheet(
+            orderId: widget.orderId,
+            item: newItem,
+            autoFocusFirstField: true, // important: will request focus
+          ),
+        );
+      },
     );
+
     if (created != null) {
-      // reload items
       orderCtrl.loadItems(widget.orderId);
       await _reloadItems();
     }
   }
 
   Future<void> _onEditItem(OrderItem item) async {
-    final updated = await Get.to<OrderItem>(
-      () => EditOrderItemScreen(orderId: widget.orderId, item: item),
+    final updated = await showModalBottomSheet<OrderItem>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final kb = MediaQuery.of(ctx).viewInsets.bottom;
+        final initialHeight = 400.0;
+        final bigHeight = MediaQuery.of(ctx).size.height * 0.75;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          height: kb > 0 ? bigHeight : initialHeight,
+          child: EditOrderItemBottomSheet(orderId: widget.orderId, item: item, autoFocusFirstField: true, ),
+        );
+      },
     );
+
     if (updated != null) {
-      // controller may have to reload items
       orderCtrl.loadItems(widget.orderId);
       await _reloadItems();
-      await _reloadOrder(); // in case costs/status changed
+      await _reloadOrder();
     }
   }
+
+  //
+  // Future<void> _onEditItem(OrderItem item) async {
+  //   final updated = await Get.to<OrderItem>(
+  //     () => EditOrderItemScreen(orderId: widget.orderId, item: item),
+  //   );
+  //   if (updated != null) {
+  //     // controller may have to reload items
+  //     orderCtrl.loadItems(widget.orderId);
+  //     await _reloadItems();
+  //     await _reloadOrder(); // in case costs/status changed
+  //   }
+  // }
 
   Future<void> _onAssignUser(BuildContext context) async {
     try {

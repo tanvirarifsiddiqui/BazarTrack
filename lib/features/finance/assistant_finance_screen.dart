@@ -27,7 +27,7 @@ class AssistantFinancePage extends StatelessWidget {
     final role        = auth.currentUser?.role;
     final isOwner     = role == UserRole.owner;
     final userId      = assistant?.id ?? int.parse(auth.currentUser!.id);
-    ctrl.userId       = userId; // triggers wallet load
+    ctrl.userId       = userId;
 
     final displayName = assistant?.name ?? auth.currentUser!.name;
     final numFmt      = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
