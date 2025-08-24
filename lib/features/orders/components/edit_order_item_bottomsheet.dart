@@ -194,7 +194,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-
+                  if(_isNew)const SizedBox(height: 12),
                   // Title + actions row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,7 +227,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                     ],
                   ),
 
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 12),
 
                   Form(
                     key: _formKey,
@@ -248,7 +248,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                           onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_quantityFocus),
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
 
                         // QUANTITY & UNIT
                         Row(
@@ -350,7 +350,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                           ],
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
 
                         // ESTIMATED COST
                         TextFormField(
@@ -374,7 +374,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                           },
                         ),
 
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
 
                         // ACTUAL COST (Assistant only, if not purchased)
                         if (isAssistant) ...[
@@ -393,7 +393,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                               return (c == null || c < 0) ? 'Invalid cost' : null;
                             },
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                         ],
 
                         // STATUS DROPDOWN

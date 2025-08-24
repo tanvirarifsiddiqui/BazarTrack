@@ -12,6 +12,7 @@ import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
+import '../../base/empty_state.dart';
 import '../../base/price_format.dart';
 import '../finance/model/assistant.dart';
 import 'components/edit_order_item_bottomsheet.dart';
@@ -399,8 +400,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         final items = itemSnap.data ?? [];
                         if (items.isEmpty) {
-                          return const Center(
-                            child: Text('No items added yet.'),
+                          return const EmptyState(
+                            icon: Icons.inventory,
+                            message: 'No items added yet. Tap “Add Item” to begin.',
                           );
                         }
 
@@ -451,15 +453,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     child: Row(
                       children: [
                         if (!isOwner && order.assignedTo == null && isAssistant)
-                          Expanded(
+                         ...[ Expanded(
                             child: CustomButton(
                               icon: Icons.person_add,
-                              width: MediaQuery.of(context).size.width * .45,
                               buttonText: 'Assign to me',
                               onPressed: _onSelfAssign,
                               btnColor: AppColors.tertiary,
                             ),
                           ),
+                           const SizedBox(width: 12),
+                         ],
 
                         if (isOwner) ...[
                           Expanded(
