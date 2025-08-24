@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
-import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -12,7 +12,7 @@ import 'components/assistant_selector.dart';
 import 'components/create_order_item_card.dart';
 
 class CreateOrderScreen extends StatelessWidget {
-  const CreateOrderScreen({Key? key}) : super(key: key);
+  const CreateOrderScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -93,181 +93,220 @@ class CreateOrderScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        // Local mutable state for quantity inside the sheet
+        // Local mutable state & focus node for quantity input inside sheet
         int currentQty = int.tryParse(quantityCtrl.text.trim()) ?? item.quantity;
-        const int minQuantity = 0; // change to 1 if you don't want zero allowed
+        const int minQuantity = 0; // change to 1 if you want a minimum of 1
+        final qtyFocus = FocusNode();
 
         return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 8,
-            ),
-            child: StatefulBuilder(builder: (context, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isNew ? 'Add New Item' : 'Edit Item',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              productCtrl.clear();
-                              quantityCtrl.clear();
-                              unitCtrl.clear();
-                              estCtrl.clear();
-                              setState(() {
-                                currentQty = 0;
-                              });
-                            },
-                            icon: Icon(Icons.refresh, color: AppColors.primary),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: Icon(Icons.clear),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 8,
+          ),
+          child: StatefulBuilder(builder: (context, setState) {
+            void _setQty(int newQty) {
+              final safe = newQty < minQuantity ? minQuantity : newQty;
+              setState(() {
+                currentQty = safe;
+                quantityCtrl.text = currentQty.toString();
+                quantityCtrl.selection = TextSelection.fromPosition(
+                  TextPosition(offset: quantityCtrl.text.length),
+                );
+              });
+            }
 
-                  // Product Name
-                  TextFormField(
-                    controller: productCtrl,
-                    decoration: AppInputDecorations.generalInputDecoration(
-                      label: 'Product Name',
-                      prefixIcon: Icons.shopping_basket,
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isNew ? 'Add New Item' : 'Edit Item',
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            productCtrl.clear();
+                            quantityCtrl.clear();
+                            unitCtrl.clear();
+                            estCtrl.clear();
+                            _setQty(0);
+                          },
+                          icon: Icon(Icons.refresh, color: AppColors.primary),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(Icons.clear),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Product Name
+                TextFormField(
+                  controller: productCtrl,
+                  decoration: AppInputDecorations.generalInputDecoration(
+                    label: 'Product Name',
+                    prefixIcon: Icons.shopping_basket,
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 12),
 
-                  // Quantity (with increment/decrement) & Unit
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Decrement
-                              IconButton(
-                                visualDensity: VisualDensity.compact,
-                                padding: EdgeInsets.zero,
-                                icon: const Icon(Icons.remove_circle_outline, color: AppColors.primary,),
-                                onPressed: () {
-                                  if (currentQty > minQuantity) {
-                                    setState(() {
-                                      currentQty = currentQty - 1;
-                                      quantityCtrl.text = currentQty.toString();
-                                    });
-                                  }
-                                },
-                              ),
-
-                              // Quantity display
-                              Expanded(
-                                child: Text(
-                                  currentQty.toString(),
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.titleMedium,
+                // Quantity (floating +/- over TextField) & Unit
+                Row(
+                  children: [
+                    // Quantity area (will take available width defined by flex)
+                    Expanded(
+                      flex: 2,
+                      child: SizedBox(
+                        height: 56,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // The actual TextField (fills area)
+                            TextFormField(
+                              controller: quantityCtrl,
+                              focusNode: qtyFocus,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              textAlign: TextAlign.center,
+                              decoration: AppInputDecorations.generalInputDecoration(
+                                label: 'Quantity',
+                              ).copyWith(
+                                // leave horizontal padding so text doesn't touch floating buttons
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 42,
+                                  vertical: 12,
                                 ),
                               ),
+                              onChanged: (val) {
+                                final parsed = int.tryParse(val.trim());
+                                setState(() {
+                                  currentQty = parsed ?? 0;
+                                });
+                              },
+                            ),
 
-                              // Increment
-                              IconButton(
+                            // A full-area GestureDetector that focuses the field when user taps outside the buttons
+                            // (Placed before buttons so buttons are on top and remain tappable.)
+                            Positioned.fill(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  qtyFocus.requestFocus();
+                                },
+                                child: const SizedBox.expand(),
+                              ),
+                            ),
+
+                            // Decrement button (left)
+                            Positioned(
+                              left: 4,
+                              child: IconButton(
+                                icon: const Icon(Icons.remove_circle_outline, color: AppColors.primary,),
                                 visualDensity: VisualDensity.compact,
                                 padding: EdgeInsets.zero,
-                                icon: const Icon(Icons.add_circle_outline, color: AppColors.primary,),
                                 onPressed: () {
-                                  setState(() {
-                                    currentQty = currentQty + 1;
-                                    quantityCtrl.text = currentQty.toString();
-                                  });
+                                  if (currentQty > minQuantity) _setQty(currentQty - 1);
                                 },
                               ),
-                            ],
-                          ),
+                            ),
+
+                            // Increment button + small "Here" focus button (right)
+                            Positioned(
+                              right: 4,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.add_circle_outline, color: AppColors.primary,),
+                                    visualDensity: VisualDensity.compact,
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () => _setQty(currentQty + 1),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-
-                      const SizedBox(width: 12),
-
-                      Expanded(
-                        flex: 3,
-                        child: TextFormField(
-                          controller: unitCtrl,
-                          decoration: AppInputDecorations.generalInputDecoration(
-                            label: 'Unit',
-                            prefixIcon: Icons.straighten,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Estimated Cost
-                  TextFormField(
-                    controller: estCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
                     ),
-                    decoration: AppInputDecorations.generalInputDecoration(
-                      label: 'Estimated Cost',
-                      prefixText: '৳ ',
-                    ),
-                  ),
 
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          buttonText: isNew ? 'Add item to Order' : 'Save',
-                          icon: isNew ? Icons.add : Icons.check,
-                          onPressed: () {
-                            final qty = currentQty;
-                            final est = double.tryParse(estCtrl.text.trim());
-                            final updated = item.copyWith(
-                              productName: productCtrl.text.trim(),
-                              quantity: qty,
-                              unit: unitCtrl.text.trim(),
-                              estimatedCost: est,
-                            );
-                            Navigator.pop(context, updated);
-                          },
+                    const SizedBox(width: 12),
+
+                    // Unit input
+                    Expanded(
+                      flex: 3,
+                      child: TextFormField(
+                        controller: unitCtrl,
+                        decoration: AppInputDecorations.generalInputDecoration(
+                          label: 'Unit',
+                          prefixIcon: Icons.straighten,
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Estimated Cost
+                TextFormField(
+                  controller: estCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
                   ),
-                  const SizedBox(height: 16),
-                ],
-              );
-            })
+                  decoration: AppInputDecorations.generalInputDecoration(
+                    label: 'Estimated Cost',
+                    prefixText: '৳ ',
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        buttonText: isNew ? 'Add item to Order' : 'Save',
+                        icon: isNew ? Icons.add : Icons.check,
+                        onPressed: () {
+                          // prefer typed value if present, otherwise currentQty
+                          final qty = int.tryParse(quantityCtrl.text.trim()) ?? currentQty;
+                          final est = double.tryParse(estCtrl.text.trim());
+                          final updated = item.copyWith(
+                            productName: productCtrl.text.trim(),
+                            quantity: qty,
+                            unit: unitCtrl.text.trim(),
+                            estimatedCost: est,
+                          );
+                          Navigator.pop(context, updated);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }),
         );
       },
     );
   }
 
+
+
 }
 
 class OrderItemsList extends StatelessWidget {
   final OrderController ctrl;
-  const OrderItemsList({required this.ctrl, Key? key}) : super(key: key);
+  const OrderItemsList({required this.ctrl, super.key});
 
   @override
   Widget build(BuildContext context) {

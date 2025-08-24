@@ -183,7 +183,7 @@ class AssistantFinancePage extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: isOwner
+      floatingActionButton: !isOwner
           ? FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: const Text('Debit'),
