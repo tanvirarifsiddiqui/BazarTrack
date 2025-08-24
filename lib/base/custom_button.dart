@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:flutter_boilerplate/util/styles.dart';
 import 'package:flutter/material.dart';
@@ -13,16 +14,17 @@ class CustomButton extends StatelessWidget {
   final double? fontSize;
   final double radius;
   final IconData? icon;
+  final Color? btnColor;
   const CustomButton({
     super.key, this.onPressed, required this.buttonText, this.transparent = false, this.margin, this.width,
-    this.height, this.fontSize, this.radius = 12, this.icon,
+    this.height, this.fontSize, this.radius = 12, this.icon, this.btnColor = AppColors.primary
   });
 
   @override
   Widget build(BuildContext context) {
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       backgroundColor: onPressed == null ? Theme.of(context).disabledColor : transparent
-          ? Colors.transparent : Theme.of(context).primaryColor,
+          ? Colors.transparent : btnColor,
       minimumSize: Size(width ?? context.width, height ?? 50),
       padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(

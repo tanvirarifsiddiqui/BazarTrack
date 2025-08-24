@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/price_format.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../features/finance/model/finance.dart';
@@ -7,8 +8,7 @@ import '../util/dimensions.dart';
 
 class CustomFinanceTile extends StatelessWidget {
   final Finance finance;
-  final NumberFormat numFormat;
-  const CustomFinanceTile({super.key, required this.finance, required this.numFormat});
+  const CustomFinanceTile({super.key, required this.finance,});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class CustomFinanceTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        numFormat.format(finance.amount),
+                        formatPrice(finance.amount),
                         style: textTheme.titleMedium?.copyWith(
                           color: color,
                           fontWeight: FontWeight.w700,

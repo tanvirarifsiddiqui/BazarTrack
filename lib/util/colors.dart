@@ -8,6 +8,8 @@ class AppColors {
   static const Color background = Color(0xFFF5F5F5); // Light background
   static const Color cardBackground = Colors.white;
   static const Color textLight = Colors.grey;
+  static const Color baseGrey = Color(0xFF808080);
+  static final Color dividerWithAlpha = baseGrey.withValues(alpha:0.25); // 25% alpha
   static const Color icon = Colors.grey;
   static const Color grey = Colors.grey;
   static final Color? lightGray = Colors.grey[300];

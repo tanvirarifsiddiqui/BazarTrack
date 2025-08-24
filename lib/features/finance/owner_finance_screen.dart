@@ -15,7 +15,6 @@ class OwnerFinancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl  = Get.find<FinanceController>();
-    final fmt   = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
     // final theme = Theme.of(context);
     // final ts    = theme.textTheme;
 
@@ -47,7 +46,6 @@ class OwnerFinancePage extends StatelessWidget {
                 sliver: SliverToBoxAdapter(
                   child: AssistantSummaryCard(
                     assistants: ctrl.assistants,
-                    fmt: fmt,
                   ),
                 ),
               ),
@@ -86,7 +84,6 @@ class OwnerFinancePage extends StatelessWidget {
                       ),
                       child: CustomFinanceTile(
                         finance: tx[i],
-                        numFormat: fmt,
                       ),
                     ),
                     childCount: tx.length,

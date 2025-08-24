@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
+import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../model/assistant_analytics.dart';
 import '../model/monthly_report.dart';
@@ -50,7 +51,6 @@ class ReportsChartSyncfusion extends StatelessWidget {
     // Month label uses only the month abbreviation (Jan, Feb, Mar)
     final monthOnlyFmt = DateFormat('MMM');
     final monthAndYearFmt = DateFormat('MMM yyyy');
-    final currencyFmt = NumberFormat.simpleCurrency(decimalDigits: 0,name:"৳");
 
     if (_data.isEmpty) {
       return Center(child: Text('No data available', style: theme.textTheme.bodyMedium));
@@ -178,13 +178,13 @@ class ReportsChartSyncfusion extends StatelessWidget {
         if (customBelow != null) ...[
           customBelow!,
         ] else if (showTableBelow) ...[
-          _buildCombinedTable(points, monthAndYearFmt, currencyFmt),
+          _buildCombinedTable(points, monthAndYearFmt),
         ],
       ],
     );
   }
 
-  Widget _buildCombinedTable(List<_ChartPoint> pts, DateFormat monthLabelFmt, NumberFormat currencyFmt) {
+  Widget _buildCombinedTable(List<_ChartPoint> pts, DateFormat monthLabelFmt) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
@@ -200,7 +200,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
           return DataRow(cells: [
             DataCell(Text(monthLabelFmt.format(pt.month))),
             DataCell(Text(pt.orders.toString())),
-            DataCell(Text(currencyFmt.format(pt.revenue))),
+            DataCell(Text(formatPrice(pt.revenue))),
           ]);
         }).toList(),
       ),

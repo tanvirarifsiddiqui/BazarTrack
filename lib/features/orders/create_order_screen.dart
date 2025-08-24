@@ -45,6 +45,8 @@ class CreateOrderScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: CustomButton(
+                    btnColor: AppColors.tertiary,
+
                     icon: Icons.add,
                     buttonText: 'Add Item',
                     onPressed: () async {

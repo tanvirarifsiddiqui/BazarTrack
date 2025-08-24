@@ -6,6 +6,7 @@ import '../../../util/colors.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_finance_tile.dart';
 import '../../base/empty_state.dart';
+import '../../base/price_format.dart';
 import '../../util/dimensions.dart';
 import '../auth/controller/auth_controller.dart';
 import '../auth/model/role.dart';
@@ -32,7 +33,6 @@ class AssistantFinancePage extends StatelessWidget {
     final role        = auth.currentUser?.role;
     final isOwner     = role == UserRole.owner;
     final displayName = assistant?.name ?? auth.currentUser!.name;
-    final numFmt      = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
     final theme       = Theme.of(context);
     final ts          = theme.textTheme;
 
@@ -116,7 +116,7 @@ class AssistantFinancePage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                numFmt.format(ctrl.balance.value),
+                                formatPrice(ctrl.balance.value),
                                 style: ts.headlineSmall?.copyWith(
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.bold,
@@ -174,7 +174,7 @@ class AssistantFinancePage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 2),
                     child: CustomFinanceTile(
-                        finance: tx[i], numFormat: numFmt),
+                        finance: tx[i],),
                   ),
                   childCount: tx.length,
                 ),

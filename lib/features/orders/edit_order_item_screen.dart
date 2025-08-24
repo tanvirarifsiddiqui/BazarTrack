@@ -294,7 +294,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
                 // STATUS DROPDOWN
                 if (!_isPurchased)
                   DropdownButtonFormField<OrderItemStatus>(
-                    value: _status,
+                    initialValue: _status,
                     decoration: AppInputDecorations.generalInputDecoration(
                       label: 'Status',
                     ),

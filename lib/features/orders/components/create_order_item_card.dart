@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
+import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../model/order_item.dart';
 
@@ -33,7 +34,7 @@ class OrderItemCard extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 12,),
-            const Divider(height: 1, color: Colors.grey,),
+            Divider(height: 1, color: AppColors.dividerWithAlpha,),
             const SizedBox(height: 12),
             _buildInfoSection(context),
           ],
@@ -97,34 +98,24 @@ class OrderItemCard extends StatelessWidget {
             Expanded(
               child: _InfoTile(
                 label: 'Quantity',
-                value: item.quantity.toString(),
+                value: "${item.quantity.toString()} ${item.unit.isNotEmpty ? item.unit : ''}" ,
                 leading: _SquareBadge(icon: Icons.production_quantity_limits),
               ),
             ),
             Expanded(
               child: _InfoTile(
                 label: 'Price',
-                value: _formatPrice(item.estimatedCost),
+                value: formatPrice(item.estimatedCost),
                 leading: _SquareBadge(symbol: '৳'),
               ),
             ),
           ],
         ),
-        _InfoTile(
-          label: 'Unit',
-          value: item.unit.isNotEmpty ? item.unit : '-',
-          leading: _SquareBadge(icon: Icons.straighten),
-        ),
-
       ],
     );
   }
 
-  String _formatPrice(num? price) {
-    if (price == null) return '-';
-    // Keep minimal formatting; caller can adapt for locales
-    return '৳ ${price is int ? price : price.toStringAsFixed(2)}';
-  }
+
 }
 
 

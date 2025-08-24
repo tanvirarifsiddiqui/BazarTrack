@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../../../util/dimensions.dart';
 import '../assistant_finance_screen.dart';
 import '../model/assistant.dart';
@@ -9,10 +8,8 @@ import 'assistant_row.dart';
 /// A Card that shows the total and list of assistants.
 class AssistantSummaryCard extends StatelessWidget {
   final List<Assistant> assistants;
-  final NumberFormat fmt;
   const AssistantSummaryCard({
     required this.assistants,
-    required this.fmt,
   });
 
   @override
@@ -62,7 +59,6 @@ class AssistantSummaryCard extends StatelessWidget {
                 final a = assistants[i];
                 return AssistantRow(
                   assistant: a,
-                  fmt: fmt,
                   onTap: () => Get.to(() => AssistantFinancePage(assistant: a)),
                 );
               },

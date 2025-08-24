@@ -4,7 +4,6 @@ import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/util/app_format.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/helper/route_helper.dart';
+import '../../base/price_format.dart';
 import '../finance/model/assistant.dart';
 import 'components/edit_order_item_bottomsheet.dart';
 
@@ -421,14 +421,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 children: [
                                   if (item.estimatedCost != null)
                                     Text(
-                                      'Est: ${NumberFormat.currency(symbol: '৳').format(item.estimatedCost)}',
+                                      'Est: ${formatPrice(item.estimatedCost)}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   if (item.actualCost != null)
                                     Text(
-                                      'Act: ${NumberFormat.currency(symbol: '৳').format(item.actualCost)}',
+                                      'Act: ${formatPrice(item.actualCost)}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.green,

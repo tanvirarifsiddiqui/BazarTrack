@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../../../base/price_format.dart';
 
 class AssistantRow extends StatelessWidget {
   final dynamic assistant; // replace dynamic with your Assistant model type if available
-  final NumberFormat fmt;
   final VoidCallback? onTap;
 
   const AssistantRow({
     Key? key,
     required this.assistant,
-    required this.fmt,
     this.onTap,
   }) : super(key: key);
 
@@ -54,7 +52,7 @@ class AssistantRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            balance != null ? fmt.format(balance) : '-',
+            balance != null ? formatPrice(balance) : '-',
             style: textTheme.bodyMedium?.copyWith(
               color: theme.primaryColor,
               fontWeight: FontWeight.w700,

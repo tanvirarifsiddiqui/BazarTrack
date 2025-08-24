@@ -14,7 +14,7 @@ import '../../../util/dimensions.dart';
 import '../../finance/model/assistant.dart';
 import '../assistant_dashboard_details_screen.dart';
 
-final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳');
+final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳', decimalDigits: 0);
 
 // WalletSummary showing ALL assistants inside a single full-width card.
 class WalletSummary extends StatelessWidget {

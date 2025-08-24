@@ -8,6 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
 
+import '../../../base/price_format.dart';
+
 class StatsSummary extends StatelessWidget {
   final int totalOrders;
   final int totalUsers;
@@ -30,7 +32,7 @@ class StatsSummary extends StatelessWidget {
       _StatTile('Total Orders', totalOrders.toString(), Icons.shopping_cart, AppColors.primary,),
       _StatTile('Users', totalUsers.toString(), Icons.group, Colors.orange,),
       _StatTile('Total Payments', totalPayments.toString(), Icons.payments, Colors.teal,),
-      _StatTile('Total Revenue', '৳${balance.toString()}', Icons.account_balance_wallet, Colors.green,),
+      _StatTile('Total Revenue', '${formatPrice(balance)}', Icons.account_balance_wallet, Colors.green,),
     ];
 
     return GridView.count(
