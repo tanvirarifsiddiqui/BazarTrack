@@ -6,6 +6,7 @@ import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import '../../base/custom_button.dart';
+import '../../base/custom_unit_dropdown.dart';
 import '../../base/empty_state.dart';
 import '../../util/input_decoration.dart';
 import 'components/assistant_selector.dart';
@@ -246,14 +247,14 @@ class CreateOrderScreen extends StatelessWidget {
                     // Unit input
                     Expanded(
                       flex: 3,
-                      child: TextFormField(
-                        controller: unitCtrl,
-                        decoration: AppInputDecorations.generalInputDecoration(
-                          label: 'Unit',
-                          prefixIcon: Icons.straighten,
-                        ),
+                      child: UnitDropdown(
+                        value: unitCtrl.text.isEmpty ? null : unitCtrl.text, // sync with controller
+                        onChanged: (val) {
+                          unitCtrl.text = val ?? ""; // store short form (e.g. "kg")
+                        },
                       ),
                     ),
+
                   ],
                 ),
                 const SizedBox(height: 12),

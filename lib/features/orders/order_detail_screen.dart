@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/util/app_format.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
@@ -456,6 +457,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               width: MediaQuery.of(context).size.width * .45,
                               buttonText: 'Assign to me',
                               onPressed: _onSelfAssign,
+                              btnColor: AppColors.tertiary,
                             ),
                           ),
 

@@ -8,13 +8,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
+import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../../finance/model/assistant.dart';
 import '../assistant_dashboard_details_screen.dart';
 
-final _takaFormat = NumberFormat.currency(locale: 'en_BD', symbol: '৳', decimalDigits: 0);
 
 // WalletSummary showing ALL assistants inside a single full-width card.
 class WalletSummary extends StatelessWidget {
@@ -183,7 +181,7 @@ class _AssistantRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _takaFormat.format(assistant.balance),
+                formatPrice(assistant.balance),
                 style: textTheme.titleLarge?.copyWith(
                   color: theme.primaryColor,
                   fontWeight: FontWeight.bold,

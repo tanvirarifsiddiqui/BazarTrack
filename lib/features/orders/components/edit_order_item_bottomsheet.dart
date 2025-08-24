@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart'; // <-- ADDED for FilteringTextInputFormatter
 import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
+import '../../../base/custom_unit_dropdown.dart';
 import '../../../helper/route_helper.dart';
 
 class EditOrderItemBottomSheet extends StatefulWidget {
@@ -43,6 +45,10 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
   late bool _isPurchased;
   bool _saving = false;
 
+  // NEW state for quantity widget
+  int _currentQty = 0;
+  final int _minQuantity = 1;
+
   bool get _isNew => widget.item.id == null;
 
   final _controller = Get.find<OrderController>();
@@ -61,6 +67,10 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
         TextEditingController(text: itm.estimatedCost?.toString() ?? '');
     _actualCostCtrl =
         TextEditingController(text: itm.actualCost?.toString() ?? '');
+
+    // initialize _currentQty from controller / item
+    _currentQty = int.tryParse(_quantityCtrl.text) ?? itm.quantity;
+    if (_currentQty < _minQuantity) _currentQty = _minQuantity;
   }
 
   @override
@@ -76,6 +86,15 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
     _estCostFocus.dispose();
     _actualCostFocus.dispose();
     super.dispose();
+  }
+
+  // NEW helper to update qty
+  void _setQty(int v) {
+    if (v < _minQuantity) v = _minQuantity;
+    setState(() {
+      _currentQty = v;
+      _quantityCtrl.text = v.toString();
+    });
   }
 
   Future<void> _save() async {
@@ -234,41 +253,100 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                         // QUANTITY & UNIT
                         Row(
                           children: [
+                            // <-- REPLACED QUANTITY WIDGET START
                             Expanded(
                               flex: 2,
-                              child: TextFormField(
-                                controller: _quantityCtrl,
-                                focusNode: _quantityFocus,
-                                textInputAction: TextInputAction.next,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Quantity',
-                                  prefixIcon: const Icon(Icons.confirmation_number),
-                                  border: const OutlineInputBorder(),
+                              child: SizedBox(
+                                height: 56,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // The actual TextField (fills area)
+                                    TextFormField(
+                                      controller: _quantityCtrl,
+                                      focusNode: _quantityFocus,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                      textAlign: TextAlign.center,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Quantity',
+                                        border: OutlineInputBorder(),
+                                      ).copyWith(
+                                        // leave horizontal padding so text doesn't touch floating buttons
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 42,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      validator: (v) {
+                                        final n = int.tryParse(v ?? '');
+                                        return n == null || n <= 0 ? 'Enter a valid number' : null;
+                                      },
+                                      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_unitFocus),
+                                      onChanged: (val) {
+                                        final parsed = int.tryParse(val.trim());
+                                        setState(() {
+                                          _currentQty = parsed ?? 0;
+                                        });
+                                      },
+                                    ),
+
+                                    // A full-area GestureDetector that focuses the field when user taps outside the buttons
+                                    Positioned.fill(
+                                      child: GestureDetector(
+                                        behavior: HitTestBehavior.translucent,
+                                        onTap: () {
+                                          _quantityFocus.requestFocus();
+                                        },
+                                        child: const SizedBox.expand(),
+                                      ),
+                                    ),
+
+                                    // Decrement button (left)
+                                    Positioned(
+                                      left: 4,
+                                      child: IconButton(
+                                        icon: Icon(Icons.remove_circle_outline, color: Theme.of(context).primaryColor),
+                                        visualDensity: VisualDensity.compact,
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {
+                                          if (_currentQty > _minQuantity) _setQty(_currentQty - 1);
+                                        },
+                                      ),
+                                    ),
+
+                                    // Increment button (right)
+                                    Positioned(
+                                      right: 4,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.add_circle_outline, color: Theme.of(context).primaryColor),
+                                            visualDensity: VisualDensity.compact,
+                                            padding: EdgeInsets.zero,
+                                            onPressed: () => _setQty(_currentQty + 1),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                validator: (v) {
-                                  final n = int.tryParse(v ?? '');
-                                  return n == null || n <= 0 ? 'Enter a valid number' : null;
-                                },
-                                onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_unitFocus),
                               ),
                             ),
+                            // <-- REPLACED QUANTITY WIDGET END
+
                             const SizedBox(width: 12),
                             Expanded(
                               flex: 3,
-                              child: TextFormField(
-                                controller: _unitCtrl,
-                                focusNode: _unitFocus,
-                                textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  labelText: 'Unit',
-                                  prefixIcon: const Icon(Icons.straighten),
-                                  border: const OutlineInputBorder(),
-                                ),
-                                validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
-                                onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_estCostFocus),
+                              child: UnitDropdown(
+                                value: _unitCtrl.text.isEmpty ? null : _unitCtrl.text, // sync with controller
+                                onChanged: (val) {
+                                  _unitCtrl.text = val ?? ""; // store short form (e.g. "kg")
+                                },
                               ),
                             ),
+
                           ],
                         ),
 
