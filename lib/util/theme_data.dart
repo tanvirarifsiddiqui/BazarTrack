@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/dimensions.dart';
 
 import 'colors.dart';
 
@@ -10,14 +11,14 @@ final ThemeData appTheme = ThemeData(
   colorScheme: ColorScheme.fromSwatch().copyWith(secondary: AppColors.accent),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
       borderSide: BorderSide(color: AppColors.primary),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
       borderSide: BorderSide(color: AppColors.borderGrey, width: 1.5),
     ),
     floatingLabelStyle: TextStyle(

@@ -3,6 +3,7 @@ import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
 import '../../util/colors.dart';
+import '../../util/dimensions.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -67,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
                     ),
                     child: ListTile(
                       leading: const Icon(

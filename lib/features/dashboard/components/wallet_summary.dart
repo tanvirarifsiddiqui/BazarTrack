@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../util/dimensions.dart';
 import '../../finance/model/assistant.dart';
 import '../assistant_dashboard_details_screen.dart';
 
@@ -46,7 +47,7 @@ class WalletSummary extends StatelessWidget {
         child: Card(
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
           ),
           child: Padding(
             padding: padding,
@@ -60,7 +61,7 @@ class WalletSummary extends StatelessWidget {
       width: double.infinity, // ensures the card takes maximum available width
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
         child: Padding(
           padding: padding,
           child: Column(

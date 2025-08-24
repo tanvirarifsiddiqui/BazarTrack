@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
+import '../../../util/dimensions.dart';
 import '../model/order_item.dart';
 
 class OrderItemCard extends StatelessWidget {
@@ -22,7 +23,7 @@ class OrderItemCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
         side: BorderSide(color: cs.outline.withValues(alpha: 0.14)),
       ),
       child: Padding(

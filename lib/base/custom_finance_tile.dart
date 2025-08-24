@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../features/finance/model/finance.dart';
 import '../helper/route_helper.dart';
+import '../util/dimensions.dart';
 
 class CustomFinanceTile extends StatelessWidget {
   final Finance finance;
@@ -19,10 +20,10 @@ class CustomFinanceTile extends StatelessWidget {
     final textTheme = Theme.of(Get.context!).textTheme;
     return  Card(
         margin: const EdgeInsets.only(bottom: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
         elevation: 1,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
           onTap: () {
             Get.toNamed(RouteHelper.getEntityHistoryRoute('Payment', finance.id.toString()));
           },
@@ -35,7 +36,7 @@ class CustomFinanceTile extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
                   ),
                   child: Icon(
                     credit ? Icons.arrow_upward : Icons.arrow_downward,

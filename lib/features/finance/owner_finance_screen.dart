@@ -5,6 +5,7 @@ import '../../../util/input_decoration.dart';
 import '../../../util/colors.dart';
 import '../../base/custom_finance_tile.dart';
 import '../../base/empty_state.dart';
+import '../../util/dimensions.dart';
 import 'components/assistant_summary_card.dart';
 import 'controller/finance_controller.dart';
 
@@ -250,7 +251,7 @@ class OwnerFinancePage extends StatelessWidget {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
           ),
           title: Row(
             children: [

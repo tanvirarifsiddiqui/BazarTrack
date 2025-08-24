@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../helper/route_helper.dart';
 import '../../../util/colors.dart';
+import '../../../util/dimensions.dart';
 
 class OrderCard extends StatelessWidget {
   final order;
@@ -19,7 +20,7 @@ class OrderCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
       ),
       color: AppColors.cardBackground,
       child: ListTile(

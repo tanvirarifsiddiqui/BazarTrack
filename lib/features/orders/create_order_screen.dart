@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
+import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
@@ -74,13 +75,12 @@ class CreateOrderScreen extends StatelessWidget {
   }
 
   Future<OrderItem?> _showItemDialog(
-    BuildContext context, [
-    OrderItem? existing,
-  ]) {
+      BuildContext context, [
+        OrderItem? existing,
+      ]) {
     final isNew = existing == null;
     final item =
-        existing?.copyWith() ??
-        OrderItem.empty(orderId: 0); // you’ll set real orderId later
+        existing?.copyWith() ?? OrderItem.empty(orderId: 0); // you’ll set real orderId later
 
     final productCtrl = TextEditingController(text: item.productName);
     final quantityCtrl = TextEditingController(text: item.quantity.toString());
@@ -93,127 +93,176 @@ class CreateOrderScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) {
+        // Local mutable state for quantity inside the sheet
+        int currentQty = int.tryParse(quantityCtrl.text.trim()) ?? item.quantity;
+        const int minQuantity = 0; // change to 1 if you don't want zero allowed
+
         return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 8,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 8,
+            ),
+            child: StatefulBuilder(builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    isNew ? 'Add New Item' : 'Edit Item',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: () {
-                          productCtrl.clear();
-                          quantityCtrl.clear();
-                          unitCtrl.clear();
-                          estCtrl.clear();
-                        },
-                        icon: Icon(Icons.refresh, color: AppColors.primary),
+                      Text(
+                        isNew ? 'Add New Item' : 'Edit Item',
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(Icons.clear),
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              productCtrl.clear();
+                              quantityCtrl.clear();
+                              unitCtrl.clear();
+                              estCtrl.clear();
+                              setState(() {
+                                currentQty = 0;
+                              });
+                            },
+                            icon: Icon(Icons.refresh, color: AppColors.primary),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: Icon(Icons.clear),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-              // Product Name
-              TextFormField(
-                controller: productCtrl,
-                decoration: AppInputDecorations.generalInputDecoration(
-                  label: 'Product Name',
-                  prefixIcon: Icons.shopping_basket,
-                ),
-              ),
-              const SizedBox(height: 12),
+                  // Product Name
+                  TextFormField(
+                    controller: productCtrl,
+                    decoration: AppInputDecorations.generalInputDecoration(
+                      label: 'Product Name',
+                      prefixIcon: Icons.shopping_basket,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
 
-              // Quantity & Unit
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: TextFormField(
-                      controller: quantityCtrl,
-                      keyboardType: TextInputType.number,
-                      decoration: AppInputDecorations.generalInputDecoration(
-                        label: 'Quantity',
-                        prefixIcon: Icons.confirmation_number,
+                  // Quantity (with increment/decrement) & Unit
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Decrement
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.remove_circle_outline, color: AppColors.primary,),
+                                onPressed: () {
+                                  if (currentQty > minQuantity) {
+                                    setState(() {
+                                      currentQty = currentQty - 1;
+                                      quantityCtrl.text = currentQty.toString();
+                                    });
+                                  }
+                                },
+                              ),
+
+                              // Quantity display
+                              Expanded(
+                                child: Text(
+                                  currentQty.toString(),
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ),
+
+                              // Increment
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.add_circle_outline, color: AppColors.primary,),
+                                onPressed: () {
+                                  setState(() {
+                                    currentQty = currentQty + 1;
+                                    quantityCtrl.text = currentQty.toString();
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 3,
-                    child: TextFormField(
-                      controller: unitCtrl,
-                      decoration: AppInputDecorations.generalInputDecoration(
-                        label: 'Unit',
-                        prefixIcon: Icons.straighten,
+
+                      const SizedBox(width: 12),
+
+                      Expanded(
+                        flex: 3,
+                        child: TextFormField(
+                          controller: unitCtrl,
+                          decoration: AppInputDecorations.generalInputDecoration(
+                            label: 'Unit',
+                            prefixIcon: Icons.straighten,
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Estimated Cost
+                  TextFormField(
+                    controller: estCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: AppInputDecorations.generalInputDecoration(
+                      label: 'Estimated Cost',
+                      prefixText: '৳ ',
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
 
-              // Estimated Cost
-              TextFormField(
-                controller: estCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                decoration: AppInputDecorations.generalInputDecoration(
-                  label: 'Estimated Cost',
-                  prefixText: '৳ ',
-                ),
-              ),
-
-              const SizedBox(height: 24),
-              Row(
-                children: [
-
-                  Expanded(
-                    child: CustomButton(
-                      buttonText: isNew ? 'Add item to Order' : 'Save',
-                      icon: isNew ? Icons.add : Icons.check,
-                      onPressed: () {
-                        final qty =
-                            int.tryParse(quantityCtrl.text.trim()) ??
-                            item.quantity;
-                        final est = double.tryParse(estCtrl.text.trim());
-                        final updated = item.copyWith(
-                          productName: productCtrl.text.trim(),
-                          quantity: qty,
-                          unit: unitCtrl.text.trim(),
-                          estimatedCost: est,
-                        );
-                        Navigator.pop(context, updated);
-                      },
-                    ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          buttonText: isNew ? 'Add item to Order' : 'Save',
+                          icon: isNew ? Icons.add : Icons.check,
+                          onPressed: () {
+                            final qty = currentQty;
+                            final est = double.tryParse(estCtrl.text.trim());
+                            final updated = item.copyWith(
+                              productName: productCtrl.text.trim(),
+                              quantity: qty,
+                              unit: unitCtrl.text.trim(),
+                              estimatedCost: est,
+                            );
+                            Navigator.pop(context, updated);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 16),
                 ],
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+              );
+            })
         );
       },
     );
   }
+
 }
 
 class OrderItemsList extends StatelessWidget {

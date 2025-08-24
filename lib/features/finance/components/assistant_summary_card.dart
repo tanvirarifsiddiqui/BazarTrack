@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../util/dimensions.dart';
 import '../assistant_finance_screen.dart';
 import '../model/assistant.dart';
 import 'assistant_row.dart';
@@ -22,7 +23,7 @@ class AssistantSummaryCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),

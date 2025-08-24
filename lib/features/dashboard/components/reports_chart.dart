@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
+import '../../../util/dimensions.dart';
 import '../model/assistant_analytics.dart';
 import '../model/monthly_report.dart';
 
@@ -81,7 +82,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
       children: [
         Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
             child: SizedBox(
@@ -186,7 +187,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
   Widget _buildCombinedTable(List<_ChartPoint> pts, DateFormat monthLabelFmt, NumberFormat currencyFmt) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
       margin: const EdgeInsets.symmetric(horizontal: 4.0),
       child: DataTable(
         columnSpacing: 12,

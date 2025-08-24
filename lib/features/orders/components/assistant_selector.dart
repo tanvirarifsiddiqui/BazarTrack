@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../util/dimensions.dart';
 import '../../../util/input_decoration.dart';
 import '../controller/order_controller.dart';
 
@@ -12,7 +13,7 @@ class AssistantSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
           () => DropdownButtonFormField<int?>(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
 
         initialValue: ctrl.assignedToUserId.value,
         items: [

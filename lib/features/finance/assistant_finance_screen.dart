@@ -6,6 +6,7 @@ import '../../../util/colors.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_finance_tile.dart';
 import '../../base/empty_state.dart';
+import '../../util/dimensions.dart';
 import '../auth/controller/auth_controller.dart';
 import '../auth/model/role.dart';
 import 'controller/assistant_finance_controller.dart';
@@ -57,7 +58,7 @@ class AssistantFinancePage extends StatelessWidget {
                 child: Card(
                   elevation: 2,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -284,7 +285,7 @@ class AssistantFinancePage extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
         title: Row(
           children: [
             const Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
