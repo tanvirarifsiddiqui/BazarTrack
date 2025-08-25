@@ -12,27 +12,27 @@ class MonthlyCount {
   }
 }
 
-class MonthlyRevenue {
+class MonthlyResponse {
   final String month;
-  final double revenue;
+  final double expense;
 
-  MonthlyRevenue({ required this.month, required this.revenue });
+  MonthlyResponse({ required this.month, required this.expense });
 
-  factory MonthlyRevenue.fromJson(Map<String, dynamic> json) {
-    return MonthlyRevenue(
+  factory MonthlyResponse.fromJson(Map<String, dynamic> json) {
+    return MonthlyResponse(
       month:   json['month'] as String,
-      revenue: double.parse(json['revenue'].toString()),
+      expense: double.parse(json['expense'].toString()),
     );
   }
 }
 
 class ReportsData {
   final List<MonthlyCount>   ordersByMonth;
-  final List<MonthlyRevenue> revenueByMonth;
+  final List<MonthlyResponse> expenseByMonth;
 
   ReportsData({
     required this.ordersByMonth,
-    required this.revenueByMonth,
+    required this.expenseByMonth,
   });
 
   factory ReportsData.fromJson(Map<String, dynamic> json) {
@@ -40,8 +40,8 @@ class ReportsData {
       ordersByMonth: (json['orders_by_month'] as List)
           .map((e) => MonthlyCount.fromJson(e))
           .toList(),
-      revenueByMonth: (json['revenue_by_month'] as List)
-          .map((e) => MonthlyRevenue.fromJson(e))
+      expenseByMonth: (json['expense_by_month'] as List)
+          .map((e) => MonthlyResponse.fromJson(e))
           .toList(),
     );
   }

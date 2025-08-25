@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class AssistantStatsSummary extends StatelessWidget {
   final int totalOrders;
-  final double totalRevenue;
+  final double totalExpense;
   final ThemeData theme;
 
   const AssistantStatsSummary({
     Key? key,
     required this.totalOrders,
-    required this.totalRevenue,
+    required this.totalExpense,
     required this.theme,
   }) : super(key: key);
 
@@ -22,8 +22,8 @@ class AssistantStatsSummary extends StatelessWidget {
         theme.primaryColor,
       ),
       _StatTile(
-        'Total Revenue',
-        '৳${totalRevenue.toStringAsFixed(2)}',
+        'Total Expense',
+        '৳${totalExpense.toStringAsFixed(2)}',
         Icons.account_balance_wallet,
         Colors.green,
       ),

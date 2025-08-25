@@ -16,13 +16,13 @@ class ReportsSummary extends StatelessWidget {
       MonthlyCount(month: '2025-05', count: 10),
       MonthlyCount(month: '2025-08', count: 43),
     ],
-    revenueByMonth: [
-      MonthlyRevenue(month: '2025-01', revenue: 75.00),
-      MonthlyRevenue(month: '2025-02', revenue: 120.50),
-      MonthlyRevenue(month: '2025-03', revenue: 300.00),
-      MonthlyRevenue(month: '2025-04', revenue: 210.25),
-      MonthlyRevenue(month: '2025-05', revenue: 450.00),
-      MonthlyRevenue(month: '2025-08', revenue: 1878.00),
+    expenseByMonth: [
+      MonthlyResponse(month: '2025-01', expense: 75.00),
+      MonthlyResponse(month: '2025-02', expense: 120.50),
+      MonthlyResponse(month: '2025-03', expense: 300.00),
+      MonthlyResponse(month: '2025-04', expense: 210.25),
+      MonthlyResponse(month: '2025-05', expense: 450.00),
+      MonthlyResponse(month: '2025-08', expense: 1878.00),
     ],
   );
 

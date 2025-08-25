@@ -25,7 +25,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
   factory ReportsChartSyncfusion.fromAssistantAnalytics(
       AssistantAnalytics analytics, ThemeData theme,
       {bool showTableBelow = true, Widget? customBelow}) {
-    final points = _mergeMonthlyData(analytics.ordersByMonth, analytics.revenueByMonth);
+    final points = _mergeMonthlyData(analytics.ordersByMonth, analytics.expenseByMonth);
     return ReportsChartSyncfusion._(
       data: points,
       theme: theme,
@@ -37,7 +37,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
   factory ReportsChartSyncfusion.fromReportsData(
       ReportsData reports, ThemeData theme,
       {bool showTableBelow = true, Widget? customBelow}) {
-    final points = _mergeMonthlyData(reports.ordersByMonth, reports.revenueByMonth);
+    final points = _mergeMonthlyData(reports.ordersByMonth, reports.expenseByMonth);
     return ReportsChartSyncfusion._(
       data: points,
       theme: theme,
@@ -68,9 +68,9 @@ class ReportsChartSyncfusion extends StatelessWidget {
 
     // axis maxima (20% headroom)
     final maxOrders = points.map((p) => p.orders).fold<int>(0, (a, b) => a > b ? a : b);
-    final maxRevenue = points.map((p) => p.revenue).fold<double>(0.0, (a, b) => a > b ? a : b);
+    final maxExpense = points.map((p) => p.expense).fold<double>(0.0, (a, b) => a > b ? a : b);
     final orderTop = ((maxOrders == 0) ? 5.0 : (maxOrders * 1.2)).clamp(5.0, double.infinity);
-    final revenueTop = ((maxRevenue == 0.0) ? 5.0 : (maxRevenue * 1.2)).clamp(5.0, double.infinity);
+    final expenseTop = ((maxExpense == 0.0) ? 5.0 : (maxExpense * 1.2)).clamp(5.0, double.infinity);
 
     // Label interval logic: show at most ~6 labels to avoid crowding
     final visibleLabelCount = 6;
@@ -113,14 +113,14 @@ class ReportsChartSyncfusion extends StatelessWidget {
                       majorGridLines: const MajorGridLines(width: 0.5),
                     ),
 
-                    // Right Y: Revenue
+                    // Right Y: Expense
                     axes: <ChartAxis>[
                       NumericAxis(
-                        name: 'revenueAxis',
-                        title: AxisTitle(text: 'Revenue'),
+                        name: 'expenseAxis',
+                        title: AxisTitle(text: 'Expense'),
                         minimum: 0,
-                        maximum: revenueTop,
-                        interval: (revenueTop / 4),
+                        maximum: expenseTop,
+                        interval: (expenseTop / 4),
                         opposedPosition: true,
                         numberFormat: NumberFormat.simpleCurrency(decimalDigits: 0, name:"৳"),
                         majorGridLines: const MajorGridLines(width: 0.0),
@@ -143,9 +143,9 @@ class ReportsChartSyncfusion extends StatelessWidget {
                       LineSeries<_ChartPoint, String>(
                         dataSource: points,
                         xValueMapper: (pt, _) => monthOnlyFmt.format(pt.month),
-                        yValueMapper: (pt, _) => pt.revenue,
-                        yAxisName: 'revenueAxis',
-                        name: 'Revenue',
+                        yValueMapper: (pt, _) => pt.expense,
+                        yAxisName: 'expenseAxis',
+                        name: 'Expense',
                         width: 2.2,
                         color: theme.colorScheme.secondary,
                         markerSettings: MarkerSettings(isVisible: true),
@@ -194,27 +194,27 @@ class ReportsChartSyncfusion extends StatelessWidget {
         columns: const [
           DataColumn(label: Text('Month')),
           DataColumn(label: Text('Orders')),
-          DataColumn(label: Text('Revenue')),
+          DataColumn(label: Text('Expense')),
         ],
         rows: pts.map((pt) {
           return DataRow(cells: [
             DataCell(Text(monthLabelFmt.format(pt.month))),
             DataCell(Text(pt.orders.toString())),
-            DataCell(Text(formatPrice(pt.revenue))),
+            DataCell(Text(formatPrice(pt.expense))),
           ]);
         }).toList(),
       ),
     );
   }
 
-  static List<_ChartPoint> _mergeMonthlyData(List<MonthlyCount> orders, List<MonthlyRevenue> revenue) {
+  static List<_ChartPoint> _mergeMonthlyData(List<MonthlyCount> orders, List<MonthlyResponse> expense) {
     final DateFormat keyFmt = DateFormat('yyyy-MM');
 
     final orderMap = <String, int>{
       for (var o in orders) keyFmt.format(_parseMonthToFirstOfMonth(o.month)): o.count
     };
-    final revenueMap = <String, double>{
-      for (var r in revenue) keyFmt.format(_parseMonthToFirstOfMonth(r.month)): r.revenue
+    final expenseMap = <String, double>{
+      for (var r in expense) keyFmt.format(_parseMonthToFirstOfMonth(r.month)): r.expense
     };
 
     final seen = <String>[];
@@ -222,14 +222,14 @@ class ReportsChartSyncfusion extends StatelessWidget {
       final k = keyFmt.format(_parseMonthToFirstOfMonth(o.month));
       if (!seen.contains(k)) seen.add(k);
     }
-    for (final r in revenue) {
+    for (final r in expense) {
       final k = keyFmt.format(_parseMonthToFirstOfMonth(r.month));
       if (!seen.contains(k)) seen.add(k);
     }
 
     if (seen.isEmpty) {
       seen.addAll(orderMap.keys);
-      seen.addAll(revenueMap.keys);
+      seen.addAll(expenseMap.keys);
     }
 
     final months = seen.map((k) {
@@ -242,7 +242,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
 
     final points = months.map((dt) {
       final k = keyFmt.format(dt);
-      return _ChartPoint(month: dt, orders: orderMap[k] ?? 0, revenue: revenueMap[k] ?? 0.0);
+      return _ChartPoint(month: dt, orders: orderMap[k] ?? 0, expense: expenseMap[k] ?? 0.0);
     }).toList(growable: false);
 
     return points;
@@ -266,11 +266,11 @@ class ReportsChartSyncfusion extends StatelessWidget {
 class _ChartPoint {
   final DateTime month;
   final int orders;
-  final double revenue;
+  final double expense;
 
   const _ChartPoint({
     required this.month,
     required this.orders,
-    required this.revenue,
+    required this.expense,
   });
 }

@@ -2,26 +2,26 @@ import 'monthly_report.dart';
 
 class AssistantAnalytics {
   final int totalOrders;
-  final double totalRevenue;
+  final double totalExpense;
   final List<MonthlyCount>   ordersByMonth;
-  final List<MonthlyRevenue> revenueByMonth;
+  final List<MonthlyResponse> expenseByMonth;
 
   AssistantAnalytics({
     required this.totalOrders,
-    required this.totalRevenue,
+    required this.totalExpense,
     required this.ordersByMonth,
-    required this.revenueByMonth,
+    required this.expenseByMonth,
   });
 
   factory AssistantAnalytics.fromJson(Map<String, dynamic> json) {
     return AssistantAnalytics(
       totalOrders:    json['total_orders']   as int,
-      totalRevenue:   (json['total_revenue'] as num).toDouble(),
+      totalExpense:   (json['total_expense'] as num).toDouble(),
       ordersByMonth:  (json['orders_by_month'] as List)
           .map((e) => MonthlyCount.fromJson(e as Map<String, dynamic>))
           .toList(),
-      revenueByMonth: (json['revenue_by_month'] as List)
-          .map((e) => MonthlyRevenue.fromJson(e as Map<String, dynamic>))
+      expenseByMonth: (json['expense_by_month'] as List)
+          .map((e) => MonthlyResponse.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }

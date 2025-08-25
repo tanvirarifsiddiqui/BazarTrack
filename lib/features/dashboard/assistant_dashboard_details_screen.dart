@@ -36,7 +36,7 @@ class AssistantDashboardDetails extends StatelessWidget {
           children: [
             AssistantStatsSummary(
               totalOrders:  data.totalOrders,
-              totalRevenue: data.totalRevenue,
+              totalExpense: data.totalExpense,
               theme:        theme,
             ),
             spacer,

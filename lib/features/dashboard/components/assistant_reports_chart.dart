@@ -11,7 +11,7 @@ class AssistantReportsChart extends StatelessWidget {
   // todo: just for testing, have to remove it later.
   static final AssistantAnalytics _dummyAssistantAnalytics = AssistantAnalytics(
     totalOrders: 16,
-    totalRevenue: 1204.0,
+    totalExpense: 1204.0,
     ordersByMonth: [
       MonthlyCount(month: '2025-01', count: 1),
       MonthlyCount(month: '2025-02', count: 3),
@@ -20,13 +20,13 @@ class AssistantReportsChart extends StatelessWidget {
       MonthlyCount(month: '2025-05', count: 5),
       MonthlyCount(month: '2025-08', count: 15),
     ],
-    revenueByMonth: [
-      MonthlyRevenue(month: '2025-01', revenue: 50.00),
-      MonthlyRevenue(month: '2025-02', revenue: 150.00),
-      MonthlyRevenue(month: '2025-03', revenue: 100.00),
-      MonthlyRevenue(month: '2025-04', revenue: 170.00),
-      MonthlyRevenue(month: '2025-05', revenue: 200.00),
-      MonthlyRevenue(month: '2025-08', revenue: 1154.00),
+    expenseByMonth: [
+      MonthlyResponse(month: '2025-01', expense: 50.00),
+      MonthlyResponse(month: '2025-02', expense: 150.00),
+      MonthlyResponse(month: '2025-03', expense: 100.00),
+      MonthlyResponse(month: '2025-04', expense: 170.00),
+      MonthlyResponse(month: '2025-05', expense: 200.00),
+      MonthlyResponse(month: '2025-08', expense: 1154.00),
     ],
   );
 

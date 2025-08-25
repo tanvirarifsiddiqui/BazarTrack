@@ -31,8 +31,8 @@ class StatsSummary extends StatelessWidget {
     final stats = [
       _StatTile('Total Orders', totalOrders.toString(), Icons.shopping_cart, AppColors.primary,),
       _StatTile('Users', totalUsers.toString(), Icons.group, Colors.orange,),
-      _StatTile('Total Payments', totalPayments.toString(), Icons.payments, Colors.teal,),
-      _StatTile('Total Revenue', '${formatPrice(balance)}', Icons.account_balance_wallet, Colors.green,),
+      _StatTile('Payment Count', totalPayments.toString(), Icons.payments, Colors.teal,),
+      _StatTile('Total Expense', formatPrice(balance), Icons.account_balance_wallet, Colors.green,),
     ];
 
     return GridView.count(

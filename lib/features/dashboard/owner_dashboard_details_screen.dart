@@ -35,7 +35,7 @@ class OwnerDashboardDetails extends StatelessWidget {
                 totalOrders:    dash.totalOrders,
                 totalUsers:     dash.totalUsers,
                 totalPayments:     dash.totalPayments,
-                balance:      dash.totalRevenue,
+                balance:      dash.totalExpense,
                 theme: theme,
               ),
               spacer,
