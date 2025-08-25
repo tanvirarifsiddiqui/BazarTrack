@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart'; // <-- ADDED for FilteringTextInputFormatter
 import 'package:flutter_boilerplate/base/custom_button.dart';
@@ -194,7 +195,6 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  if(_isNew)const SizedBox(height: 12),
                   // Title + actions row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,6 +214,17 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                                   'Order_item', widget.item.id.toString(),
                                 ),
                               );
+                            },
+                          ),
+                          if (_isNew)IconButton(
+                            icon: const Icon(Icons.refresh),
+                            tooltip: 'Reset',
+                            onPressed: () {
+                              _productCtrl.clear();
+                              _quantityCtrl.clear();
+                              _setQty(1);
+                              _estCostCtrl.clear();
+                              _actualCostCtrl.clear();
                             },
                           ),
                           if (!_isNew && !_isPurchased)
@@ -239,11 +250,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
                           controller: _productCtrl,
                           focusNode: _productFocus,
                           textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: 'Product Name',
-                            prefixIcon: const Icon(Icons.shopping_basket),
-                            border: const OutlineInputBorder(),
-                          ),
+                          decoration: AppInputDecorations.generalInputDecoration(label: "Product Name", prefixIcon: Icons.shopping_basket),
                           validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                           onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_quantityFocus),
                         ),

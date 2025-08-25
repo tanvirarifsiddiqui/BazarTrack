@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
+import '../../../base/custom_squre_badge.dart';
 import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../model/order_item.dart';
@@ -99,14 +100,14 @@ class OrderItemCard extends StatelessWidget {
               child: _InfoTile(
                 label: 'Quantity',
                 value: "${item.quantity.toString()} ${item.unit.isNotEmpty ? item.unit : ''}" ,
-                leading: _SquareBadge(icon: Icons.production_quantity_limits),
+                leading: SquareBadge(icon: Icons.production_quantity_limits),
               ),
             ),
             Expanded(
               child: _InfoTile(
                 label: 'Price',
                 value: formatPrice(item.estimatedCost),
-                leading: _SquareBadge(symbol: '৳'),
+                leading: SquareBadge(symbol: '৳'),
               ),
             ),
           ],
@@ -145,38 +146,6 @@ class _LeadingBadge extends StatelessWidget {
   }
 }
 
-class _SquareBadge extends StatelessWidget {
-  final IconData? icon;
-  final String? symbol;
-
-  const _SquareBadge({
-    this.icon,
-    this.symbol,
-  })  : assert(icon != null || symbol != null, 'Provide icon or symbol');
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      alignment: Alignment.center,
-      child: icon != null
-          ? Icon(icon, size: 18, color: AppColors.primary)
-          : Text(
-        symbol!,
-        style: theme.textTheme.titleMedium?.copyWith(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
 
 class _CircleActionButton extends StatelessWidget {
   final IconData icon;

@@ -138,7 +138,7 @@ class CreateOrderScreen extends StatelessWidget {
                             quantityCtrl.clear();
                             unitCtrl.clear();
                             estCtrl.clear();
-                            _setQty(0);
+                            _setQty(1);
                           },
                           icon: Icon(Icons.refresh, color: AppColors.primary),
                         ),

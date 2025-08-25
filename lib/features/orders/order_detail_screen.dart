@@ -65,13 +65,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final kb = MediaQuery.of(ctx).viewInsets.bottom;
+        final keyboardBottomSize = MediaQuery.of(ctx).viewInsets.bottom;
         final initialHeight = 400.0;
-        final bigHeight = MediaQuery.of(ctx).size.height * 0.75;
+        final bigHeight = MediaQuery.of(ctx).size.height * 0.80;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
-          height: kb > 0 ? bigHeight : initialHeight,
+          height: keyboardBottomSize > 0 ? bigHeight : initialHeight,
           child: EditOrderItemBottomSheet(
             orderId: widget.orderId,
             item: newItem,
@@ -95,7 +95,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       builder: (ctx) {
         final kb = MediaQuery.of(ctx).viewInsets.bottom;
         final initialHeight = 400.0;
-        final bigHeight = MediaQuery.of(ctx).size.height * 0.75;
+        final bigHeight = MediaQuery.of(ctx).size.height * 0.80;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
