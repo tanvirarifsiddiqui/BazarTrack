@@ -6,7 +6,6 @@ import 'package:flutter_boilerplate/features/orders/controller/order_controller.
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
-
 import '../../base/empty_state.dart';
 import 'components/filter_bar.dart';
 import 'components/order_card.dart';
@@ -35,47 +34,66 @@ class OrderListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Obx(() {
-        return CustomScrollView(
-          slivers: [
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _FilterBarDelegate(
-                child: FilterBar(ctrl: ctrl, isOwner: isOwner),
-                height: 72,
-              ),
-            ),
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollInfo) {
+          if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 100 &&
+              !ctrl.isLoadingMore.value &&
+              ctrl.hasMore.value) {
+            ctrl.loadMore();
+          }
+          return false;
+        },
+        child: Obx(() {
+          if (ctrl.isInitialLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (ctrl.isLoading.value)
-              const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (ctrl.orders.isEmpty)
-              const SliverFillRemaining(
-                child: EmptyState(
-                  icon: Icons.inbox,
-                  message: 'No orders found.',
-                ),
-              )
-            else
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final order = ctrl.orders[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: Dimensions.scaffoldPadding,
-                        vertical: 2,
-                      ),
-                      child: OrderCard(order: order),
-                    );
-                  },
-                  childCount: ctrl.orders.length,
+          return CustomScrollView(
+            slivers: [
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _FilterBarDelegate(
+                  child: FilterBar(ctrl: ctrl, isOwner: isOwner),
+                  height: 72,
                 ),
               ),
-          ],
-        );
-      }),
+
+              if (ctrl.orders.isEmpty)
+                const SliverFillRemaining(
+                  child: EmptyState(
+                    icon: Icons.inbox,
+                    message: 'No orders found.',
+                  ),
+                )
+              else
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                      final order = ctrl.orders[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.scaffoldPadding,
+                          vertical: 4,
+                        ),
+                        child: OrderCard(order: order),
+                      );
+                    },
+                    childCount: ctrl.orders.length,
+                  ),
+                ),
+
+              // Loader at bottom
+              if (ctrl.isLoadingMore.value)
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+            ],
+          );
+        }),
+      ),
       floatingActionButton: isOwner
           ? FloatingActionButton.extended(
         heroTag: 'add_order',

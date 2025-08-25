@@ -28,6 +28,7 @@ class StatsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final stats = [
       _StatTile('Total Orders', totalOrders.toString(), Icons.shopping_cart, AppColors.primary,),
       _StatTile('Users', totalUsers.toString(), Icons.group, Colors.orange,),

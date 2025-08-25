@@ -21,14 +21,15 @@ class BazarTrackApi {
   Future<Response> me() => client.getData(Endpoints.me);
   Future<Response> refresh() => client.postData(Endpoints.refresh, {});
 
-  // Orders
-  // Future<Response> orders() => client.getData(Endpoints.orders);
-  //filter operation
-  Future<Response> orders({String? status, int? assignedTo,}) {
-    final params = <String, dynamic>{};
-    if (status     != null) params['status']      = status;
-    if (assignedTo != null) params['assigned_to'] = assignedTo;
-    return client.getData(Endpoints.orders, query: params);
+
+  Future<Response> orders({String? status, int? assignedTo, int? limit, int? cursor,
+  }) {
+    final query = <String, dynamic>{};
+    if (status     != null) query['status']      = status;
+    if (assignedTo != null) query['assigned_to'] = assignedTo;
+    if (limit      != null) query['limit']       = limit;
+    if (cursor     != null) query['cursor']      = cursor;
+    return client.getData(Endpoints.orders, query: query.isEmpty ? null : query);
   }
   Future<Response> createOrder(Map<String, dynamic> data) => client.postData(Endpoints.orders, data);
   Future<Response> order(int id) => client.getData(Endpoints.order(id));

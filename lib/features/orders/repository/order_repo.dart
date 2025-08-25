@@ -21,6 +21,7 @@ class OrderRepo {
       item.toJson(),
     );
 
+
     if (!res.isOk || res.body is! Map<String, dynamic>) {
       throw Exception('Failed to update order item (${res.statusCode})');
     }
@@ -98,16 +99,21 @@ class OrderRepo {
   }
 
 
-  Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo,}) async {
+  Future<List<Order>> getOrders({
+    OrderStatus? status,
+    int? assignedTo,
+    int? limit,
+    int? cursor,
+  }) async {
     final res = await api.orders(
       status:     status?.toApi(),
       assignedTo: assignedTo,
+      limit:      limit,
+      cursor:     cursor,
     );
-
     if (!res.isOk || res.body is! List) {
       throw Exception('Failed to load orders');
     }
-
     return (res.body as List)
         .map((e) => Order.fromJson(e as Map<String, dynamic>))
         .toList();

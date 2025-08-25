@@ -56,6 +56,13 @@ class Order {
     );
   }
 
+  /// Convenience parsed integer id for internal use (nullable)
+  int? get id {
+    if (orderId == null) return null;
+    return int.tryParse(orderId!);
+  }
+
+
   /// Full JSON for updates/fetch
   Map<String, dynamic> toJson() => {
     if (orderId != null) 'id': orderId,
@@ -91,5 +98,4 @@ class Order {
 
     return map;
   }
-
 }

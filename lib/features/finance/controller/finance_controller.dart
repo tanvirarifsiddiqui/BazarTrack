@@ -124,19 +124,6 @@ class FinanceController extends GetxController {
     }
   }
 
-  // Future<void> loadAllTransactions() async {
-  //   isLoading.value = true;
-  //   try {
-  //     final list = await service.fetchPayments();
-  //     payments.value = list;
-  //   } catch (e, st) {
-  //     payments.clear();
-  //     _showError('Failed to load transactions', e, st);
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-
   Future<void> addCreditForAssistant(int assistantId, double amount) async {
     final finance = Finance(
       userId: assistantId,

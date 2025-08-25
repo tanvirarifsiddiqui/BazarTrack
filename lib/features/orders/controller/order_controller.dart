@@ -13,6 +13,7 @@ class OrderController extends GetxController {
   final AuthService authService;
   final FinanceRepo financeRepo;
 
+  static const _pageSize = 30; // max 30
   OrderController({
     required this.orderRepo,
     required this.authService,
@@ -36,11 +37,47 @@ class OrderController extends GetxController {
   var items = <OrderItem>[].obs;
   var isLoadingItems = false.obs;
 
+  //for pagination
+  var isInitialLoading = false.obs;
+  var isLoadingMore  = false.obs;
+  var hasMore        = true.obs;
+
+
+
   @override
   void onInit() {
     super.onInit();
     getAllAssistants();
-    loadOrders();
+    loadInitial();
+  }
+
+  Future<void> loadInitial() async {
+    hasMore.value = true;
+    orders.clear();
+    isInitialLoading.value = true;
+    await _fetchPage(reset: true);
+    isInitialLoading.value = false;
+  }
+
+  Future<void> loadMore() async {
+    if (!hasMore.value || isLoadingMore.value) return;
+    isLoadingMore.value = true;
+    await _fetchPage();
+    isLoadingMore.value = false;
+  }
+
+  Future<void> _fetchPage({bool reset = false}) async {
+    final cursor = reset || orders.isEmpty ? null : orders.last.id;
+    final page = await orderRepo.getOrders(
+      status:     filterStatus.value,
+      assignedTo: filterAssignedTo.value,
+      limit:      _pageSize,
+      cursor:     cursor,
+    );
+    if (page.length < _pageSize) {
+      hasMore.value = false;
+    }
+    orders.addAll(page);
   }
 
   Future<void> loadOrders() async {
@@ -55,13 +92,14 @@ class OrderController extends GetxController {
 
   void setStatusFilter(OrderStatus? status) {
     filterStatus.value = status;
-    loadOrders();
+    loadInitial();
   }
 
   void setAssignedToFilter(int? userId) {
     filterAssignedTo.value = userId;
-    loadOrders();
+    loadInitial();
   }
+
 
   Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) {
     return orderRepo.getOrders(status: status, assignedTo: assignedTo);
@@ -139,7 +177,7 @@ class OrderController extends GetxController {
 
     try {
       final created = await orderRepo.createOrderWithItems(order, newItems);
-      loadOrders();
+      loadInitial();
       Get.back(result: created);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save order: $e');
