@@ -13,6 +13,7 @@ import '../model/assistant.dart';
 
 class FinanceController extends GetxController {
   final FinanceRepo financeRepo;
+  static const _pageSize = 30;
 
   FinanceController({
     required this.financeRepo,
@@ -32,10 +33,15 @@ class FinanceController extends GetxController {
   var filterFrom = Rxn<DateTime>();
   var filterTo = Rxn<DateTime>();
 
+  // Paging for payments
+  var isInitialLoading = false.obs;
+  var isLoadingMore    = false.obs;
+  var hasMore          = true.obs;
+
   @override
   void onInit() {
     super.onInit();
-    loadAssistantsAndTransactions();
+    loadAssistantsAndPayments();
   }
 
   bool get hasActiveFilters =>
@@ -89,6 +95,49 @@ class FinanceController extends GetxController {
     filterFrom.value = null;
     filterTo.value = null;
     loadPayments();
+  }
+
+  Future<void> loadAssistantsAndPayments() async {
+    // load assistants first (error handling omitted for brevity)
+    isLoadingAssistants.value = true;
+    final a = await financeRepo.getAssistants(withBalance: true);
+    assistants.assignAll(a);
+    isLoadingAssistants.value = false;
+
+    // then load payments initial page
+    await loadInitialPayments();
+  }
+
+  Future<void> loadInitialPayments() async {
+    hasMore.value = true;
+    payments.clear();
+    isInitialLoading.value = true;
+    await _fetchPage(reset: true);
+    isInitialLoading.value = false;
+  }
+
+  Future<void> loadMorePayments() async {
+    if (!hasMore.value || isLoadingMore.value) return;
+    isLoadingMore.value = true;
+    await _fetchPage();
+    isLoadingMore.value = false;
+  }
+
+  Future<void> _fetchPage({ bool reset = false }) async {
+    final cursor = reset || payments.isEmpty ? null : payments.last.id;
+    final page = await financeRepo.getPayments(
+      userId: filterUserId.value,
+      type:   filterType.value,
+      from:   filterFrom.value,
+      to:     filterTo.value,
+      limit:  _pageSize,
+      cursor: cursor,
+    );
+
+    payments.addAll(page);
+    if (page.length < _pageSize) {
+      hasMore.value = false;
+    }
   }
 
   Future<void> loadAssistantsAndTransactions() async {

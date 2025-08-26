@@ -15,95 +15,113 @@ class OwnerFinancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl  = Get.find<FinanceController>();
-    // final theme = Theme.of(context);
-    // final ts    = theme.textTheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Assistant Wallets & Transactions'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh',
-            onPressed: ctrl.clearFilters,
-          ),
-        ],
-      ),
+    return Obx(() {
+      // 1) Show a full‐screen spinner while we fetch the first page
+      if (ctrl.isInitialLoading.value || ctrl.isLoadingAssistants.value) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
 
-      body: Obx(() {
-        if (ctrl.isLoadingAssistants.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        return RefreshIndicator(
+      // 2) Once the first page is in, show the slivers
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Assistant Wallets & Transactions'),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: 'Refresh',
+              onPressed: ctrl.clearFilters,
+            ),
+          ],
+        ),
+        body: RefreshIndicator(
           onRefresh: () async => ctrl.clearFilters(),
-          child: CustomScrollView(
-            slivers: [
-              // ─── ASSISTANT SUMMARY ───────────────────────
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                sliver: SliverToBoxAdapter(
-                  child: AssistantSummaryCard(
-                    assistants: ctrl.assistants,
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (sn) {
+              if (sn.metrics.pixels >= sn.metrics.maxScrollExtent - 100) {
+                ctrl.loadMorePayments();
+              }
+              return false;
+            },
+            child: CustomScrollView(
+              slivers: [
+                // Assistants Summary
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  sliver: SliverToBoxAdapter(
+                    child: AssistantSummaryCard(
+                      assistants: ctrl.assistants,
+                    ),
                   ),
                 ),
-              ),
 
-              // ─── TRANSACTIONS HEADER ─────────────────────
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _HeaderDelegate(
-                  child: _TransactionsHeader(
-                    hasFilter: ctrl.hasActiveFilters,
-                    onFilter: () => _showFilterDialog(context, ctrl),
-                    onClear: ctrl.clearFilters,
+                // Transactions Header (Filter / Clear)
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _HeaderDelegate(
+                    height: 56,
+                    child: _TransactionsHeader(
+                      hasFilter: ctrl.hasActiveFilters,
+                      onFilter:  () => _showFilterDialog(context, ctrl),
+                      onClear:   ctrl.clearFilters,
+                    ),
                   ),
-                  height: 56,
                 ),
-              ),
 
-              // ─── TRANSACTIONS LIST ──────────────────────
-              Obx(() {
-                final tx = ctrl.payments;
-                if (tx.isEmpty) {
-                  return SliverFillRemaining(
+                // 3) Now that initial load is done, check if we have items
+                if (ctrl.payments.isEmpty)
+                  const SliverFillRemaining(
                     hasScrollBody: false,
                     child: EmptyState(
                       icon: Icons.receipt_long,
                       message: 'No transactions yet.',
                     ),
-                  );
-                }
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (ctx, i) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 2,
-                      ),
-                      child: CustomFinanceTile(
-                        finance: tx[i],
-                      ),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                          (_, i) {
+                        final f = ctrl.payments[i];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 2),
+                          child: CustomFinanceTile(finance: f),
+                        );
+                      },
+                      childCount: ctrl.payments.length,
                     ),
-                    childCount: tx.length,
                   ),
-                );
-              }),
-            ],
-          ),
-        );
-      }),
 
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'owner_add',
-        icon: const Icon(Icons.account_balance_wallet),
-        label: const Text('Credit'),
-        backgroundColor: AppColors.primary,
-        onPressed: () => _showCreditDialog(context, Get.find<FinanceController>()),
-      ),
-    );
+                // 4) Always show a loader at the bottom when paging
+                if (ctrl.isLoadingMore.value)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+
+        floatingActionButton: FloatingActionButton.extended(
+          heroTag: 'owner_add',
+          icon: const Icon(Icons.account_balance_wallet),
+          label: const Text('Credit'),
+          backgroundColor: AppColors.primary,
+          onPressed: () => _showCreditDialog(
+            context,
+            Get.find<FinanceController>(),
+          ),
+        ),
+      );
+    });
   }
+
 
   Future<void> _showFilterDialog(
       BuildContext context,
