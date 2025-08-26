@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
+import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/sign_in_screen.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard.dart';
 import 'package:flutter_boilerplate/features/dashboard/owner_dashboard.dart';
@@ -22,7 +21,7 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     Future.delayed(const Duration(seconds: 2), () {
-      final auth = Get.find<AuthController>();
+      final auth = Get.find<AuthService>();
       if (auth.isLoggedIn) {
         final user = auth.currentUser;
         if (user?.role == UserRole.owner) {

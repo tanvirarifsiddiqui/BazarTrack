@@ -66,6 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     id: DateTime.now().microsecondsSinceEpoch.toString(),
                     name: _nameController.text,
                     role: _role,
+                    email: '',
                   );
                   await Get.find<AuthController>().signUp(user);
                   if (_role == UserRole.owner) {

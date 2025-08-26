@@ -1,4 +1,3 @@
-import 'package:flutter_boilerplate/data/api/api_checker.dart';
 import 'package:flutter_boilerplate/data/repository/splash_repo.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -13,14 +12,7 @@ class SplashController extends GetxController {
   bool _firstTimeConnectionCheck = true;
   bool get firstTimeConnectionCheck => _firstTimeConnectionCheck;
 
-  Future<void> getConfigData() async {
-    Response response = await splashRepo.getConfigData();
-    if(response.hasError) {
-      ApiChecker.checkApi(response);
-    }else {
-      Get.showSnackbar(GetSnackBar(title: 'response', message: '${response.body}'));
-    }
-  }
+
 
   Future<bool> initSharedData() {
     return splashRepo.initSharedData();

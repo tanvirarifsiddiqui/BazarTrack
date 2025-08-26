@@ -14,11 +14,12 @@ class AuthService extends GetxService {
   UserModel? _currentUser;
   UserModel? get currentUser => _currentUser;
 
-  void loadUser() {
+  Future<UserModel?> loadUser() async {
     final jsonString = authRepo.getUser();
     if (jsonString != null) {
       _currentUser = UserModel.fromJson(jsonDecode(jsonString));
     }
+    return _currentUser;
   }
 
 

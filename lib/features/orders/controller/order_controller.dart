@@ -4,7 +4,6 @@ import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:get/get.dart';
-import '../../../helper/route_helper.dart';
 import '../../auth/service/auth_service.dart';
 import '../../finance/model/assistant.dart';
 
@@ -139,7 +138,6 @@ class OrderController extends GetxController {
   void onCreateOrderTapped() {
     newItems.clear();
     assignedToUserId.value = null;
-    Get.toNamed(RouteHelper.orderCreate);
   }
 
   void addItem() {

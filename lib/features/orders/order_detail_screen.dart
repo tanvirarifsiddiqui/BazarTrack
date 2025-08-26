@@ -317,12 +317,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               _buildTableRow(
                                 Icons.person,
                                 'Created by',
-                                order.createdBy.toString(),
+                                order.createdUserName.toString(),
                               ),
                               _buildTableRow(
                                 Icons.group,
                                 'Assigned to',
-                                order.assignedTo?.toString() ?? '-',
+                                order.assignedUserName?.toString() ?? '-',
                               ),
                               _buildTableRow(
                                 Icons.flag,

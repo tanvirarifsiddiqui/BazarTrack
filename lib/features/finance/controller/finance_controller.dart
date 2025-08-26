@@ -52,7 +52,6 @@ class FinanceController extends GetxController {
 
   void _showError(String title, Object error, [StackTrace? st]) {
     Get.snackbar(title, error.toString(), snackPosition: SnackPosition.BOTTOM);
-
   }
 
   Future<void> loadPayments() async {

@@ -7,6 +7,7 @@ import 'package:flutter_boilerplate/features/orders/model/order_status.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import '../../base/empty_state.dart';
+import '../../helper/route_helper.dart';
 import 'components/filter_bar.dart';
 import 'components/order_card.dart';
 
@@ -100,7 +101,10 @@ class OrderListScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add),
         label: const Text('New Order'),
-        onPressed: ctrl.onCreateOrderTapped,
+        onPressed: (){
+          ctrl.onCreateOrderTapped;
+          Get.toNamed(RouteHelper.orderCreate);
+        },
       )
           : null,
     );

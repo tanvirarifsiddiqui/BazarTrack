@@ -38,11 +38,12 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
     super.initState();
     final auth = Get.find<AuthService>();
     final uid = int.parse(auth.currentUser!.id);
+    final Assistant assistant = Assistant(id: uid, name: auth.currentUser!.name,);
 
     _screens = [
-      AssistantDashboardDetails(assistant: Assistant(id: uid, name: auth.currentUser!.name,)),
+      AssistantDashboardDetails(assistant: assistant),
       const OrderListScreen(),
-      const AssistantFinancePage(),
+      AssistantFinancePage(assistant: assistant),
       const HistoryCenterPage(),
     ];
   }
