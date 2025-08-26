@@ -3,31 +3,45 @@ import '../model/history_log.dart';
 
 class HistoryRepo {
   final BazarTrackApi api;
-  HistoryRepo({ required this.api });
+  HistoryRepo({required this.api});
 
-  Future<List<HistoryLog>> getAll() async {
-    final res = await api.history();
-    if (res.isOk && res.body is List) {
-      return (res.body as List)
-          .map((e) => HistoryLog.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    return [];
+  /// GET /api/history?limit=&cursor=&changed_by=
+  Future<List<HistoryLog>> getAll({
+    int limit = 30,
+    int? cursor,
+    int? changedBy,
+  }) async {
+    final query = <String, dynamic>{'limit': limit};
+    if (cursor != null) query['cursor'] = cursor;
+    if (changedBy != null) query['changed_by'] = changedBy;
+
+    final res = await api.history(query: query);
+    if (!res.isOk || res.body is! List) return [];
+    return (res.body as List)
+        .map((e) => HistoryLog.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<List<HistoryLog>> getByEntity(String entity) async {
-    final res = await api.historyByEntity(entity); // endpoint: /history/order
-    if (res.isOk && res.body is! Map<String, dynamic>) {
-      final data = res.body;
-      if (data is List) {
-        return data.map((e) => HistoryLog.fromJson(e)).toList();
-      }
-    }
-    return [];
+  Future<List<HistoryLog>> getByEntity(
+    String entity, {
+    int limit = 30,
+    int? cursor,
+  }) async {
+    final query = <String, dynamic>{'limit': limit};
+    if (cursor != null) query['cursor'] = cursor;
+
+    final res = await api.historyByEntity(entity, query: query);
+    if (!res.isOk || res.body is! List) return [];
+    return (res.body as List)
+        .map((e) => HistoryLog.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<HistoryLog>> getByEntityId(String entity, int id) async {
-    final res = await api.historyByEntityId(entity, id); // endpoint: /history/order/30
+    final res = await api.historyByEntityId(
+      entity,
+      id,
+    ); // endpoint: /history/order/30
     if (res.isOk && res.body is! Map<String, dynamic>) {
       final data = res.body;
 

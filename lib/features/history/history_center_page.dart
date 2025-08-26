@@ -1,212 +1,112 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import '../../util/colors.dart';
+import 'components/history_list.dart';
 import 'controller/history_controller.dart';
-import 'model/history_log.dart';
-import 'model/history_log_item.dart';
-
 class HistoryCenterPage extends StatelessWidget {
-  const HistoryCenterPage({Key? key}) : super(key: key);
-
+  const HistoryCenterPage({super.key});
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<HistoryController>();
-
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('History Logs'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'All'),
-              Tab(text: 'Orders'),
-              Tab(text: 'Items'),
-              Tab(text: 'Payments'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _HistoryList(
-              loading: ctrl.isLoadingAll,
-              logs:    ctrl.allLogs,
-            ),
-            _HistoryList(
-              loading: ctrl.isLoadingOrder,
-              logs:    ctrl.orderLogs,
-            ),
-            _HistoryList(
-              loading: ctrl.isLoadingItem,
-              logs:    ctrl.itemLogs,
-            ),
-            _HistoryList(
-              loading: ctrl.isLoadingPayment,
-              logs:    ctrl.paymentLogs,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+        // No AppBar here — header is part of the page body for a more modern look
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Stylish tab bar container
+              Padding(
+                padding:  EdgeInsets.fromLTRB(16.0, 12, 16, 0),
+                child: Material(
+                  elevation: 2,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface, // subtle background
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(6),
+                    child: TabBar(
+                      indicator: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      indicatorPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Theme.of(context).textTheme.bodyLarge?.color,
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w700),
+                      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 12), // ✅ reduces space
+                      tabs: const [
+                        Tab(text: 'All'),
+                        Tab(text: 'Orders'),
+                        Tab(text: 'Items'),
+                        Tab(text: 'Payments'),
+                      ],
+                    )
 
-/// Reusable widget for a single tab’s list
-class _HistoryList extends StatelessWidget {
-  final RxBool            loading;
-  final RxList<HistoryLog> logs;
-
-  const _HistoryList({
-    required this.loading,
-    required this.logs,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final fmt = DateFormat('dd MMM yyyy, hh:mma');
-
-    return Obx(() {
-      if (loading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (logs.isEmpty) {
-        return const Center(child: Text('No history entries.'));
-      }
-      return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: logs.length,
-        itemBuilder: (context, index) {
-          final log = logs[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            // 1) Unique key per tile
-            key: ValueKey('${log.entityType}_${log.id}'),
-            child: ExpansionTile(
-              // 2) Force a bool, never reuse old state
-              key: PageStorageKey('exp_${log.entityType}_${log.id}'),
-              initiallyExpanded: false,
-              title: Text('${log.entityType} · ${log.action}'),
-              subtitle: Text(fmt.format(log.timestamp)),
-              childrenPadding: const EdgeInsets.symmetric(horizontal: 12),
-              expandedAlignment: Alignment.centerLeft,
-              children: [
-                _buildSnapshot(log.dataSnapshot),
-              ],
-            ),
-          );
-        },
-      );
-    });
-  }
-
-
-  Widget _buildSnapshot(Map<String, dynamic> snapshot) {
-    if (snapshot.isEmpty) return const Text('No snapshot data');
-
-    final rows = <DataRow>[];
-    List<HistoryLogItem> items = [];
-
-    snapshot.forEach((key, value) {
-      if (key == 'items') {
-        if (value is List) {
-          items = value
-              .whereType<Map<String, dynamic>>()
-              .map((m) => HistoryLogItem.fromJson(m))
-              .toList();
-        }
-      } else {
-        rows.add(
-          DataRow(cells: [
-            DataCell(Text(key, style: const TextStyle(fontWeight: FontWeight.bold))),
-            DataCell(Text(': ${value ?? ''}')),
-          ]),
-        );
-      }
-    });
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          key: PageStorageKey('history_items_table_scroll_${snapshot.length}'),
-          // scrollDirection: Axis.horizontal,
-          child: DataTable(
-            dataRowHeight: 25,
-            headingRowHeight: 25,
-            horizontalMargin: 0,
-            columnSpacing: 10,
-            columns: const [
-              DataColumn(
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Name'),
+                  ),
                 ),
               ),
-              DataColumn(
-                label: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Value'),
+              const SizedBox(height: 12),
+              // Tab views
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    HistoryList(
+                      loading: ctrl.isLoadingAll,
+                      logs:    ctrl.allLogs,
+                      loadingMore: ctrl.allLoadingMore,
+                      hasMore:     ctrl.allHasMore,
+                      onLoadMore:  ctrl.loadMoreAll,
+                      onRefresh:   ctrl.refreshAll,
+                    ),
+                    HistoryList(
+                      loading: ctrl.isLoadingOrder,
+                      logs:    ctrl.orderLogs,
+                      loadingMore: ctrl.orderLoadingMore,
+                      hasMore:     ctrl.orderHasMore,
+                      onLoadMore:  ctrl.loadMoreOrders,
+                      onRefresh:   ctrl.refreshOrders,
+                    ),
+                    HistoryList(
+                      loading: ctrl.isLoadingItem,
+                      logs:    ctrl.itemLogs,
+                      loadingMore: ctrl.itemLoadingMore,
+                      hasMore:     ctrl.itemHasMore,
+                      onLoadMore:  ctrl.loadMoreItems,
+                      onRefresh:   ctrl.refreshItems,
+                    ),
+                    HistoryList(
+                      loading: ctrl.isLoadingPayment,
+                      logs:    ctrl.paymentLogs,
+                      loadingMore: ctrl.paymentLoadingMore,
+                      hasMore:     ctrl.paymentHasMore,
+                      onLoadMore:  ctrl.loadMorePayments,
+                      onRefresh:   ctrl.refreshPayments,
+                    ),
+                  ],
                 ),
               ),
             ],
-            rows: rows,
-          )
+          ),
+
         ),
 
-        const SizedBox(height: 16),
-
-        // --- Items table (only if present) ---
-        if (items.isNotEmpty)
-          _buildItemsTable(items)
-        else
-          const Text(''),
-      ],
-    );
-  }
-
-  /// DataTable to show products with nullable costs
-  Widget _buildItemsTable(List<HistoryLogItem> items) {
-    if (items.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Text('No items'),
-      );
-    }
-
-    return SingleChildScrollView(
-      key: PageStorageKey('history_items_table_scroll_${items.length}'),
-      scrollDirection: Axis.horizontal,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Items:", style: TextStyle(fontWeight: FontWeight.bold),),
-          DataTable(
-            dataRowHeight: 25,
-            headingRowHeight: 25,
-            horizontalMargin: 0,
-            columnSpacing: 10,
-            columns: const [
-              DataColumn(label: Text('Product')),
-              DataColumn(label: Text('Qty')),
-              DataColumn(label: Text('Unit')),
-              DataColumn(label: Text('Est. Cost')),
-              DataColumn(label: Text('Act. Cost')),
-              DataColumn(label: Text('Status')),
-            ],
-            rows: items.map((it) {
-              return DataRow(cells: [
-                DataCell(Text(it.productName)),
-                DataCell(Text(it.quantity.toString())),
-                DataCell(Text(it.unit)),
-                DataCell(Text(it.estimatedCost?.toStringAsFixed(2) ?? '-')),
-                DataCell(Text(it.actualCost?.toStringAsFixed(2)    ?? '-')),
-                DataCell(Text(it.status)),
-              ]);
-            }).toList(),
-          ),
-        ],
       ),
+
     );
+
   }
 
 }
+
