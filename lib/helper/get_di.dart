@@ -10,7 +10,6 @@ import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/features/auth/repository/auth_repo.dart';
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
-import 'package:flutter_boilerplate/features/finance/controller/assistant_finance_controller.dart';
 import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 
 import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
@@ -69,7 +68,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => OrderController(orderRepo: Get.find<OrderRepo>(), authService: Get.find<AuthService>(),financeRepo: Get.find<FinanceRepo>()), fenix: true);
   Get.lazyPut(() => HistoryController(historyRepo: Get.find<HistoryRepo>()), fenix: true);
   Get.lazyPut(() => FinanceController(financeRepo: Get.find<FinanceRepo>()), fenix: true);
-  Get.lazyPut(() => AssistantFinanceController(assistantFinanceRepo: Get.find<AssistantFinanceRepo>()), fenix: true);
+  // Get.lazyPut(() => AssistantFinanceController(assistantFinanceRepo: Get.find<AssistantFinanceRepo>()), fenix: true);
   Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find()), fenix: true);
 
   // Retrieving localized data

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../util/dimensions.dart';
 import '../assistant_finance_screen.dart';
+import '../controller/assistant_finance_controller.dart';
 import '../model/assistant.dart';
 import 'assistant_row.dart';
 
@@ -59,7 +60,19 @@ class AssistantSummaryCard extends StatelessWidget {
                 final a = assistants[i];
                 return AssistantRow(
                   assistant: a,
-                  onTap: () => Get.to(() => AssistantFinancePage(assistant: a)),
+                  onTap: () {
+                    Get.to(
+                          () => AssistantFinancePage(assistant: a),
+                      binding: BindingsBuilder(() {
+                        final uid  = a.id;
+                        Get.put(AssistantFinanceController(
+                          repo:   Get.find(),
+                          userId: uid,
+                        ));
+                      }),
+                    );
+
+                  },
                 );
               },
             ),

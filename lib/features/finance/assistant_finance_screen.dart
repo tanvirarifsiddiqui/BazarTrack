@@ -15,7 +15,7 @@ import 'model/assistant.dart';
 
 class AssistantFinancePage extends StatelessWidget {
   final Assistant? assistant;
-  const AssistantFinancePage({super.key, this.assistant});
+  const AssistantFinancePage({Key? key, this.assistant}) : super(key: key);
 
   String _getInitials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -25,174 +25,172 @@ class AssistantFinancePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl        = Get.find<AssistantFinanceController>();
-    final auth        = Get.find<AuthController>();
-    final userId      = assistant?.id ?? int.parse(auth.currentUser!.id);
-    ctrl.userId       = userId;
-    ctrl.loadPayments();
-    final role        = auth.currentUser?.role;
+    final ctrl  = Get.find<AssistantFinanceController>();
+    final auth  = Get.find<AuthController>();
+    final role  = auth.currentUser?.role;
     final isOwner     = role == UserRole.owner;
     final displayName = assistant?.name ?? auth.currentUser!.name;
     final theme       = Theme.of(context);
     final ts          = theme.textTheme;
 
-    return Scaffold(
-      appBar: isOwner?CustomAppBar(
-        title: "$displayName’s Wallet",
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh',
-            onPressed: ctrl.clearFilters,
-          ),
-        ],
-      ): null,
-      body: RefreshIndicator(
-        onRefresh: () async => ctrl.clearFilters(),
-        child: CustomScrollView(
-          slivers: [
-            // ─── SUMMARY CARD ────────────────────────
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              sliver: SliverToBoxAdapter(
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor:
-                          theme.primaryColor.withValues(alpha: 0.12),
-                          child: Text(
-                            _getInitials(displayName),
-                            style: ts.titleLarge?.copyWith(
-                              color: theme.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                displayName,
-                                style: ts.titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Current balance',
-                                style: ts.bodySmall
-                                    ?.copyWith(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Obx(() {
-                          if (ctrl.isLoadingWallet.value) {
-                            return SizedBox(
-                              width: 110,
-                              height: 36,
-                              child: Center(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: theme.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                formatPrice(ctrl.balance.value),
-                                style: ts.headlineSmall?.copyWith(
+    return Obx(() {
+      // FULL-SCREEN LOADER on first page or balance load
+      if (ctrl.isInitialLoading.value || ctrl.isLoadingBalance.value) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      // ACTUAL PAGE
+      return Scaffold(
+        appBar: isOwner
+            ? CustomAppBar(
+          title: "$displayName’s Wallet",
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: 'Refresh',
+              onPressed: ctrl.clearFilters,
+            ),
+          ],
+        )
+            : null,
+        body: RefreshIndicator(
+          onRefresh: () async => ctrl.clearFilters(),
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (sn) {
+              if (sn.metrics.pixels >= sn.metrics.maxScrollExtent - 100) {
+                ctrl.loadMoreTransactions();
+              }
+              return false;
+            },
+            child: CustomScrollView(
+              slivers: [
+                // ── SUMMARY CARD ───────────────────
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  sliver: SliverToBoxAdapter(
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 28,
+                              backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                              child: Text(
+                                _getInitials(displayName),
+                                style: ts.titleLarge?.copyWith(
                                   color: theme.primaryColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Available',
-                                style: ts.bodySmall
-                                    ?.copyWith(color: Colors.grey[600]),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    displayName,
+                                    style: ts.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Current balance',
+                                    style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                  ),
+                                ],
                               ),
-                            ],
-                          );
-                        }),
-                      ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  formatPrice(ctrl.balance.value),
+                                  style: ts.headlineSmall?.copyWith(
+                                    color: theme.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Available',
+                                  style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
 
-            // ─── TRANSACTIONS HEADER ─────────────────
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _HeaderDelegate(
-                height: 56,
-                child: _TransactionsHeader(
-                  onFilter: () => _showFilterDialog(context, ctrl),
-                  onClear: ctrl.clearFilters,
-                  showClear: ctrl.hasFilter,
+                // ── FILTER HEADER ────────────────────
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _HeaderDelegate(
+                    height: 56,
+                    child: _TransactionsHeader(
+                      onFilter: () => _showFilterDialog(context, ctrl),
+                      onClear:  ctrl.clearFilters,
+                      showClear: ctrl.hasFilter,
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            // ─── TRANSACTIONS LIST ───────────────────
-            Obx(() {
-              if (ctrl.isLoadingWallet.value) {
-                return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              final tx = ctrl.transactions;
-              if (tx.isEmpty) {
-                return SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: EmptyState(
-                    icon: Icons.receipt_long,
-                    message: 'No transactions yet.',
+                // ── TRANSACTIONS LIST ───────────────
+                if (ctrl.transactions.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: const EmptyState(
+                      icon: Icons.receipt_long,
+                      message: 'No transactions yet.',
+                    ),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                          (ctx, i) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        child: CustomFinanceTile(finance: ctrl.transactions[i]),
+                      ),
+                      childCount: ctrl.transactions.length,
+                    ),
                   ),
-                );
-              }
-              return SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (_, i) => Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 2),
-                    child: CustomFinanceTile(
-                        finance: tx[i],),
+
+                // ── BOTTOM LOADER ───────────────────
+                if (ctrl.isLoadingMore.value)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   ),
-                  childCount: tx.length,
-                ),
-              );
-            }),
-          ],
+              ],
+            ),
+          ),
         ),
-      ),
-      floatingActionButton: !isOwner
-          ? FloatingActionButton.extended(
-        icon: const Icon(Icons.add),
-        label: const Text('Debit'),
-        backgroundColor: AppColors.primary,
-        onPressed: () => _showDebitDialog(context, ctrl, userId),
-      )
-          : null,
-    );
+
+        // ── DEBIT FAB ─────────────────────────
+        floatingActionButton: !isOwner
+            ? FloatingActionButton.extended(
+          heroTag: 'debit',
+          icon: const Icon(Icons.add),
+          label: const Text('Debit'),
+          backgroundColor: AppColors.primary,
+          onPressed: () => _showDebitDialog(context, ctrl, ctrl.userId),
+        )
+            : null,
+      );
+    });
   }
+}
 
   Future<void> _showFilterDialog(
       BuildContext context, AssistantFinanceController ctrl) {
@@ -307,7 +305,7 @@ class AssistantFinancePage extends StatelessWidget {
             onPressed: () {
               final amt = double.tryParse(amtCtrl.text.trim()) ?? 0;
               if (amt > 0) {
-                ctrl.addDebitForAssistant(userId, amt)
+                ctrl.addDebit(amt)
                     .then((_) => Navigator.pop(ctx));
               }
             },
@@ -316,7 +314,6 @@ class AssistantFinancePage extends StatelessWidget {
       ),
     );
   }
-}
 
 class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;

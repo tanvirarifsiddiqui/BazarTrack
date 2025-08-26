@@ -5,9 +5,11 @@ import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
 import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
+import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
+import '../finance/controller/assistant_finance_controller.dart';
 import '../orders/order_list_screen.dart';
 
 class AssistantDashboard extends StatefulWidget {
@@ -22,7 +24,6 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
 
   // Keep screens in state to avoid recreating them on each build
   late final List<Widget> _screens;
-
   // Titles for AppBar (use .tr for translations if desired)
   final List<String> _titles = [
     'assistants_dashboard',
@@ -38,8 +39,22 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
   void initState() {
     super.initState();
     final auth = Get.find<AuthService>();
+    final uid = int.parse(auth.currentUser!.id);
+
+    Get.lazyPut<AssistantFinanceController>(
+      () => AssistantFinanceController(
+        repo: Get.find<AssistantFinanceRepo>(),
+        userId: uid,
+      ),
+      fenix: true,
+    );
     _screens = [
-      AssistantDashboardDetails(assistant: Assistant(id: int.parse(auth.currentUser!.id), name: auth.currentUser!.name)),
+      AssistantDashboardDetails(
+        assistant: Assistant(
+          id: int.parse(auth.currentUser!.id),
+          name: auth.currentUser!.name,
+        ),
+      ),
       const OrderListScreen(),
       const AssistantFinancePage(),
       const HistoryCenterPage(),
@@ -59,19 +74,19 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
         title: _titles[_currentIndex].tr,
         // optional actions: search / notifications
         actions: [
-
           IconButton(
             tooltip: 'profile'.tr,
             icon: const Icon(CupertinoIcons.profile_circled),
             onPressed: () {
               Get.to(
-                    () => ProfileScreen(),
-                transition: Transition.cupertino, // or try others like fadeIn, zoom, rightToLeft
+                () => ProfileScreen(),
+                transition:
+                    Transition
+                        .cupertino, // or try others like fadeIn, zoom, rightToLeft
                 duration: const Duration(milliseconds: 400),
               );
             },
           ),
-
         ],
       ),
 
@@ -81,11 +96,17 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
           bucket: _bucket,
           child: IndexedStack(
             index: _currentIndex,
-            children: _screens
-                .asMap()
-                .map((i, w) => MapEntry(i, KeyedSubtree(key: PageStorageKey('tab_$i'), child: w)))
-                .values
-                .toList(),
+            children:
+                _screens
+                    .asMap()
+                    .map(
+                      (i, w) => MapEntry(
+                        i,
+                        KeyedSubtree(key: PageStorageKey('tab_$i'), child: w),
+                      ),
+                    )
+                    .values
+                    .toList(),
           ),
         ),
       ),
@@ -108,18 +129,31 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
           child: BottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: _onTabSelected,
-            type: BottomNavigationBarType.fixed, // ensures labels always visible
+            type:
+                BottomNavigationBarType.fixed, // ensures labels always visible
             backgroundColor: colorScheme.surface,
             selectedItemColor: theme.primaryColor,
             unselectedItemColor: Colors.grey[600],
             showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400, fontSize: 11),
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 11,
+            ),
             elevation: 6,
 
             // slightly larger icon for better tap target
-            selectedIconTheme: IconThemeData(size: 26, color: theme.primaryColor),
-            unselectedIconTheme: IconThemeData(size: 22, color: Colors.grey[600]),
+            selectedIconTheme: IconThemeData(
+              size: 26,
+              color: theme.primaryColor,
+            ),
+            unselectedIconTheme: IconThemeData(
+              size: 22,
+              color: Colors.grey[600],
+            ),
 
             items: [
               BottomNavigationBarItem(
@@ -146,7 +180,6 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
           ),
         ),
       ),
-
     );
   }
 }
