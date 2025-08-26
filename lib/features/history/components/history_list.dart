@@ -37,74 +37,90 @@ class HistoryList extends StatelessWidget {
         onRefresh: ()async{
           onRefresh();
         },
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: logs.length,
-          itemBuilder: (context, index) {
-            final log = logs[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              elevation: 2, // optional for shadow
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-              ),
-              clipBehavior: Clip.antiAlias,
-              key: ValueKey('${log.entityType}_${log.id}'),
-              child: ExpansionTile(
-                key: PageStorageKey('exp_${log.entityType}_${log.id}'),
-                initiallyExpanded: false,
-                tilePadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (sn){
+            if (sn.metrics.pixels >= sn.metrics.maxScrollExtent - 100 &&
+                hasMore.value &&
+                !loadingMore.value) {
+              onLoadMore();
+            }
+            return false;
+          },
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: logs.length,
+            itemBuilder: (context, index) {
+              if(index> logs.length){
+                return Padding(padding: const EdgeInsetsGeometry.symmetric(vertical: 16),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary,),
+                ));
+              }
+              final log = logs[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                elevation: 2, // optional for shadow
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                 ),
-                collapsedBackgroundColor: Colors.white,
-                backgroundColor: Colors.white,
-                title: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _entityColor(
-                          log.entityType,
-                        ).withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        log.entityType.toUpperCase(),
+                clipBehavior: Clip.antiAlias,
+                key: ValueKey('${log.entityType}_${log.id}'),
+                child: ExpansionTile(
+                  key: PageStorageKey('exp_${log.entityType}_${log.id}'),
+                  initiallyExpanded: false,
+                  tilePadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  collapsedBackgroundColor: Colors.white,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _entityColor(
+                            log.entityType,
+                          ).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          log.entityType.toUpperCase(),
 
-                        style: TextStyle(
-                          color: _entityColor(log.entityType),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                          style: TextStyle(
+                            color: _entityColor(log.entityType),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        log.action,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          log.action,
 
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+
+                  subtitle: Text(fmt.format(log.timestamp)),
+
+                  childrenPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+
+                  expandedAlignment: Alignment.centerLeft,
+
+                  children: [_buildSnapshot(log.dataSnapshot)],
                 ),
-
-                subtitle: Text(fmt.format(log.timestamp)),
-
-                childrenPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-
-                expandedAlignment: Alignment.centerLeft,
-
-                children: [_buildSnapshot(log.dataSnapshot)],
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       );
     });

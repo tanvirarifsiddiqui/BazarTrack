@@ -33,6 +33,4 @@ final ThemeData appTheme = ThemeData(
     selectionHandleColor: AppColors.primary, // handle color
   ),
 
-
-
 );
