@@ -1,36 +1,40 @@
+import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:get/get.dart';
 import '../model/finance.dart';
 import '../repository/assistant_finance_repo.dart';
 
 class AssistantFinanceController extends GetxController {
   final AssistantFinanceRepo repo;
-  final int userId;
+  final AuthService auth;
   static const _pageSize = 30;
 
-  AssistantFinanceController({
-    required this.repo,
-    required this.userId,
-  });
+  AssistantFinanceController({required this.repo, required this.auth});
+
+  late int _assistantId;
+
+  int get assistantId => _assistantId;
+
+  set assistantId(int value) {
+    _assistantId = value;
+  }
 
   // ── Balance ────────────────────────────────────────
-  var balance            = 0.0.obs;
-  var isLoadingBalance   = false.obs;
+  var balance = 0.0.obs;
+  var isLoadingBalance = false.obs;
 
   // ── Pagination state ─────────────────────────────
-  var transactions        = <Finance>[].obs;
-  var isInitialLoading    = false.obs;
-  var isLoadingMore       = false.obs;
-  var hasMore             = true.obs;
+  var transactions = <Finance>[].obs;
+  var isInitialLoading = false.obs;
+  var isLoadingMore = false.obs;
+  var hasMore = true.obs;
 
   // ── Filters ──────────────────────────────────────
-  var filterType         = RxnString();
-  var filterFrom         = Rxn<DateTime>();
-  var filterTo           = Rxn<DateTime>();
-  var hasFilter          = false.obs;
+  var filterType = RxnString();
+  var filterFrom = Rxn<DateTime>();
+  var filterTo = Rxn<DateTime>();
+  var hasFilter = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
+  Future<void> prepareAndLoadingPayments() async {
     _loadBalance();
     _loadInitialTransactions();
   }
@@ -38,14 +42,14 @@ class AssistantFinanceController extends GetxController {
   Future<void> _loadBalance() async {
     isLoadingBalance.value = true;
     try {
-      balance.value = await repo.getWalletBalance(userId);
+      balance.value = await repo.getWalletBalance(_assistantId);
     } finally {
       isLoadingBalance.value = false;
     }
   }
 
   Future<void> _loadInitialTransactions() async {
-    hasMore.value          = true;
+    hasMore.value = true;
     transactions.clear();
     isInitialLoading.value = true;
     await _fetchPage(reset: true);
@@ -59,17 +63,15 @@ class AssistantFinanceController extends GetxController {
     isLoadingMore.value = false;
   }
 
-  Future<void> _fetchPage({ bool reset = false }) async {
-    final cursor = reset || transactions.isEmpty
-        ? null
-        : transactions.last.id;
+  Future<void> _fetchPage({bool reset = false}) async {
+    final cursor = reset || transactions.isEmpty ? null : transactions.last.id;
 
     final page = await repo.getPayments(
-      userId: userId,
-      type:   filterType.value,
-      from:   filterFrom.value,
-      to:     filterTo.value,
-      limit:  _pageSize,
+      userId: _assistantId,
+      type: filterType.value,
+      from: filterFrom.value,
+      to: filterTo.value,
+      limit: _pageSize,
       cursor: cursor,
     );
 
@@ -79,31 +81,27 @@ class AssistantFinanceController extends GetxController {
     }
   }
 
-  void setFilters({
-    String? type,
-    DateTime? from,
-    DateTime? to,
-  }) {
+  void setFilters({String? type, DateTime? from, DateTime? to}) {
     filterType.value = type;
     filterFrom.value = from;
-    filterTo.value   = to;
-    hasFilter.value  = type != null || from != null || to != null;
+    filterTo.value = to;
+    hasFilter.value = type != null || from != null || to != null;
     _loadInitialTransactions();
   }
 
   void clearFilters() {
     filterType.value = null;
     filterFrom.value = null;
-    filterTo.value   = null;
-    hasFilter.value  = false;
+    filterTo.value = null;
+    hasFilter.value = false;
     _loadInitialTransactions();
   }
 
   Future<void> addDebit(double amount) async {
     final f = Finance(
-      userId:    userId,
-      amount:    amount,
-      type:      'debit',
+      userId: _assistantId,
+      amount: amount,
+      type: 'debit',
       createdAt: DateTime.now(),
     );
     await repo.createPayment(f);

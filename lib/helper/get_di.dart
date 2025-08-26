@@ -28,6 +28,7 @@ import 'package:get/get.dart';
 
 import '../features/dashboard/controller/analytics_controller.dart';
 import '../features/dashboard/repository/analytics_repo.dart';
+import '../features/finance/controller/assistant_finance_controller.dart';
 
 Future<Map<String, Map<String, String>>> init() async {
   // Core
@@ -68,7 +69,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => OrderController(orderRepo: Get.find<OrderRepo>(), authService: Get.find<AuthService>(),financeRepo: Get.find<FinanceRepo>()), fenix: true);
   Get.lazyPut(() => HistoryController(historyRepo: Get.find<HistoryRepo>()), fenix: true);
   Get.lazyPut(() => FinanceController(financeRepo: Get.find<FinanceRepo>()), fenix: true);
-  // Get.lazyPut(() => AssistantFinanceController(assistantFinanceRepo: Get.find<AssistantFinanceRepo>()), fenix: true);
+  Get.lazyPut(() => AssistantFinanceController(repo: Get.find<AssistantFinanceRepo>(), auth: Get.find<AuthService>()), fenix: true);
   Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find()), fenix: true);
 
   // Retrieving localized data

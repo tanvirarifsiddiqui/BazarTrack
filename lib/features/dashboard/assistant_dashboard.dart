@@ -5,11 +5,9 @@ import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard_details_screen.dart';
 import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
 import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
-import 'package:flutter_boilerplate/features/finance/repository/assistant_finance_repo.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
-import '../finance/controller/assistant_finance_controller.dart';
 import '../orders/order_list_screen.dart';
 
 class AssistantDashboard extends StatefulWidget {
@@ -41,20 +39,8 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
     final auth = Get.find<AuthService>();
     final uid = int.parse(auth.currentUser!.id);
 
-    Get.lazyPut<AssistantFinanceController>(
-      () => AssistantFinanceController(
-        repo: Get.find<AssistantFinanceRepo>(),
-        userId: uid,
-      ),
-      fenix: true,
-    );
     _screens = [
-      AssistantDashboardDetails(
-        assistant: Assistant(
-          id: int.parse(auth.currentUser!.id),
-          name: auth.currentUser!.name,
-        ),
-      ),
+      AssistantDashboardDetails(assistant: Assistant(id: uid, name: auth.currentUser!.name,)),
       const OrderListScreen(),
       const AssistantFinancePage(),
       const HistoryCenterPage(),

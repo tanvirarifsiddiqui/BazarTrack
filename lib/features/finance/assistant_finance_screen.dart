@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../util/input_decoration.dart';
@@ -8,28 +9,41 @@ import '../../base/custom_finance_tile.dart';
 import '../../base/empty_state.dart';
 import '../../base/price_format.dart';
 import '../../util/dimensions.dart';
-import '../auth/controller/auth_controller.dart';
 import '../auth/model/role.dart';
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
 
-class AssistantFinancePage extends StatelessWidget {
+class AssistantFinancePage extends StatefulWidget {
   final Assistant? assistant;
   const AssistantFinancePage({Key? key, this.assistant}) : super(key: key);
 
+  @override
+  State<AssistantFinancePage> createState() => _AssistantFinancePageState();
+}
+
+class _AssistantFinancePageState extends State<AssistantFinancePage> {
   String _getInitials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
     if (parts.length == 1) return parts.first[0].toUpperCase();
     return (parts.first[0] + parts.last[0]).toUpperCase();
   }
 
+  late AssistantFinanceController ctrl;
+  late AuthService auth;
+  @override
+  void initState() {
+     ctrl  = Get.find<AssistantFinanceController>();
+     auth  = ctrl.auth;
+     ctrl.assistantId = widget.assistant!.id;
+     ctrl.prepareAndLoadingPayments();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ctrl  = Get.find<AssistantFinanceController>();
-    final auth  = Get.find<AuthController>();
     final role  = auth.currentUser?.role;
     final isOwner     = role == UserRole.owner;
-    final displayName = assistant?.name ?? auth.currentUser!.name;
+    final displayName = widget.assistant?.name ?? auth.currentUser!.name;
     final theme       = Theme.of(context);
     final ts          = theme.textTheme;
 
@@ -184,7 +198,7 @@ class AssistantFinancePage extends StatelessWidget {
           icon: const Icon(Icons.add),
           label: const Text('Debit'),
           backgroundColor: AppColors.primary,
-          onPressed: () => _showDebitDialog(context, ctrl, ctrl.userId),
+          onPressed: () => _showDebitDialog(context, ctrl, ctrl.assistantId),
         )
             : null,
       );
