@@ -4,7 +4,9 @@ import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
 import 'package:get/get.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_button.dart'; // <- custom button
+import '../../base/custom_snackbar.dart';
 import '../../util/dimensions.dart';
+import '../dashboard/controller/analytics_controller.dart';
 import 'controller/auth_controller.dart';
 import 'model/role.dart';
 
@@ -275,12 +277,13 @@ class _CreateUserPageState extends State<CreateUserPage> {
       _nameCtrl.clear();
       _emailCtrl.clear();
       _passwordCtrl.clear();
-      _confirmPasswordCtrl.clear();
       setState(() => _selectedRole = null);
 
+      _confirmPasswordCtrl.clear();
       // Show success and navigate
       Get.off(() => CreatedProfileScreen(createdUser: created));
-      Get.snackbar('Success', 'User ${created.name} created', snackPosition: SnackPosition.BOTTOM);
+      showCustomSnackBar('User ${created.name} created', isError: false);
+      Get.find<AnalyticsController>().loadDashboardUserInfo();
     }
   }
 }

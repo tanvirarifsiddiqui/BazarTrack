@@ -32,9 +32,15 @@ class AuthRepo {
     };
 
     final res = await api.createUser(body);
+    if (!res.isOk || res.body is! Map<String, dynamic> || res.statusCode == 409) {
+      final msg = res.body is Map
+          ? (res.body['msg'] ?? 'Unknown error').toString()
+          : 'Email already exists';
+      throw Exception(msg);
+    }
     if (!res.isOk || res.body is! Map<String, dynamic>) {
       final msg = res.body is Map
-          ? (res.body['message'] ?? 'Unknown error').toString()
+          ? (res.body['msg'] ?? 'Unknown error').toString()
           : 'Failed to create user';
       throw Exception(msg);
     }

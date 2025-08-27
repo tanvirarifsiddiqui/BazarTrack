@@ -35,65 +35,71 @@ class OrderListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollInfo) {
-          if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 100 &&
-              !orderCtrl.isLoadingMore.value &&
-              orderCtrl.hasMore.value) {
-            orderCtrl.loadMore();
-          }
-          return false;
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: ()async{
+          orderCtrl.loadInitial();
         },
-        child: Obx(() {
-          if (orderCtrl.isInitialLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (scrollInfo) {
+            if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 100 &&
+                !orderCtrl.isLoadingMore.value &&
+                orderCtrl.hasMore.value) {
+              orderCtrl.loadMore();
+            }
+            return false;
+          },
+          child: Obx(() {
+            if (orderCtrl.isInitialLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return CustomScrollView(
-            slivers: [
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _FilterBarDelegate(
-                  child: FilterBar(ctrl: orderCtrl, isOwner: isOwner),
-                  height: 72,
-                ),
-              ),
-
-              if (orderCtrl.orders.isEmpty)
-                const SliverFillRemaining(
-                  child: EmptyState(
-                    icon: Icons.inbox,
-                    message: 'No orders found.',
-                  ),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                      final order = orderCtrl.orders[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Dimensions.scaffoldPadding,
-                          vertical: 4,
-                        ),
-                        child: OrderCard(order: order),
-                      );
-                    },
-                    childCount: orderCtrl.orders.length,
+            return CustomScrollView(
+              slivers: [
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _FilterBarDelegate(
+                    child: FilterBar(ctrl: orderCtrl, isOwner: isOwner),
+                    height: 72,
                   ),
                 ),
 
-              // Loader at bottom
-              if (orderCtrl.isLoadingMore.value)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: CircularProgressIndicator()),
+                if (orderCtrl.orders.isEmpty)
+                  const SliverFillRemaining(
+                    child: EmptyState(
+                      icon: Icons.inbox,
+                      message: 'No orders found.',
+                    ),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                        final order = orderCtrl.orders[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: Dimensions.scaffoldPadding,
+                            vertical: 4,
+                          ),
+                          child: OrderCard(order: order),
+                        );
+                      },
+                      childCount: orderCtrl.orders.length,
+                    ),
                   ),
-                ),
-            ],
-          );
-        }),
+
+                // Loader at bottom
+                if (orderCtrl.isLoadingMore.value)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+              ],
+            );
+          }),
+        ),
       ),
       floatingActionButton: isOwner
           ? FloatingActionButton.extended(

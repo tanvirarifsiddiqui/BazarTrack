@@ -34,6 +34,7 @@ class HistoryList extends StatelessWidget {
         return const Center(child: Text('No history entries.'));
       }
       return RefreshIndicator(
+        color: AppColors.primary,
         onRefresh: ()async{
           onRefresh();
         },

@@ -14,13 +14,19 @@ class AnalyticsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-      _loadAll();
+      loadAll();
   }
 
-  Future<void> _loadAll() async {
+  Future<void> loadAll() async {
     isLoading.value = true;
     dashboard.value = await analyticsRepo.fetchDashboard();
     reports.value   = await analyticsRepo.fetchReports();
+    isLoading.value = false;
+  }
+
+  Future<void> loadDashboardUserInfo() async {
+    isLoading.value = true;
+    dashboard.value = await analyticsRepo.fetchDashboard();
     isLoading.value = false;
   }
 

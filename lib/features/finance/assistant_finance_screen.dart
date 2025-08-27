@@ -70,6 +70,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
         )
             : null,
         body: RefreshIndicator(
+          color: AppColors.primary,
           onRefresh: () async => ctrl.clearFilters(),
           child: NotificationListener<ScrollNotification>(
             onNotification: (sn) {
