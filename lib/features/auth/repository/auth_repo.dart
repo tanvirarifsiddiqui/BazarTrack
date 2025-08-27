@@ -4,7 +4,7 @@ import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import 'package:flutter_boilerplate/util/app_constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-
+import '../model/user.dart';
 class AuthRepo {
   final BazarTrackApi api;
   final SharedPreferences sharedPreferences;
@@ -21,6 +21,27 @@ class AuthRepo {
       await sharedPreferences.setString(AppConstants.userData, jsonEncode(response.body['user']));
     }
     return response;
+  }
+
+  Future<UserModel> createUser({required String name, required String email, required String password, required String role,}) async {
+    final body = {
+      'name':     name,
+      'email':    email,
+      'password': password,
+      'role':     role,
+    };
+
+    final res = await api.createUser(body);
+    if (!res.isOk || res.body is! Map<String, dynamic>) {
+      final msg = res.body is Map
+          ? (res.body['message'] ?? 'Unknown error').toString()
+          : 'Failed to create user';
+      throw Exception(msg);
+    }
+
+    final user = UserModel.fromJson(res.body as Map<String, dynamic>);
+
+    return user;
   }
 
   Future<void> signUp(String userJson) async {

@@ -1,5 +1,3 @@
-// lib/features/auth/controller/auth_controller.dart
-
 import 'package:get/get.dart';
 import '../model/role.dart';
 import '../model/user.dart';
@@ -10,6 +8,9 @@ class AuthController extends GetxController {
 
   /// Holds the currently authenticated user (null if not logged in)
   final user = Rxn<UserModel>();
+
+  // Loading flag for user creation
+  final isCreatingUser = false.obs;
 
   AuthController({ required this.authService });
 
@@ -23,6 +24,32 @@ class AuthController extends GetxController {
   bool get isLoggedIn => user.value != null;
 
   bool get isOwner => user.value?.role == UserRole.owner;
+
+  /// Create a new user (owner or assistant)
+  Future<UserModel?> createUser({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole role,
+  }) async {
+    isCreatingUser.value = true;
+    try {
+      final newUser = await authService.createUser(
+        name:     name,
+        email:    email,
+        password: password,
+        role:     role.toApi(),
+      );
+      // Optionally, you could refresh some list of users here
+      return newUser;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(),
+          snackPosition: SnackPosition.BOTTOM);
+      return null;
+    } finally {
+      isCreatingUser.value = false;
+    }
+  }
 
   Future<void> loadUser() async {
     await authService.loadUser();

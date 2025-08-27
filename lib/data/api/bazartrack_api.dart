@@ -17,10 +17,12 @@ class BazarTrackApi {
     return res;
   }
 
+  
+  //Auth
   Future<Response> logout() => client.postData(Endpoints.logout, {});
   Future<Response> me() => client.getData(Endpoints.me);
   Future<Response> refresh() => client.postData(Endpoints.refresh, {});
-
+  Future<Response> createUser(Map<String, dynamic> data) => client.postData(Endpoints.createUser, data);
 
   Future<Response> orders({String? status, int? assignedTo, int? limit, int? cursor,
   }) {
@@ -59,7 +61,6 @@ class BazarTrackApi {
     final uri = Endpoints.assistants + (withBalance ? '/?with_balance=true' : '');
     return client.getData(uri);
   }
-
 
   // History
   Future<Response> history({Map<String, dynamic>? query}) => client.getData(Endpoints.history,query: query);

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/auth/create_user_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
+import '../auth/model/role.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -11,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authCtrl = Get.find<AuthController>();
-
+    final isOwner = authCtrl.user.value?.role == UserRole.owner;
     return Scaffold(
       appBar: const CustomAppBar(title: 'Profile'),
       body: Obx(() {
@@ -63,6 +65,28 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: 36),
 
+              // Create user Button
+              if(isOwner)...[SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.person, color: Colors.white),
+                  label: const Text(
+                    'Create User',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    Get.to(()=>CreateUserPage());
+                  },
+                ),
+              ),
+              const SizedBox(height: 36)],
               // Logout Button
               SizedBox(
                 width: double.infinity,
@@ -85,6 +109,7 @@ class ProfileScreen extends StatelessWidget {
                   },
                 ),
               ),
+
             ],
           ),
         );

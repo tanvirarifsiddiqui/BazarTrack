@@ -50,4 +50,15 @@ class AuthService extends GetxService {
     _currentUser = user;
     await authRepo.saveUser(jsonEncode(user.toJson()));
   }
+
+  Future<UserModel> createUser({
+    required String name,
+    required String email,
+    required String password,
+    required String role,  // “owner” or “assistant”
+  }) async {
+    final user = await authRepo.createUser(name: name, email: email, password: password, role: role);
+    return user;
+  }
+
 }
