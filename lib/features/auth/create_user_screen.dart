@@ -1,24 +1,55 @@
-// lib/features/auth/screens/create_user_page.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/auth/created_profile_screen.dart';
+import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
 import 'package:get/get.dart';
 import '../../base/custom_app_bar.dart';
-import '../../util/colors.dart';
+import '../../base/custom_button.dart'; // <- custom button
 import '../../util/dimensions.dart';
 import 'controller/auth_controller.dart';
 import 'model/role.dart';
 
-class CreateUserPage extends StatelessWidget {
-  CreateUserPage({Key? key}) : super(key: key);
+class CreateUserPage extends StatefulWidget {
+  const CreateUserPage({Key? key}) : super(key: key);
 
+  @override
+  State<CreateUserPage> createState() => _CreateUserPageState();
+}
+
+class _CreateUserPageState extends State<CreateUserPage> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
-  final _nameCtrl     = TextEditingController();
-  final _emailCtrl    = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final _role         = Rxn<UserRole>();
+  final _confirmPasswordCtrl = TextEditingController();
+
+  // Role (nullable)
+  UserRole? _selectedRole;
+
+  // Visibility toggles for password fields
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
+
+  // Focus nodes for smooth keyboard navigation
+  final _nameFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
+    _nameFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmFocus.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,110 +69,181 @@ class CreateUserPage extends StatelessWidget {
               key: _formKey,
               child: Column(
                 children: [
-                  // Name field
-                  TextFormField(
-                    controller: _nameCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Full Name',
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                  // Header
+                  const AuthHeader('Create New User'),
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Padding(
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                      child: Column(
+                        children: [
+                          // Name field
+                          TextFormField(
+                            controller: _nameCtrl,
+                            focusNode: _nameFocus,
+                            decoration: InputDecoration(
+                              labelText: 'Full Name',
+                              prefixIcon: const Icon(Icons.person_outline),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) => _emailFocus.requestFocus(),
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Name is required'
+                                : null,
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Email field
+                          TextFormField(
+                            controller: _emailCtrl,
+                            focusNode: _emailFocus,
+                            decoration: InputDecoration(
+                              labelText: 'Email Address',
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Email is required';
+                              }
+                              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                              if (!emailRegex.hasMatch(v.trim())) {
+                                return 'Enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Password field with eye icon
+                          TextFormField(
+                            controller: _passwordCtrl,
+                            focusNode: _passwordFocus,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                tooltip: _obscurePassword ? 'Show' : 'Hide',
+                                icon: Icon(
+                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                ),
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Password is required';
+                              }
+                              if (v.length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Confirm password field with eye icon + matching validation
+                          TextFormField(
+                            controller: _confirmPasswordCtrl,
+                            focusNode: _confirmFocus,
+                            decoration: InputDecoration(
+                              labelText: 'Confirm Password',
+                              prefixIcon: const Icon(Icons.lock),
+                              suffixIcon: IconButton(
+                                tooltip: _obscureConfirm ? 'Show' : 'Hide',
+                                icon: Icon(
+                                  _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                                ),
+                                onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            obscureText: _obscureConfirm,
+                            textInputAction: TextInputAction.next,
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Please confirm your password';
+                              }
+                              if (v != _passwordCtrl.text) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Role dropdown
+                          DropdownButtonFormField<UserRole>(
+                            initialValue: _selectedRole,
+                            decoration: InputDecoration(
+                              labelText: 'Role',
+                              prefixIcon: const Icon(Icons.admin_panel_settings_outlined),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            items: UserRole.values.map((r) {
+                              return DropdownMenuItem(
+                                value: r,
+                                child: Text(r.toApi().capitalizeFirst!),
+                              );
+                            }).toList(),
+                            onChanged: (r) => setState(() => _selectedRole = r),
+                            validator: (v) => v == null ? 'Please select a role' : null,
+                          ),
+                        ],
                       ),
                     ),
-                    textInputAction: TextInputAction.next,
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Name is required'
-                        : null,
                   ),
-                  const SizedBox(height: 16),
 
-                  // Email field
-                  TextFormField(
-                    controller: _emailCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Email Address',
-                      prefixIcon: const Icon(Icons.email_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      ),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return 'Email is required';
-                      }
-                      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                      if (!emailRegex.hasMatch(v.trim())) {
-                        return 'Enter a valid email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 28),
 
-                  // Password field
-                  TextFormField(
-                    controller: _passwordCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      ),
-                    ),
-                    obscureText: true,
-                    textInputAction: TextInputAction.next,
-                    validator: (v) => (v == null || v.length < 6)
-                        ? 'Password must be at least 6 characters'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Role dropdown
-                  DropdownButtonFormField<UserRole>(
-                    initialValue: _role.value,
-                    decoration: InputDecoration(
-                      labelText: 'Role',
-                      prefixIcon: const Icon(Icons.admin_panel_settings_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      ),
-                    ),
-                    items: UserRole.values.map((r) {
-                      return DropdownMenuItem(
-                        value: r,
-                        child: Text(r.toApi().capitalizeFirst!),
-                      );
-                    }).toList(),
-                    onChanged: (r) => _role.value = r,
-                    validator: (v) =>
-                    v == null ? 'Please select a role' : null,
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Submit button
+                  // Use your custom button (adjust properties if your CustomButton signature is different)
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
+                    child: CustomButton(
+                      buttonText: 'Create User',
+                      icon: Icons.person_add,
+                      // isLoading: authCtrl.isCreatingUser.value,
                       onPressed: authCtrl.isCreatingUser.value
                           ? null
                           : () => _onSubmit(authCtrl, context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: authCtrl.isCreatingUser.value
-                          ? const CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(Colors.white),
-                      )
-                          : const Text(
-                        'Create User',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
+                      // If your CustomButton uses another param name, change accordingly
                     ),
                   ),
                 ],
@@ -156,16 +258,16 @@ class CreateUserPage extends StatelessWidget {
   Future<void> _onSubmit(AuthController authCtrl, BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final name     = _nameCtrl.text.trim();
-    final email    = _emailCtrl.text.trim();
+    final name = _nameCtrl.text.trim();
+    final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text;
-    final role     = _role.value!;
+    final role = _selectedRole!;
 
     final created = await authCtrl.createUser(
-      name:     name,
-      email:    email,
+      name: name,
+      email: email,
       password: password,
-      role:     role,
+      role: role,
     );
 
     if (created != null) {
@@ -173,12 +275,12 @@ class CreateUserPage extends StatelessWidget {
       _nameCtrl.clear();
       _emailCtrl.clear();
       _passwordCtrl.clear();
-      _role.value = null;
+      _confirmPasswordCtrl.clear();
+      setState(() => _selectedRole = null);
 
-      // Show success and navigate back
-      Get.snackbar('Success', 'User ${created.name} created',
-          snackPosition: SnackPosition.BOTTOM);
-      Get.back();
+      // Show success and navigate
+      Get.off(() => CreatedProfileScreen(createdUser: created));
+      Get.snackbar('Success', 'User ${created.name} created', snackPosition: SnackPosition.BOTTOM);
     }
   }
 }

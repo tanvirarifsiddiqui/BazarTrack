@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/auth/create_user_screen.dart';
+import 'package:flutter_boilerplate/features/auth/model/user.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
-import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
-import '../auth/model/role.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class CreatedProfileScreen extends StatelessWidget {
+  final UserModel createdUser;
+  const CreatedProfileScreen({Key? key, required this.createdUser}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final authCtrl = Get.find<AuthController>();
-    final isOwner = authCtrl.user.value?.role == UserRole.owner;
+    // final authCtrl = Get.find<AuthController>();
+    // final isOwner = authCtrl.user.value?.role == UserRole.owner;
+    final user = createdUser;
     return Scaffold(
       appBar: const CustomAppBar(title: 'Profile'),
-      body: Obx(() {
-        final user = authCtrl.user.value;
-        if (user == null) {
-          return const Center(child: Text("No user data found."));
-        }
-
-        return SingleChildScrollView(
+      body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
@@ -63,57 +57,9 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 36),
-
-              // Create user Button
-              if(isOwner)...[SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Colors.white),
-                  label: const Text(
-                    'Create User',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    Get.to(()=>CreateUserPage());
-                  },
-                ),
-              ),
-              const SizedBox(height: 36)],
-              // Logout Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () async {
-                    await authCtrl.logout();
-                    Get.offAllNamed('/login');
-                  },
-                ),
-              ),
-
             ],
           ),
-        );
-      }),
+        )
     );
   }
 
