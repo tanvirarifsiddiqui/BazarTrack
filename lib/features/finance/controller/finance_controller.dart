@@ -107,6 +107,14 @@ class FinanceController extends GetxController {
     await loadInitialPayments();
   }
 
+  Future<void> loadAssistants() async {
+    // load assistants first (error handling omitted for brevity)
+    isLoadingAssistants.value = true;
+    final a = await financeRepo.getAssistants(withBalance: true);
+    assistants.assignAll(a);
+    isLoadingAssistants.value = false;
+  }
+
   Future<void> loadInitialPayments() async {
     hasMore.value = true;
     payments.clear();

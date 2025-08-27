@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/features/auth/created_profile_screen.dart';
 import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
+import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
+import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:get/get.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_button.dart'; // <- custom button
@@ -284,6 +286,10 @@ class _CreateUserPageState extends State<CreateUserPage> {
       Get.off(() => CreatedProfileScreen(createdUser: created));
       showCustomSnackBar('User ${created.name} created', isError: false);
       Get.find<AnalyticsController>().loadDashboardUserInfo();
+      if(created.role == UserRole.assistant){
+        Get.find<OrderController>().getAllAssistants();
+        Get.find<FinanceController>().loadAssistants();
+      }
     }
   }
 }
