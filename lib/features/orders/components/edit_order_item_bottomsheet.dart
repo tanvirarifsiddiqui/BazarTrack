@@ -13,12 +13,15 @@ class EditOrderItemBottomSheet extends StatefulWidget {
   final String orderId;
   final OrderItem item;
   final bool autoFocusFirstField;
+  final ScrollController? scrollController;
+
 
   const EditOrderItemBottomSheet({
     Key? key,
     required this.orderId,
     required this.item,
-    required this.autoFocusFirstField
+    required this.autoFocusFirstField,
+    this.scrollController,
   }) : super(key: key);
 
   @override
@@ -181,6 +184,8 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
               top: topPadding,
             ),
             child: SingleChildScrollView(
+              controller: widget.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

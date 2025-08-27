@@ -65,18 +65,26 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final keyboardBottomSize = MediaQuery.of(ctx).viewInsets.bottom;
-        final initialHeight = 400.0;
-        final bigHeight = MediaQuery.of(ctx).size.height * 0.80;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          height: keyboardBottomSize > 0 ? bigHeight : initialHeight,
-          child: EditOrderItemBottomSheet(
-            orderId: widget.orderId,
-            item: newItem,
-            autoFocusFirstField: true, // important: will request focus
-          ),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.25,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            // wrap in Material/Container to get rounded corners and bg
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: EditOrderItemBottomSheet(
+                orderId: widget.orderId,
+                item: newItem,
+                autoFocusFirstField: true,
+                scrollController: scrollController,
+              ),
+            );
+          },
         );
       },
     );
@@ -88,20 +96,31 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> _onEditItem(OrderItem item) async {
-    final updated = await showModalBottomSheet<OrderItem>(
+    final updated = showModalBottomSheet<OrderItem?>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
-        final kb = MediaQuery.of(ctx).viewInsets.bottom;
-        final initialHeight = 400.0;
-        final bigHeight = MediaQuery.of(ctx).size.height * 0.80;
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          height: kb > 0 ? bigHeight : initialHeight,
-          child: EditOrderItemBottomSheet(orderId: widget.orderId, item: item, autoFocusFirstField: true, ),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.55,
+          minChildSize: 0.25,
+          maxChildSize: 0.9,
+          expand: false,
+          builder: (context, scrollController) {
+            // wrap in Material/Container to get rounded corners and bg
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: EditOrderItemBottomSheet(
+                orderId: widget.orderId,
+                item: item,
+                autoFocusFirstField: true,
+                scrollController: scrollController,
+              ),
+            );
+          },
         );
       },
     );

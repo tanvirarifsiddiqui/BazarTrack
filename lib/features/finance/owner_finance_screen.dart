@@ -384,7 +384,7 @@ class _TransactionsHeader extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Row(
         children: [
-          Text('All Transactions', style: ts.titleLarge),
+          Text('All Payments', style: ts.titleLarge),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.filter_list),
