@@ -38,6 +38,7 @@ class OrderListScreen extends StatelessWidget {
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: ()async{
+          orderCtrl.getAllAssistants();
           orderCtrl.loadInitial();
         },
         child: NotificationListener<ScrollNotification>(

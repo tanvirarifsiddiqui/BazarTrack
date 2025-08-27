@@ -19,7 +19,7 @@ class AssistantSelector extends StatelessWidget {
         items: [
           const DropdownMenuItem(value: null, child: Text("None")),
           ...ctrl.assistants
-              .map((a) => DropdownMenuItem(value: a.id, child: Text(a.name)))
+              .map((a) => DropdownMenuItem(value: a.id, child: Text(a.name, overflow: TextOverflow.ellipsis)))
         ],
         onChanged: (v) => ctrl.assignedToUserId.value = v,
         decoration: AppInputDecorations.generalInputDecoration(

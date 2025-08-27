@@ -7,12 +7,12 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_divider.dart';
 import 'package:get/get.dart';
 import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../../finance/model/assistant.dart';
 import '../assistant_dashboard_details_screen.dart';
-
 
 // WalletSummary showing ALL assistants inside a single full-width card.
 class WalletSummary extends StatelessWidget {
@@ -82,7 +82,8 @@ class WalletSummary extends StatelessWidget {
                   ),
                 ],
               ),
-
+              const SizedBox(height: 6),
+              CustomDivider.defaultDivider,
               const SizedBox(height: 12),
 
               // list of assistants (in same card)
@@ -102,7 +103,7 @@ class WalletSummary extends StatelessWidget {
                       if (i < assistants.length - 1)
                         Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 12),
-                          child: Divider(height: 1, color: Colors.grey[300]),
+                          child: CustomDivider.defaultDivider,
                         ),
                     ],
                   );

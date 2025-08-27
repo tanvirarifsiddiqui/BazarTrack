@@ -39,7 +39,10 @@ class OwnerFinancePage extends StatelessWidget {
         ),
         body: RefreshIndicator(
           color: AppColors.primary,
-          onRefresh: () async => ctrl.clearFilters(),
+          onRefresh: () async {
+            ctrl.loadAssistants();
+            ctrl.clearFilters();
+          },
           child: NotificationListener<ScrollNotification>(
             onNotification: (sn) {
               if (sn.metrics.pixels >= sn.metrics.maxScrollExtent - 100) {

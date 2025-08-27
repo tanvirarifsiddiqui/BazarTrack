@@ -24,7 +24,7 @@ class FilterBar extends StatelessWidget {
           Expanded(
             child: Obx(() {
               return DropdownButtonFormField<OrderStatus?>(
-                value: ctrl.filterStatus.value,
+                initialValue: ctrl.filterStatus.value,
                 decoration: AppInputDecorations.generalInputDecoration(
                   label: 'Status',
                 ),
@@ -53,23 +53,25 @@ class FilterBar extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 return DropdownButtonFormField<int?>(
-                  value: ctrl.filterAssignedTo.value,
+                  initialValue: ctrl.filterAssignedTo.value,
+                  isExpanded: true, // <<< important: allows the dropdown to fill available width
                   decoration: AppInputDecorations.generalInputDecoration(
                     label: 'Assigned To',
                   ),
                   items: [
-                    const DropdownMenuItem(value: null, child: Text('All')),
+                    const DropdownMenuItem(value: null, child: Text('All'),),
                     ...ctrl.assistants.map(
                           (a) => DropdownMenuItem(
                         value: a.id,
-                        child: Text(a.name),
+                        child: Text(a.name, overflow: TextOverflow.ellipsis),
                       ),
-                    )
+                    ),
                   ],
                   onChanged: ctrl.setAssignedToFilter,
                 );
               }),
             ),
+
         ],
       ),
     );
