@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
+import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/util/app_format.dart';
 import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:get/get.dart';
-import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
@@ -27,7 +27,7 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   late final OrderController orderCtrl;
-  late final AuthService auth;
+  late final AuthController authCtrl;
   Future<Order?>? _orderFuture;
   Future<List<OrderItem>>? _itemsFuture;
 
@@ -35,7 +35,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   void initState() {
     super.initState();
     orderCtrl = Get.find<OrderController>();
-    auth = Get.find<AuthService>();
+    authCtrl = Get.find<AuthController>();
     _loadAll();
   }
 
@@ -243,8 +243,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isOwner = auth.currentUser?.role == UserRole.owner;
-    final isAssistant = auth.currentUser?.role == UserRole.assistant;
+    final isOwner = authCtrl.user.value?.role == UserRole.owner;
+    final isAssistant = authCtrl.user.value?.role == UserRole.assistant;
     final dateFmt = AppFormats.appDateTimeFormat;
 
     return Scaffold(

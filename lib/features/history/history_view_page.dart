@@ -17,7 +17,7 @@ class HistoryViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl = Get.put(HistoryController(historyRepo: Get.find()));
+    final ctrl = Get.find<HistoryController>();
     final fmt  = AppFormats.appDateTimeFormat;
 
     // Load logs

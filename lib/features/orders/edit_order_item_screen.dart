@@ -1,12 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
+import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:get/get.dart';
-
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import '../../util/input_decoration.dart';
 import '../../helper/route_helper.dart';
-import '../auth/service/auth_service.dart';
 import '../auth/model/role.dart';
 import 'controller/order_controller.dart';
 import 'model/order_item.dart';
@@ -50,7 +48,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
   bool get _isNew => widget.item.id == null;
 
   final _controller = Get.find<OrderController>();
-  final _auth       = Get.find<AuthService>();
+  final _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -145,7 +143,7 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isAssistant = _auth.currentUser?.role == UserRole.assistant;
+    final isAssistant = _authController.user.value?.role == UserRole.assistant;
 
     return Scaffold(
       appBar: CustomAppBar(

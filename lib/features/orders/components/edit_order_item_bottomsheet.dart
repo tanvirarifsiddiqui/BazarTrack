@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/auth/controller/auth_controller.dart';
 import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
-import 'package:flutter/services.dart'; // <-- ADDED for FilteringTextInputFormatter
+import 'package:flutter/services.dart'; //
 import 'package:flutter_boilerplate/base/custom_button.dart';
-import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/auth/model/role.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
 import '../../../base/custom_unit_dropdown.dart';
 import '../../../helper/route_helper.dart';
-
 class EditOrderItemBottomSheet extends StatefulWidget {
   final String orderId;
   final OrderItem item;
@@ -52,8 +51,8 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
 
   bool get _isNew => widget.item.id == null;
 
-  final _controller = Get.find<OrderController>();
-  final _auth = Get.find<AuthService>();
+  final _orderController = Get.find<OrderController>();
+  final _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -119,10 +118,10 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
 
     try {
       if (_isNew) {
-        final created = await _controller.createOrderItem(updated);
+        final created = await _orderController.createOrderItem(updated);
         Navigator.pop(context, created); // return created
       } else {
-        await _controller.updateOrderItem(updated, _isPurchased);
+        await _orderController.updateOrderItem(updated, _isPurchased);
         Navigator.pop(context, updated); // return updated
       }
     } catch (e) {
@@ -152,7 +151,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
     if (ok != true) return;
 
     try {
-      await _controller.deleteOrderItem(widget.item);
+      await _orderController.deleteOrderItem(widget.item);
       Navigator.pop(context); // close sheet after delete
       Get.snackbar('Deleted', 'Item removed', snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
@@ -162,7 +161,7 @@ class _EditOrderItemBottomSheetState extends State<EditOrderItemBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isAssistant = _auth.currentUser?.role == UserRole.assistant;
+    final isAssistant = _authController.user.value?.role == UserRole.assistant;
     final topPadding = 12.0;
 
     return Material(
