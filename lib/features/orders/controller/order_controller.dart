@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/features/dashboard/controller/analytics_controller.dart';
 import 'package:flutter_boilerplate/features/finance/repository/finance_repo.dart';
 import 'package:flutter_boilerplate/features/orders/model/order.dart';
 import 'package:flutter_boilerplate/features/orders/model/order_item.dart';
@@ -176,6 +177,7 @@ class OrderController extends GetxController {
     try {
       final created = await orderRepo.createOrderWithItems(order, newItems);
       loadInitial();
+      Get.find<AnalyticsController>().refreshAll();
       Get.back(result: created);
     } catch (e) {
       Get.snackbar('Error', 'Failed to save order: $e');

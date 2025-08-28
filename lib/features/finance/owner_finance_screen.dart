@@ -33,7 +33,10 @@ class OwnerFinancePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.refresh_rounded),
               tooltip: 'Refresh',
-              onPressed: ctrl.clearFilters,
+              onPressed: (){
+                ctrl.loadAssistants();
+                ctrl.clearFilters();
+              },
             ),
           ],
         ),
@@ -157,7 +160,7 @@ class OwnerFinancePage extends StatelessWidget {
                   ...ctrl.assistants.map(
                         (a) => DropdownMenuItem(
                       value: a.id,
-                      child: Text(a.name),
+                      child: Text(a.name, overflow:TextOverflow.ellipsis,),
                     ),
                   ),
                 ],
