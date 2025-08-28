@@ -8,47 +8,51 @@ import 'package:get/get.dart';
 import '../auth/model/role.dart';
 import 'components/assistant_reports_chart.dart';
 import 'components/assistant_stats_summary.dart';
+import 'components/recent_orders.dart';
 
 class AssistantDashboardDetails extends StatelessWidget {
   final Assistant assistant;
 
   const AssistantDashboardDetails({Key? key, required this.assistant})
-      : super(key: key);
-
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ctrl  = Get.put(AssistantAnalyticsController(analyticsRepo: Get.find<AnalyticsRepo>(), assistantId: assistant.id));
+    final ctrl = Get.put(
+      AssistantAnalyticsController(
+        analyticsRepo: Get.find<AnalyticsRepo>(),
+        assistantId: assistant.id,
+      ),
+    );
     final isOwner = Get.find<AuthService>().currentUser?.role == UserRole.owner;
     final theme = Theme.of(context);
     const spacer = SizedBox(height: 10);
 
     return Scaffold(
-      appBar: isOwner?CustomAppBar(title: "${assistant.name}'s Dashboard"):null,
+      appBar:
+          isOwner ? CustomAppBar(title: "${assistant.name}'s Dashboard") : null,
       body: Obx(() {
-      if (ctrl.isLoading.value || ctrl.analytics.value == null) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      final data = ctrl.analytics.value!; // now safe
-      return SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            AssistantStatsSummary(
-              totalOrders:  data.totalOrders,
-              totalExpense: data.totalExpense,
-              theme:        theme,
-            ),
-            spacer,
-            AssistantReportsChart(
-              data:  data,
-              theme: theme,
-            ),
-          ],
-        ),
-      );
-    }),
-
+        if (ctrl.isLoading.value || ctrl.analytics.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final data = ctrl.analytics.value!; // now safe
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              AssistantStatsSummary(
+                totalOrders: data.totalOrders,
+                totalExpense: data.totalExpense,
+                theme: theme,
+              ),
+              spacer,
+              AssistantReportsChart(data: data, theme: theme),
+              SizedBox(height: 16),
+              RecentOrdersList(),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

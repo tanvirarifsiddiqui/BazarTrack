@@ -23,29 +23,32 @@ class RecentOrdersList extends StatelessWidget {
     // show only up to 5
     final recent = orders.take(5).toList();
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-      ),
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Recent Orders:', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: recent.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (_, i) {
-                final order = recent[i];
-                return OrderCard(order: order);
-              },
-            ),
-          ],
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+        ),
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Recent Orders:', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 8),
+              ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: recent.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (_, i) {
+                  final order = recent[i];
+                  return OrderCard(order: order);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -52,7 +52,7 @@ class OwnerDashboardDetails extends StatelessWidget {
                 // ─── Reports ──────────────────────────
                 ReportsSummary(reports: ctrl.reports.value!, theme: theme),
                 // ─── Recent Orders Carousel ───────────
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 RecentOrdersList(),
 
               ],
