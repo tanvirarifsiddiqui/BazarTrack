@@ -132,18 +132,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
-  //
-  // Future<void> _onEditItem(OrderItem item) async {
-  //   final updated = await Get.to<OrderItem>(
-  //     () => EditOrderItemScreen(orderId: widget.orderId, item: item),
-  //   );
-  //   if (updated != null) {
-  //     // controller may have to reload items
-  //     orderCtrl.loadItems(widget.orderId);
-  //     await _reloadItems();
-  //     await _reloadOrder(); // in case costs/status changed
-  //   }
-  // }
 
   Future<void> _onAssignUser(BuildContext context) async {
     try {

@@ -3,6 +3,8 @@ import 'package:flutter_boilerplate/features/auth/created_profile_screen.dart';
 import 'package:flutter_boilerplate/features/auth/widget/auth_header.dart';
 import 'package:flutter_boilerplate/features/finance/controller/finance_controller.dart';
 import 'package:flutter_boilerplate/features/orders/controller/order_controller.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
+import 'package:flutter_boilerplate/util/input_decoration.dart';
 import 'package:get/get.dart';
 import '../../base/custom_app_bar.dart';
 import '../../base/custom_button.dart'; // <- custom button
@@ -78,32 +80,32 @@ class _CreateUserPageState extends State<CreateUserPage> {
                   Card(
                     elevation: 4,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                      borderRadius: BorderRadius.circular(
+                        Dimensions.radiusDefault,
+                      ),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Padding(
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                      padding: const EdgeInsets.all(
+                        Dimensions.paddingSizeDefault,
+                      ),
                       child: Column(
                         children: [
                           // Name field
                           TextFormField(
                             controller: _nameCtrl,
                             focusNode: _nameFocus,
-                            decoration: InputDecoration(
-                              labelText: 'Full Name',
-                              prefixIcon: const Icon(Icons.person_outline),
-                              filled: true,
-                              fillColor: Colors.grey.shade50,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                borderSide: BorderSide.none,
-                              ),
+                            decoration: AppInputDecorations.generalInputDecoration(
+                              label: 'Full Name',
+                              prefixIcon: Icons.person_outline,
                             ),
                             textInputAction: TextInputAction.next,
                             onFieldSubmitted: (_) => _emailFocus.requestFocus(),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Name is required'
-                                : null,
+                            validator:
+                                (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Name is required'
+                                        : null,
                           ),
                           const SizedBox(height: 14),
 
@@ -111,24 +113,21 @@ class _CreateUserPageState extends State<CreateUserPage> {
                           TextFormField(
                             controller: _emailCtrl,
                             focusNode: _emailFocus,
-                            decoration: InputDecoration(
-                              labelText: 'Email Address',
-                              prefixIcon: const Icon(Icons.email_outlined),
-                              filled: true,
-                              fillColor: Colors.grey.shade50,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                borderSide: BorderSide.none,
-                              ),
+                            decoration: AppInputDecorations.generalInputDecoration(
+                              label: 'Email Address',
+                              prefixIcon: Icons.email_outlined,
                             ),
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
+                            onFieldSubmitted:
+                                (_) => _passwordFocus.requestFocus(),
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
                                 return 'Email is required';
                               }
-                              final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                              final emailRegex = RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              );
                               if (!emailRegex.hasMatch(v.trim())) {
                                 return 'Enter a valid email';
                               }
@@ -143,24 +142,40 @@ class _CreateUserPageState extends State<CreateUserPage> {
                             focusNode: _passwordFocus,
                             decoration: InputDecoration(
                               labelText: 'Password',
-                              prefixIcon: const Icon(Icons.lock_outline),
+                              prefixIcon: const Icon(Icons.lock_outline,color: AppColors.primary,),
                               suffixIcon: IconButton(
                                 tooltip: _obscurePassword ? 'Show' : 'Hide',
                                 icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,color: AppColors.primary,
                                 ),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed:
+                                    () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
                               ),
                               filled: true,
                               fillColor: Colors.grey.shade50,
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
+                                borderSide: BorderSide(color: AppColors.borderGrey, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 1.8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+
                             ),
                             obscureText: _obscurePassword,
                             textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                            onFieldSubmitted:
+                                (_) => _confirmFocus.requestFocus(),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
                                 return 'Password is required';
@@ -179,20 +194,33 @@ class _CreateUserPageState extends State<CreateUserPage> {
                             focusNode: _confirmFocus,
                             decoration: InputDecoration(
                               labelText: 'Confirm Password',
-                              prefixIcon: const Icon(Icons.lock),
+                              prefixIcon: const Icon(Icons.lock, color: AppColors.primary,),
                               suffixIcon: IconButton(
                                 tooltip: _obscureConfirm ? 'Show' : 'Hide',
                                 icon: Icon(
-                                  _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                                  _obscureConfirm
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,color: AppColors.primary,
                                 ),
-                                onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                                onPressed:
+                                    () => setState(
+                                      () => _obscureConfirm = !_obscureConfirm,
+                                    ),
                               ),
                               filled: true,
                               fillColor: Colors.grey.shade50,
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
+                                borderSide: BorderSide(color: AppColors.borderGrey, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 1.8),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             ),
                             obscureText: _obscureConfirm,
                             textInputAction: TextInputAction.next,
@@ -211,24 +239,23 @@ class _CreateUserPageState extends State<CreateUserPage> {
                           // Role dropdown
                           DropdownButtonFormField<UserRole>(
                             initialValue: _selectedRole,
-                            decoration: InputDecoration(
-                              labelText: 'Role',
-                              prefixIcon: const Icon(Icons.admin_panel_settings_outlined),
-                              filled: true,
-                              fillColor: Colors.grey.shade50,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            items: UserRole.values.map((r) {
-                              return DropdownMenuItem(
-                                value: r,
-                                child: Text(r.toApi().capitalizeFirst!),
-                              );
-                            }).toList(),
+                            decoration:
+                                AppInputDecorations.generalInputDecoration(
+                                  label: "Role",
+                                  prefixIcon:
+                                      Icons.admin_panel_settings_outlined,
+                                ),
+                            items:
+                                UserRole.values.map((r) {
+                                  return DropdownMenuItem(
+                                    value: r,
+                                    child: Text(r.toApi().capitalizeFirst!),
+                                  );
+                                }).toList(),
                             onChanged: (r) => setState(() => _selectedRole = r),
-                            validator: (v) => v == null ? 'Please select a role' : null,
+                            validator:
+                                (v) =>
+                                    v == null ? 'Please select a role' : null,
                           ),
                         ],
                       ),
@@ -244,9 +271,10 @@ class _CreateUserPageState extends State<CreateUserPage> {
                       buttonText: 'Create User',
                       icon: Icons.person_add,
                       // isLoading: authCtrl.isCreatingUser.value,
-                      onPressed: authCtrl.isCreatingUser.value
-                          ? null
-                          : () => _onSubmit(authCtrl, context),
+                      onPressed:
+                          authCtrl.isCreatingUser.value
+                              ? null
+                              : () => _onSubmit(authCtrl, context),
                       // If your CustomButton uses another param name, change accordingly
                     ),
                   ),
@@ -286,7 +314,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
       Get.off(() => CreatedProfileScreen(createdUser: created));
       showCustomSnackBar('User ${created.name} created', isError: false);
       Get.find<AnalyticsController>().loadDashboardUserInfo();
-      if(created.role == UserRole.assistant){
+      if (created.role == UserRole.assistant) {
         Get.find<OrderController>().getAllAssistants();
         Get.find<FinanceController>().loadAssistants();
       }
