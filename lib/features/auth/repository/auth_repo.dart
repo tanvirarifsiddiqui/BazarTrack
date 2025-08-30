@@ -50,6 +50,23 @@ class AuthRepo {
     return user;
   }
 
+  Future<void> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final body = {
+      'current_password': currentPassword,
+      'new_password':     newPassword,
+    };
+    final res = await api.updatePassword(body);
+    if (!res.isOk) {
+      final error = res.body is Map
+          ? (res.body['msg'] ?? 'Failed to update password')
+          : 'Failed to update password';
+      throw Exception(error);
+    }
+  }
+
   Future<void> signUp(String userJson) async {
     await sharedPreferences.setString(AppConstants.userData, userJson);
   }

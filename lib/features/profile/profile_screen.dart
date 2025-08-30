@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_button.dart';
+import 'package:flutter_boilerplate/features/auth/change_password.dart';
 import 'package:flutter_boilerplate/features/auth/create_user_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
@@ -34,8 +35,7 @@ class ProfileScreen extends StatelessWidget {
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(Dimensions.radiusDefault),
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                 ),
                 margin: EdgeInsets.zero,
                 child: Padding(
@@ -67,17 +67,29 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 36),
 
               // Create user Button
-              if(isOwner)...[SizedBox(
+              if (isOwner) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: CustomButton(
+                    icon: Icons.person_add,
+                    buttonText: 'Create User',
+                    onPressed: () {
+                      Get.to(() => CreateUserPage());
+                    },
+                  ),
+                ),
+              ],
+              SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  icon: Icons.person_add,
-                  buttonText: 'Create User',
+                  icon: Icons.security,
+                  buttonText: 'Change Password',
                   onPressed: () {
-                    Get.to(()=>CreateUserPage());
+                    Get.to(() => ChangePasswordScreen());
                   },
                 ),
               ),
-              const SizedBox(height: 36)],
+              const SizedBox(height: 36),
               // Logout Button
               SizedBox(
                 width: double.infinity,
@@ -85,14 +97,13 @@ class ProfileScreen extends StatelessWidget {
                   loading: authCtrl.isLoading.value,
                   icon: Icons.logout,
                   buttonText: 'Logout',
-                  btnColor:  Colors.redAccent,
+                  btnColor: Colors.redAccent,
                   onPressed: () async {
                     await authCtrl.logout();
                     Get.offAllNamed('/login');
                   },
                 ),
               ),
-
             ],
           ),
         );
@@ -120,8 +131,9 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           name,
-          style: theme.textTheme.headlineSmall
-              ?.copyWith(fontWeight: FontWeight.w600),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 4),
         Chip(

@@ -61,4 +61,8 @@ class AuthService extends GetxService {
     return user;
   }
 
+  Future<void> updatePassword({required String currentPassword, required String newPassword}) async {
+    authRepo.updatePassword(currentPassword: currentPassword, newPassword: newPassword);
+  }
+
 }

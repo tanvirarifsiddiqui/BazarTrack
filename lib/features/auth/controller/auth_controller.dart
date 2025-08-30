@@ -1,17 +1,19 @@
 import 'package:get/get.dart';
 import '../model/role.dart';
 import '../model/user.dart';
+import '../repository/auth_repo.dart';
 import '../service/auth_service.dart';
 
 class AuthController extends GetxController {
   final AuthService authService;
+  final AuthRepo authRepo;
 
   /// Holds the currently authenticated user (null if not logged in)
   final user = Rxn<UserModel>();
   final isLoading   = false.obs;
   final isCreatingUser = false.obs;
 
-  AuthController({ required this.authService });
+  AuthController({ required this.authService, required this.authRepo });
 
   @override
   void onInit() {
@@ -24,7 +26,7 @@ class AuthController extends GetxController {
 
   bool get isOwner => user.value?.role == UserRole.owner;
 
-  /// Create a new user (owner or assistant)
+  // Create a new user (owner or assistant)
   Future<UserModel?> createUser({
     required String name,
     required String email,
@@ -72,6 +74,26 @@ class AuthController extends GetxController {
     await authService.signUp(newUser);
     user.value = authService.currentUser;
   }
+  /// Change password action
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    isLoading.value = true;
+    try {
+      await authRepo.updatePassword(
+        currentPassword: currentPassword,
+        newPassword:     newPassword,
+      );
+      return true;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(),
+          snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   Future<void> logout() async {
     isLoading.value = true;
@@ -83,6 +105,5 @@ class AuthController extends GetxController {
     }
 
   }
-
 
 }

@@ -23,6 +23,7 @@ class BazarTrackApi {
   Future<Response> me() => client.getData(Endpoints.me);
   Future<Response> refresh() => client.postData(Endpoints.refresh, {});
   Future<Response> createUser(Map<String, dynamic> data) => client.postData(Endpoints.createUser, data);
+  Future<Response> updatePassword(Map<String, dynamic> data) => client.putData(Endpoints.password, data);
 
   Future<Response> orders({String? status, int? assignedTo, int? limit, int? cursor,
   }) {

@@ -60,7 +60,7 @@ Future<Map<String, Map<String, String>>> init() async {
   // Get.put(AnalyticsService(repo: Get.find<AnalyticsRepo>()),);
 
   // Controllers
-  Get.lazyPut(() => AuthController(authService: Get.find<AuthService>()), fenix: true);
+  Get.lazyPut(() => AuthController(authService: Get.find<AuthService>(), authRepo: Get.find<AuthRepo>()), fenix: true);
   Get.lazyPut(() => SplashController(splashRepo: Get.find()));
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find<SharedPreferences>()));
   Get.lazyPut(() => LocalizationController(sharedPreferences: Get.find()));

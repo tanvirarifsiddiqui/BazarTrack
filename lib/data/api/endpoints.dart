@@ -2,6 +2,7 @@ import 'package:flutter_boilerplate/util/app_constants.dart';
 
 class Endpoints {
   static const login = '${AppConstants.baseUrl}/api/auth/login';
+  static const password = '${AppConstants.baseUrl}/api/auth/password';
   static const createUser = '${AppConstants.baseUrl}/api/users';
   static const logout = '${AppConstants.baseUrl}/api/auth/logout';
   static const me = '${AppConstants.baseUrl}/api/auth/me';

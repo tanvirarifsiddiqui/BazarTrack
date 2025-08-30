@@ -161,6 +161,8 @@ class ApiClient extends GetxService {
     try {
       debugPrint('====> API Call: $uri\nToken: $token');
       debugPrint('====> API Body: $body');
+      debugPrint('====> API Json Body: ${jsonEncode(body)}');
+
       http.Response response0 = await http.put(
         _getUri(uri),
         body: jsonEncode(body),
@@ -198,10 +200,9 @@ class ApiClient extends GetxService {
       debugPrint('JSON decode failed: $e');
       decoded = null;
     }
-
     // If API uses wrapper { error, msg, data: ... } prefer data as actual body
     dynamic mainBody;
-    if (decoded is Map && decoded.containsKey('data')) {
+    if (decoded is Map && decoded.containsKey('data') && decoded['data'] != null) {
       mainBody = decoded['data'];
     } else {
       mainBody = decoded ?? response.body;
