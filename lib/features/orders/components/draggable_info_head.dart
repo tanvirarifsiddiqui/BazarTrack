@@ -277,17 +277,16 @@ class _DraggableChatHeadState extends State<DraggableChatHead>
       final items = widget.ctrl.newItems;
       final total = items.fold<double>(0.0, (s, it) => s + (it.estimatedCost ?? 0.0));
 
-      // prepare rows
-      final rows = items.map((it) {
-        final per = it.estimatedCost;
-        final perText = per != null ? (per == per.truncateToDouble() ? per.toInt().toString() : per.toStringAsFixed(2)) : '-';
+      // --- prepare rows (store numeric per as double? not as '-' string) ---
+      final rows = items.map<Map<String, dynamic>>((it) {
         return {
           'product': it.productName.isEmpty ? '-' : it.productName,
           'qty': '${it.quantity}',
-          'unit': it.unit,
-          'per': perText,
+          'unit': it.unit ?? '-',        // ensure string fallback
+          'per_val': it.estimatedCost,   // double? kept numeric
         };
       }).toList();
+
 
       // card geometry
       final parent = MediaQuery.of(context).size;
@@ -384,14 +383,21 @@ class _DraggableChatHeadState extends State<DraggableChatHead>
                             else
                               Column(
                                 children: rows.map((r) {
+                                  final perVal = r['per_val'] as double?;
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                                     child: Row(
                                       children: [
-                                        Expanded(flex: 1, child: Text(r['product']!, overflow: TextOverflow.ellipsis)),
+                                        Expanded(flex: 1, child: Text(r['product'], overflow: TextOverflow.ellipsis)),
                                         Expanded(flex: 1, child: Text(r['qty']!, textAlign: TextAlign.center)),
                                         Expanded(flex: 1, child: Text(r['unit']!, textAlign: TextAlign.center)),
-                                        Expanded(flex: 1, child: Text(formatPrice(num.parse(r['per']!)), textAlign: TextAlign.right)),
+                                        Expanded(
+                                          flex: 1,
+                                          child: Text(
+                                            perVal != null ? formatPrice(perVal) : '-',
+                                            textAlign: TextAlign.right,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   );
