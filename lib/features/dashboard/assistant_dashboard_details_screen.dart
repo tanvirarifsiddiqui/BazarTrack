@@ -4,6 +4,7 @@ import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/dashboard/controller/assistant_analytics_controller.dart';
 import 'package:flutter_boilerplate/features/dashboard/repository/analytics_repo.dart';
 import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
+import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:get/get.dart';
 import '../../util/colors.dart';
 import '../auth/model/role.dart';
@@ -14,16 +15,18 @@ import 'components/recent_orders.dart';
 class AssistantDashboardDetails extends StatelessWidget {
   final Assistant assistant;
 
-  const AssistantDashboardDetails({Key? key, required this.assistant})
-    : super(key: key);
+  const AssistantDashboardDetails({super.key, required this.assistant});
 
   @override
   Widget build(BuildContext context) {
+    // inside AssistantDashboardDetails.build:
     final ctrl = Get.put(
       AssistantAnalyticsController(
         analyticsRepo: Get.find<AnalyticsRepo>(),
+        orderRepo: Get.find<OrderRepo>(),
         assistantId: assistant.id,
       ),
+      tag: 'assistant_${assistant.id}', // << unique tag
     );
     final isOwner = Get.find<AuthService>().currentUser?.role == UserRole.owner;
     final theme = Theme.of(context);
@@ -38,11 +41,15 @@ class AssistantDashboardDetails extends StatelessWidget {
         }
         final data = ctrl.analytics.value!; // now safe
         return RefreshIndicator(
+
           color: AppColors.primary,
           onRefresh: () async {
             await ctrl.refreshAll();
           },
           child: SingleChildScrollView(
+            // THIS IS THE KEY: allow overscroll even when content is short
+            physics: const AlwaysScrollableScrollPhysics(),
+            primary: true,
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [

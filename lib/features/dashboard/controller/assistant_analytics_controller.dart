@@ -7,13 +7,15 @@ import '../model/assistant_analytics.dart';
 class AssistantAnalyticsController extends GetxController {
   final AnalyticsRepo analyticsRepo;
   final int assistantId;
+  final OrderRepo orderRepo;
 
   AssistantAnalyticsController({
     required this.analyticsRepo,
+    required this.orderRepo,
     required this.assistantId,
   });
 
-  final OrderRepo orderRepo = Get.find<OrderRepo>();
+
 
   var analytics = Rxn<AssistantAnalytics>();
   var isLoading = false.obs;
@@ -43,5 +45,6 @@ class AssistantAnalyticsController extends GetxController {
     isLoading.value = true;
     analytics.value = await analyticsRepo.fetchAssistantAnalytics(assistantId);
     isLoading.value = false;
+    print(analytics.value.toString());
   }
 }
