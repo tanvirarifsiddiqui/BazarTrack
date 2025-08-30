@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:flutter_boilerplate/features/auth/create_user_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
@@ -68,19 +69,9 @@ class ProfileScreen extends StatelessWidget {
               // Create user Button
               if(isOwner)...[SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.person_add, color: Colors.white),
-                  label: const Text(
-                    'Create User',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                child: CustomButton(
+                  icon: Icons.person_add,
+                  buttonText: 'Create User',
                   onPressed: () {
                     Get.to(()=>CreateUserPage());
                   },
@@ -90,19 +81,11 @@ class ProfileScreen extends StatelessWidget {
               // Logout Button
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                child: CustomButton(
+                  loading: authCtrl.isLoading.value,
+                  icon: Icons.logout,
+                  buttonText: 'Logout',
+                  btnColor:  Colors.redAccent,
                   onPressed: () async {
                     await authCtrl.logout();
                     Get.offAllNamed('/login');

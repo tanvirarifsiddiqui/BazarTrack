@@ -8,8 +8,7 @@ class AuthController extends GetxController {
 
   /// Holds the currently authenticated user (null if not logged in)
   final user = Rxn<UserModel>();
-
-  // Loading flag for user creation
+  final isLoading   = false.obs;
   final isCreatingUser = false.obs;
 
   AuthController({ required this.authService });
@@ -57,11 +56,16 @@ class AuthController extends GetxController {
   }
 
   Future<bool> login(String email, String password) async {
-    final success = await authService.login(email, password);
-    if (success) {
-      user.value = authService.currentUser;
+    isLoading.value = true;
+    try {
+      final success = await authService.login(email, password);
+      if (success) {
+        user.value = authService.currentUser;
+      }
+      return success;
+    } finally {
+      isLoading.value = false;
     }
-    return success;
   }
 
   Future<void> signUp(UserModel newUser) async {
@@ -70,7 +74,15 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
-    await authService.logout();
-    user.value = null;
+    isLoading.value = true;
+    try {
+      await authService.logout();
+      user.value = null;
+    } finally {
+      isLoading.value = false;
+    }
+
   }
+
+
 }

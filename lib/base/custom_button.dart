@@ -1,12 +1,11 @@
 import 'package:flutter_boilerplate/util/colors.dart';
-import 'package:flutter_boilerplate/util/dimensions.dart';
 import 'package:flutter_boilerplate/util/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class CustomButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final String buttonText;
+  final bool loading;
   final bool transparent;
   final EdgeInsets? margin;
   final double? height;
@@ -16,38 +15,71 @@ class CustomButton extends StatelessWidget {
   final IconData? icon;
   final Color? btnColor;
   const CustomButton({
-    super.key, this.onPressed, required this.buttonText, this.transparent = false, this.margin, this.width,
-    this.height, this.fontSize, this.radius = 12, this.icon, this.btnColor = AppColors.primary
+    super.key,
+    this.onPressed,
+    required this.buttonText,
+    this.loading = false,
+    this.transparent = false,
+    this.margin,
+    this.width,
+    this.height,
+    this.fontSize,
+    this.radius = 12,
+    this.icon,
+    this.btnColor = AppColors.primary,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
-      backgroundColor: onPressed == null ? Theme.of(context).disabledColor : transparent
-          ? Colors.transparent : btnColor,
-      minimumSize: Size(width ?? context.width, height ?? 50),
-      padding: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(radius),
+    final disabled = onPressed == null;
+    final bgColor  = disabled
+        ? Theme.of(context).disabledColor
+        : btnColor;
+
+    return SizedBox(
+      width: width ?? double.infinity,
+      height: height ?? 50,
+      child: TextButton(
+        onPressed: disabled ? null : onPressed,
+        style: TextButton.styleFrom(
+          backgroundColor: transparent ? Colors.transparent : bgColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radius),
+          ),
+        ),
+        child: loading
+            ? SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: transparent
+                ? Theme.of(context).primaryColor
+                : Theme.of(context).cardColor,
+          ),
+        )
+            : Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[
+              Icon(icon,
+                  color: transparent
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).cardColor),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              buttonText,
+              style: robotoBold.copyWith(
+                color: transparent
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).cardColor,
+                fontSize: fontSize ?? 16,
+              ),
+            ),
+          ],
+        ),
       ),
     );
-
-    return Center(child: SizedBox(width: width ?? context.width, child: Padding(
-      padding: margin ?? EdgeInsets.all(0),
-      child: TextButton(
-        onPressed: onPressed,
-        style: flatButtonStyle,
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          icon != null ? Padding(
-            padding: EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
-            child: Icon(icon, color: transparent ? Theme.of(context).primaryColor : Theme.of(context).cardColor),
-          ) : SizedBox(),
-          Text(buttonText, textAlign: TextAlign.center, style: robotoBold.copyWith(
-            color: transparent ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
-            fontSize: fontSize ?? Dimensions.fontSizeLarge,
-          )),
-        ]),
-      ),
-    )));
   }
 }
