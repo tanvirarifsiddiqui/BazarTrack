@@ -10,7 +10,7 @@ import 'components/wallet_summary.dart';
 import 'controller/analytics_controller.dart';
 
 class OwnerDashboardDetails extends StatelessWidget {
-  const OwnerDashboardDetails({Key? key}) : super(key: key);
+  const OwnerDashboardDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,10 @@ class OwnerDashboardDetails extends StatelessWidget {
                 ReportsSummary(reports: ctrl.reports.value!, theme: theme),
                 // ─── Recent Orders Carousel ───────────
                 const SizedBox(height: 16),
-                RecentOrdersList(),
+                RecentOrdersList(
+                  recentOrders: ctrl.recentOrders,
+                  isLoadingRecent: ctrl.isLoadingRecent,
+                ),
 
               ],
             ),

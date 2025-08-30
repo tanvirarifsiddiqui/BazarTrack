@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
-import '../../../base/empty_state.dart';
 import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../model/assistant_analytics.dart';
@@ -54,10 +53,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
     final monthAndYearFmt = DateFormat('MMM yyyy');
 
     if (_data.isEmpty) {
-      return EmptyState(
-        icon: Icons.analytics,
-        message: 'No Data Available.',
-      );
+      return Container();
     }
 
     final points = List<_ChartPoint>.from(_data)..sort((a, b) => a.month.compareTo(b.month));

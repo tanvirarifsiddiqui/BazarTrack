@@ -1,27 +1,33 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/features/dashboard/controller/analytics_controller.dart';
 import 'package:get/get.dart';
+import '../../../base/empty_state.dart';
 import '../../../util/dimensions.dart';
 import '../../orders/components/order_card.dart';
 
-class RecentOrdersList extends StatelessWidget {
+class RecentOrdersList<T> extends StatelessWidget {
+  final RxList<T> recentOrders;
+  final RxBool isLoadingRecent;
 
-  const RecentOrdersList();
+  const RecentOrdersList({
+    Key? key,
+    required this.recentOrders,
+    required this.isLoadingRecent,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final AnalyticsController analyticsController = Get.find<AnalyticsController>();
-    final orders = analyticsController.recentOrders;
-    if (analyticsController.isLoadingRecent.value) {
+    if (isLoadingRecent.value) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (orders.isEmpty) {
-      return const Center(child: Text('No recent orders.'));
+    if (recentOrders.isEmpty) {
+        return EmptyState(
+          icon: Icons.inbox,
+          message: 'No recent orders.',
+        );
     }
 
-    // show only up to 5
-    final recent = orders.take(5).toList();
+    final recent = recentOrders.take(5).toList();
 
     return Padding(
       padding: const EdgeInsets.all(4.0),
@@ -44,7 +50,7 @@ class RecentOrdersList extends StatelessWidget {
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (_, i) {
                   final order = recent[i];
-                  return OrderCard(order: order);
+                  return OrderCard(order: order); // order type T must be compatible with OrderCard
                 },
               ),
             ],

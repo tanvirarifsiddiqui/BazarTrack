@@ -5,6 +5,7 @@ import 'package:flutter_boilerplate/features/dashboard/controller/assistant_anal
 import 'package:flutter_boilerplate/features/dashboard/repository/analytics_repo.dart';
 import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
 import 'package:get/get.dart';
+import '../../util/colors.dart';
 import '../auth/model/role.dart';
 import 'components/assistant_reports_chart.dart';
 import 'components/assistant_stats_summary.dart';
@@ -36,20 +37,29 @@ class AssistantDashboardDetails extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         final data = ctrl.analytics.value!; // now safe
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              AssistantStatsSummary(
-                totalOrders: data.totalOrders,
-                totalExpense: data.totalExpense,
-                theme: theme,
-              ),
-              spacer,
-              AssistantReportsChart(data: data, theme: theme),
-              SizedBox(height: 16),
-              RecentOrdersList(),
-            ],
+        return RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            await ctrl.refreshAll();
+          },
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                AssistantStatsSummary(
+                  totalOrders: data.totalOrders,
+                  totalExpense: data.totalExpense,
+                  theme: theme,
+                ),
+                spacer,
+                AssistantReportsChart(data: data, theme: theme),
+                SizedBox(height: 16),
+                RecentOrdersList(
+                  recentOrders: ctrl.recentOrders,
+                  isLoadingRecent: ctrl.isLoadingRecent,
+                ),
+              ],
+            ),
           ),
         );
       }),
