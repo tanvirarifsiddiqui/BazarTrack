@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/base/custom_button.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../util/input_decoration.dart';
@@ -237,11 +238,17 @@ class OwnerFinancePage extends StatelessWidget {
             ],
           ),
           actions: [
-            TextButton(
+            CustomButton(
+              btnColor: Colors.redAccent,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
+              buttonText: 'Cancel',
             ),
-            ElevatedButton(
+            CustomButton(
+              btnColor: AppColors.primary,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
               onPressed: () {
                 ctrl.setFilters(
                   userId: selectedUser,
@@ -251,9 +258,10 @@ class OwnerFinancePage extends StatelessWidget {
                 );
                 Navigator.pop(ctx);
               },
-              child: const Text('Apply'),
+              buttonText: 'Apply',
             ),
           ],
+          actionsAlignment: MainAxisAlignment.spaceAround,
         ),
       ),
     );
@@ -321,11 +329,17 @@ class OwnerFinancePage extends StatelessWidget {
             ],
           ),
           actions: [
-            TextButton(
+            CustomButton(
+              btnColor: Colors.redAccent,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              buttonText: 'Cancel',
             ),
-            ElevatedButton(
+            CustomButton(
+              btnColor: AppColors.primary,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
               onPressed: () {
                 final amt = double.tryParse(amtCtrl.text.trim()) ?? 0.0;
                 if (amt > 0) {
@@ -333,9 +347,10 @@ class OwnerFinancePage extends StatelessWidget {
                       .then((_) => Navigator.pop(context));
                 }
               },
-              child: const Text('Save'),
+              buttonText:'Save',
             ),
           ],
+          actionsAlignment: MainAxisAlignment.spaceAround,
         ),
       ),
     );

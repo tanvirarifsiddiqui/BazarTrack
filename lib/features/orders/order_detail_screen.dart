@@ -376,8 +376,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         if (isOwner)
                           CustomButton(
                             icon: Icons.add,
-                            height: 35,
-                            width: 100,
+                            height: MediaQuery.of(context).size.height * .04,
+                            width: MediaQuery.of(context).size.width * .3,
                             buttonText: 'Add Item',
                             onPressed: _onAddItem,
                           ),
@@ -420,7 +420,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           itemBuilder: (_, idx) {
                             final item = items[idx];
                             return ListTile(
-                              leading: const Icon(Icons.shopping_basket),
+                              leading: const Icon(Icons.shopping_basket,color: AppColors.primary,),
                               title: Text(item.productName),
                               subtitle: Text(
                                 '${item.quantity} ${item.unit} • ${item.status.toApi()}',
