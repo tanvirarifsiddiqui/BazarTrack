@@ -30,7 +30,7 @@ class AssistantDashboardDetails extends StatelessWidget {
     );
     final isOwner = Get.find<AuthService>().currentUser?.role == UserRole.owner;
     final theme = Theme.of(context);
-    const spacer = SizedBox(height: 10);
+    const spacer = SizedBox(height: 8);
 
     return Scaffold(
       appBar:
@@ -50,7 +50,7 @@ class AssistantDashboardDetails extends StatelessWidget {
             // THIS IS THE KEY: allow overscroll even when content is short
             physics: const AlwaysScrollableScrollPhysics(),
             primary: true,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               children: [
                 AssistantStatsSummary(
@@ -60,7 +60,7 @@ class AssistantDashboardDetails extends StatelessWidget {
                 ),
                 spacer,
                 AssistantReportsChart(data: data, theme: theme),
-                SizedBox(height: 16),
+                SizedBox(height: 12),
                 RecentOrdersList(
                   recentOrders: ctrl.recentOrders,
                   isLoadingRecent: ctrl.isLoadingRecent,

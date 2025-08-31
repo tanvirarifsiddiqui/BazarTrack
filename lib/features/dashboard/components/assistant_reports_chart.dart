@@ -13,20 +13,20 @@ class AssistantReportsChart extends StatelessWidget {
     totalOrders: 16,
     totalExpense: 1204.0,
     ordersByMonth: [
-      MonthlyCount(month: '2025-01', count: 1),
+      MonthlyCount(month: '2025-01', count: 2),
       MonthlyCount(month: '2025-02', count: 3),
       MonthlyCount(month: '2025-03', count: 2),
       MonthlyCount(month: '2025-04', count: 3),
       MonthlyCount(month: '2025-05', count: 5),
-      MonthlyCount(month: '2025-08', count: 15),
+      MonthlyCount(month: '2025-08', count: 8),
     ],
     expenseByMonth: [
-      MonthlyResponse(month: '2025-01', expense: 50.00),
-      MonthlyResponse(month: '2025-02', expense: 150.00),
-      MonthlyResponse(month: '2025-03', expense: 100.00),
-      MonthlyResponse(month: '2025-04', expense: 170.00),
-      MonthlyResponse(month: '2025-05', expense: 200.00),
-      MonthlyResponse(month: '2025-08', expense: 1154.00),
+      MonthlyResponse(month: '2025-01', expense: 112.00),
+      MonthlyResponse(month: '2025-02', expense: 180.00),
+      MonthlyResponse(month: '2025-03', expense: 110.00),
+      MonthlyResponse(month: '2025-04', expense: 183.00),
+      MonthlyResponse(month: '2025-05', expense: 356.00),
+      MonthlyResponse(month: '2025-08', expense: 576.00),
     ],
   );
 
@@ -39,8 +39,8 @@ class AssistantReportsChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReportsChartSyncfusion.fromAssistantAnalytics(data, theme);
-    // return ReportsChartSyncfusion.fromAssistantAnalytics(_dummyAssistantAnalytics, theme);
+    // return ReportsChartSyncfusion.fromAssistantAnalytics(data, theme);
+    return ReportsChartSyncfusion.fromAssistantAnalytics(_dummyAssistantAnalytics, theme);
 
   }
 }

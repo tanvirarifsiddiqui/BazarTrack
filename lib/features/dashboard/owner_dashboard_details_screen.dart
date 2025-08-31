@@ -44,15 +44,15 @@ class OwnerDashboardDetails extends StatelessWidget {
                   theme: theme,
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 // ─── Wallet Summary ───────────────────
                 WalletSummary(theme: theme, assistants: financeCtrl.assistants),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 // ─── Reports ──────────────────────────
                 ReportsSummary(reports: ctrl.reports.value!, theme: theme),
                 // ─── Recent Orders Carousel ───────────
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 RecentOrdersList(
                   recentOrders: ctrl.recentOrders,
                   isLoadingRecent: ctrl.isLoadingRecent,

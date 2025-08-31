@@ -173,7 +173,7 @@ class ReportsChartSyncfusion extends StatelessWidget {
         ),
 
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
 
         if (customBelow != null) ...[
           customBelow!,

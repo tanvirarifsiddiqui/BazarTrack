@@ -14,15 +14,15 @@ class ReportsSummary extends StatelessWidget {
       MonthlyCount(month: '2025-03', count: 8),
       MonthlyCount(month: '2025-04', count: 6),
       MonthlyCount(month: '2025-05', count: 10),
-      MonthlyCount(month: '2025-08', count: 43),
+      MonthlyCount(month: '2025-08', count: 22),
     ],
     expenseByMonth: [
       MonthlyResponse(month: '2025-01', expense: 75.00),
       MonthlyResponse(month: '2025-02', expense: 120.50),
       MonthlyResponse(month: '2025-03', expense: 300.00),
       MonthlyResponse(month: '2025-04', expense: 210.25),
-      MonthlyResponse(month: '2025-05', expense: 450.00),
-      MonthlyResponse(month: '2025-08', expense: 1878.00),
+      MonthlyResponse(month: '2025-05', expense: 440.00),
+      MonthlyResponse(month: '2025-08', expense: 943.00),
     ],
   );
 
@@ -34,8 +34,8 @@ class ReportsSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReportsChartSyncfusion.fromReportsData(reports, theme);
-    // return ReportsChartSyncfusion.fromReportsData(_dummyReports, theme);
+    // return ReportsChartSyncfusion.fromReportsData(reports, theme);
+    return ReportsChartSyncfusion.fromReportsData(_dummyReports, theme);
   }
 
 }

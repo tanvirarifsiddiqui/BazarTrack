@@ -40,8 +40,8 @@ class StatsSummary extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
       childAspectRatio: 2.5,
       children: stats,
     );
