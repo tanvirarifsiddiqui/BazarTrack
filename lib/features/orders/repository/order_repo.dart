@@ -98,18 +98,21 @@ class OrderRepo {
     return [];
   }
 
-
   Future<List<Order>> getOrders({
     OrderStatus? status,
-    int? assignedTo,
+    int? ownerId,
     int? limit,
     int? cursor,
+    int? assignedTo,
+    bool unassigned = false,           // NEW
   }) async {
     final res = await api.orders(
-      status:     status?.toApi(),
-      assignedTo: assignedTo,
-      limit:      limit,
-      cursor:     cursor,
+      status:      status?.toApi(),
+      ownerId:     ownerId,
+      limit:       limit,
+      cursor:      cursor,
+      assignedTo:  assignedTo,
+      unassigned:  unassigned,          // PASS IT THROUGH
     );
     if (!res.isOk || res.body is! List) {
       throw Exception('Failed to load orders');

@@ -1,3 +1,4 @@
+import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:flutter_boilerplate/features/orders/repository/order_repo.dart';
 import 'package:get/get.dart';
 import '../../orders/model/order.dart';
@@ -8,10 +9,12 @@ import '../repository/analytics_repo.dart';
 class AnalyticsController extends GetxController {
   final AnalyticsRepo analyticsRepo;
   final OrderRepo     orderRepo;
+  final AuthService   authService;
 
   AnalyticsController({
     required this.analyticsRepo,
     required this.orderRepo,
+    required this.authService,
   });
 
   var dashboard = Rxn<DashboardMetrics>();
@@ -39,7 +42,8 @@ class AnalyticsController extends GetxController {
   Future<void> _loadRecentOrders() async {
     isLoadingRecent.value = true;
     // fetch 5 most recent orders, descending by ID
-    final list = await orderRepo.getOrders(limit: 5);
+    print(int.parse(authService.currentUser!.id));
+    final list = await orderRepo.getOrders(ownerId: int.parse(authService.currentUser!.id),limit: 5);
     recentOrders.assignAll(list);
     isLoadingRecent.value = false;
   }

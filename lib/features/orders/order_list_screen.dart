@@ -11,7 +11,7 @@ import '../../helper/route_helper.dart';
 import 'components/filter_bar.dart';
 import 'components/order_card.dart';
 
-class OrderListScreen extends StatelessWidget {
+class OrderListScreen extends StatefulWidget {
   final OrderStatus? initialStatus;
   final int? initialAssignedTo;
 
@@ -22,15 +22,34 @@ class OrderListScreen extends StatelessWidget {
   });
 
   @override
+  State<OrderListScreen> createState() => _OrderListScreenState();
+}
+
+class _OrderListScreenState extends State<OrderListScreen> {
+
+  late OrderController orderCtrl ;
+  late AuthController authController;
+
+
+  @override
+  void initState() {
+     orderCtrl = Get.find<OrderController>();
+     orderCtrl.isOwner = true;
+     authController = Get.find<AuthController>();
+     //function call
+     orderCtrl.getAllAssistants();
+     orderCtrl.loadInitial();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final orderCtrl = Get.find<OrderController>();
-    final authController = Get.find<AuthController>();
     final isOwner = authController.user.value?.role == UserRole.owner;
 
     // apply initial filters once
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (initialStatus != null) orderCtrl.setStatusFilter(initialStatus);
-      if (initialAssignedTo != null) orderCtrl.setAssignedToFilter(initialAssignedTo);
+      if (widget.initialStatus != null) orderCtrl.setStatusFilter(widget.initialStatus);
+      if (widget.initialAssignedTo != null) orderCtrl.setAssignedToFilter(widget.initialAssignedTo);
     });
 
     return Scaffold(

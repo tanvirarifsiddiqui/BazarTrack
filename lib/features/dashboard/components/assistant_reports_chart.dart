@@ -39,8 +39,8 @@ class AssistantReportsChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return ReportsChartSyncfusion.fromAssistantAnalytics(data, theme);
-    return ReportsChartSyncfusion.fromAssistantAnalytics(_dummyAssistantAnalytics, theme);
+    return ReportsChartSyncfusion.fromAssistantAnalytics(data, theme);
+    // return ReportsChartSyncfusion.fromAssistantAnalytics(_dummyAssistantAnalytics, theme);
 
   }
 }

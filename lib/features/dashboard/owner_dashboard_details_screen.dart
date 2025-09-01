@@ -54,6 +54,7 @@ class OwnerDashboardDetails extends StatelessWidget {
                 // ─── Recent Orders Carousel ───────────
                 const SizedBox(height: 12),
                 RecentOrdersList(
+                  isOwner: true,
                   recentOrders: ctrl.recentOrders,
                   isLoadingRecent: ctrl.isLoadingRecent,
                 ),

@@ -17,7 +17,6 @@ class BazarTrackApi {
     return res;
   }
 
-  
   //Auth
   Future<Response> logout() => client.postData(Endpoints.logout, {});
   Future<Response> me() => client.getData(Endpoints.me);
@@ -25,15 +24,21 @@ class BazarTrackApi {
   Future<Response> createUser(Map<String, dynamic> data) => client.postData(Endpoints.createUser, data);
   Future<Response> updatePassword(Map<String, dynamic> data) => client.putData(Endpoints.password, data);
 
-  Future<Response> orders({String? status, int? assignedTo, int? limit, int? cursor,
-  }) {
+  Future<Response> orders({String? status, int? ownerId, int? limit, int? cursor, int? assignedTo, bool unassigned = false,}) {
     final query = <String, dynamic>{};
     if (status     != null) query['status']      = status;
-    if (assignedTo != null) query['assigned_to'] = assignedTo;
+    if (ownerId    != null) query['owner_id']    = ownerId;
     if (limit      != null) query['limit']       = limit;
     if (cursor     != null) query['cursor']      = cursor;
+    // Explicit unassigned mode (assigned_to=null)
+    if (unassigned) {
+      query['assigned_to'] = 'null';
+    } else if (assignedTo != null) {
+      query['assigned_to'] = assignedTo;
+    }
     return client.getData(Endpoints.orders, query: query.isEmpty ? null : query);
   }
+
   Future<Response> createOrder(Map<String, dynamic> data) => client.postData(Endpoints.orders, data);
   Future<Response> order(int id) => client.getData(Endpoints.order(id));
   Future<Response> updateOrder(int id, Map<String, dynamic> data) => client.putData(Endpoints.order(id), data);

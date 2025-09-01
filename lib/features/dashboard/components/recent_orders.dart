@@ -8,11 +8,14 @@ import '../../orders/components/order_card.dart';
 class RecentOrdersList<T> extends StatelessWidget {
   final RxList<T> recentOrders;
   final RxBool isLoadingRecent;
+  final bool isOwner;
+
 
   const RecentOrdersList({
     super.key,
     required this.recentOrders,
     required this.isLoadingRecent,
+    required this.isOwner,
   });
 
   @override
@@ -28,9 +31,7 @@ class RecentOrdersList<T> extends StatelessWidget {
           message: 'No recent orders.',
         );
       }
-
       final recent = recentOrders.take(5).toList();
-
       return Padding(
         padding: const EdgeInsets.all(4.0),
         child: Card(
@@ -43,7 +44,7 @@ class RecentOrdersList<T> extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Recent Orders:', style: Theme.of(context).textTheme.titleLarge),
+                Text(isOwner?'Recent Created Orders' : 'Recent Assigned Orders', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 ListView.separated(
                   physics: const NeverScrollableScrollPhysics(),

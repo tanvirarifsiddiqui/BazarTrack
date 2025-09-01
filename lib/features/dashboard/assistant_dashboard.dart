@@ -6,9 +6,9 @@ import 'package:flutter_boilerplate/features/dashboard/assistant_dashboard_detai
 import 'package:flutter_boilerplate/features/finance/assistant_finance_screen.dart';
 import 'package:flutter_boilerplate/features/finance/model/assistant.dart';
 import 'package:flutter_boilerplate/features/history/history_center_page.dart';
+import 'package:flutter_boilerplate/features/orders/assistant_order_list_screen.dart';
 import 'package:flutter_boilerplate/features/profile/profile_screen.dart';
 import 'package:get/get.dart';
-import '../orders/order_list_screen.dart';
 
 class AssistantDashboard extends StatefulWidget {
   const AssistantDashboard({super.key});
@@ -42,7 +42,7 @@ class _AssistantDashboardState extends State<AssistantDashboard> {
 
     _screens = [
       AssistantDashboardDetails(assistant: assistant),
-      const OrderListScreen(),
+      const AssistantOrderListScreen(),
       AssistantFinancePage(assistant: assistant),
       const HistoryCenterPage(),
     ];

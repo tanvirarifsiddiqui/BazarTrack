@@ -62,6 +62,7 @@ class AssistantDashboardDetails extends StatelessWidget {
                 AssistantReportsChart(data: data, theme: theme),
                 SizedBox(height: 12),
                 RecentOrdersList(
+                  isOwner: false,
                   recentOrders: ctrl.recentOrders,
                   isLoadingRecent: ctrl.isLoadingRecent,
                 ),

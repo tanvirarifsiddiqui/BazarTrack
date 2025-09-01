@@ -70,7 +70,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => HistoryController(historyRepo: Get.find<HistoryRepo>()), fenix: true);
   Get.lazyPut(() => FinanceController(financeRepo: Get.find<FinanceRepo>()), fenix: true);
   Get.lazyPut(() => AssistantFinanceController(repo: Get.find<AssistantFinanceRepo>(), auth: Get.find<AuthService>()), fenix: true);
-  Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find(), orderRepo: Get.find()), fenix: true);
+  Get.lazyPut(() => AnalyticsController(analyticsRepo: Get.find(), orderRepo: Get.find(), authService: Get.find()), fenix: true);
 
   // Retrieving localized data
   Map<String, Map<String, String>> languages = {};

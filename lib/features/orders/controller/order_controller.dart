@@ -22,6 +22,9 @@ class OrderController extends GetxController {
 
   Future<Order?> getOrder(String id) => orderRepo.getOrderById(id);
 
+  bool isOwner = false;
+  int? ownerId;
+
   // reactive states
   var orders = <Order>[].obs;
   var isLoading = false.obs;
@@ -42,14 +45,8 @@ class OrderController extends GetxController {
   var isLoadingMore  = false.obs;
   var hasMore        = true.obs;
 
-
-
-  @override
-  void onInit() {
-    super.onInit();
-    getAllAssistants();
-    loadInitial();
-  }
+  // NEW reactive flag
+  var isUnassignedTab = false.obs;
 
   Future<void> loadInitial() async {
     hasMore.value = true;
@@ -66,29 +63,22 @@ class OrderController extends GetxController {
     isLoadingMore.value = false;
   }
 
-  Future<void> _fetchPage({bool reset = false}) async {
+  Future<void> _fetchPage({ bool reset = false }) async {
     final cursor = reset || orders.isEmpty ? null : orders.last.id;
+
     final page = await orderRepo.getOrders(
-      status:     filterStatus.value,
-      assignedTo: filterAssignedTo.value,
-      limit:      _pageSize,
-      cursor:     cursor,
+      ownerId:     isOwner ? int.parse(authService.currentUser!.id) : null,
+      status:      filterStatus.value,
+      assignedTo:  filterAssignedTo.value,
+      unassigned:  isUnassignedTab.value,  // PASS FLAG
+      limit:       _pageSize,
+      cursor:      cursor,
     );
-    if (page.length < _pageSize) {
-      hasMore.value = false;
-    }
+
+    if (page.length < _pageSize) hasMore.value = false;
     orders.addAll(page);
   }
 
-  Future<void> loadOrders() async {
-    isLoading.value = true;
-    final list = await orderRepo.getOrders(
-      status: filterStatus.value,
-      assignedTo: filterAssignedTo.value,
-    );
-    orders.assignAll(list);
-    isLoading.value = false;
-  }
 
   void setStatusFilter(OrderStatus? status) {
     filterStatus.value = status;
@@ -100,10 +90,6 @@ class OrderController extends GetxController {
     loadInitial();
   }
 
-
-  Future<List<Order>> getOrders({OrderStatus? status, int? assignedTo}) {
-    return orderRepo.getOrders(status: status, assignedTo: assignedTo);
-  }
 
   Future<void> assignOrder(String orderId, int userId) async {
     try {
@@ -168,7 +154,7 @@ class OrderController extends GetxController {
     }
 
     final order = Order.create(
-      createdBy: authService.currentUser!.id.toString(),
+      createdBy: authService.currentUser!.id.toString(), //for owner
       assignedTo: assignedToUserId.value?.toString(),
       status: OrderStatus.pending,
       createdAt: DateTime.now(),
@@ -185,6 +171,19 @@ class OrderController extends GetxController {
   }
 
   Future<bool> selfAssign(String orderId) async {
-    return orderRepo.selfAssign(orderId, int.parse(authService.currentUser!.id));
+    return orderRepo.selfAssign(orderId, int.parse(authService.currentUser!.id)); //for assistant
+  }
+// New tab helper methods:
+  void setMyOrdersFilter() {
+    isUnassignedTab.value   = false;
+    filterAssignedTo.value  = int.parse(authService.currentUser!.id);
+    loadInitial();
+  }
+
+  void setUnassignedFilter() {
+    isUnassignedTab.value   = true;
+    filterAssignedTo.value  = null;
+    filterStatus.value      = null;  // clear any status filter
+    loadInitial();
   }
 }

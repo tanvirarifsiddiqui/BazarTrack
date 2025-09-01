@@ -32,7 +32,7 @@ class AssistantAnalyticsController extends GetxController {
   Future<void> _loadRecentOrders() async {
     isLoadingRecent.value = true;
     // fetch 5 most recent orders, descending by ID
-    final list = await orderRepo.getOrders(limit: 5);
+    final list = await orderRepo.getOrders(assignedTo: assistantId, limit: 5);
     recentOrders.assignAll(list);
     isLoadingRecent.value = false;
   }
@@ -45,6 +45,5 @@ class AssistantAnalyticsController extends GetxController {
     isLoading.value = true;
     analytics.value = await analyticsRepo.fetchAssistantAnalytics(assistantId);
     isLoading.value = false;
-    print(analytics.value.toString());
   }
 }
