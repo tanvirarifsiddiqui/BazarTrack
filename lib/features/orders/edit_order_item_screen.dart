@@ -279,12 +279,12 @@ class _EditOrderItemScreenState extends State<EditOrderItemScreen> {
                       label: 'Actual Cost',
                       prefixIcon: Icons.money_off,
                     ),
-                    validator: (v) {
-                      final c = double.tryParse(v ?? '');
-                      return (c == null || c < 0)
-                          ? 'Invalid cost'
-                          : null;
-                    },
+                    // validator: (v) {
+                    //   final c = double.tryParse(v ?? '');
+                    //   return (c == null || c < 0)
+                    //       ? 'Invalid cost'
+                    //       : null;
+                    // },
                   ),
                   const SizedBox(height: 16),
                 ],

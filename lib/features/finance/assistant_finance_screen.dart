@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../util/input_decoration.dart';
 import '../../../util/colors.dart';
 import '../../base/custom_app_bar.dart';
+import '../../base/custom_button.dart';
 import '../../base/custom_finance_tile.dart';
 import '../../base/empty_state.dart';
 import '../../base/price_format.dart';
@@ -32,43 +33,42 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
   late AuthService auth;
   @override
   void initState() {
-     ctrl  = Get.find<AssistantFinanceController>();
-     auth  = ctrl.auth;
-     ctrl.assistantId = widget.assistant!.id;
-     ctrl.prepareAndLoadingPayments();
+    ctrl = Get.find<AssistantFinanceController>();
+    auth = ctrl.auth;
+    ctrl.assistantId = widget.assistant!.id;
+    ctrl.prepareAndLoadingPayments();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final role  = auth.currentUser?.role;
-    final isOwner     = role == UserRole.owner;
+    final role = auth.currentUser?.role;
+    final isOwner = role == UserRole.owner;
     final displayName = widget.assistant?.name ?? auth.currentUser!.name;
-    final theme       = Theme.of(context);
-    final ts          = theme.textTheme;
+    final theme = Theme.of(context);
+    final ts = theme.textTheme;
 
     return Obx(() {
       // FULL-SCREEN LOADER on first page or balance load
       if (ctrl.isInitialLoading.value || ctrl.isLoadingBalance.value) {
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }
 
       // ACTUAL PAGE
       return Scaffold(
-        appBar: isOwner
-            ? CustomAppBar(
-          title: "$displayName’s Wallet",
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Refresh',
-              onPressed: ctrl.clearFilters,
-            ),
-          ],
-        )
-            : null,
+        appBar:
+            isOwner
+                ? CustomAppBar(
+                  title: "$displayName’s Wallet",
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.refresh_rounded),
+                      tooltip: 'Refresh',
+                      onPressed: ctrl.clearFilters,
+                    ),
+                  ],
+                )
+                : null,
         body: RefreshIndicator(
           color: AppColors.primary,
           onRefresh: () async => ctrl.clearFilters(),
@@ -96,7 +96,9 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                           children: [
                             CircleAvatar(
                               radius: 28,
-                              backgroundColor: theme.primaryColor.withValues(alpha: 0.12),
+                              backgroundColor: theme.primaryColor.withValues(
+                                alpha: 0.12,
+                              ),
                               child: Text(
                                 _getInitials(displayName),
                                 style: ts.titleLarge?.copyWith(
@@ -112,12 +114,16 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                                 children: [
                                   Text(
                                     displayName,
-                                    style: ts.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                                    style: ts.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Current balance',
-                                    style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                    style: ts.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -135,7 +141,9 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                                 const SizedBox(height: 4),
                                 Text(
                                   'Available',
-                                  style: ts.bodySmall?.copyWith(color: Colors.grey[600]),
+                                  style: ts.bodySmall?.copyWith(
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ],
                             ),
@@ -153,7 +161,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                     height: 56,
                     child: _TransactionsHeader(
                       onFilter: () => _showFilterDialog(context, ctrl),
-                      onClear:  ctrl.clearFilters,
+                      onClear: ctrl.clearFilters,
                       showClear: ctrl.hasFilter,
                     ),
                   ),
@@ -171,8 +179,11 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                 else
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
-                          (ctx, i) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                      (ctx, i) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
                         child: CustomFinanceTile(finance: ctrl.transactions[i]),
                       ),
                       childCount: ctrl.transactions.length,
@@ -193,142 +204,199 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
         ),
 
         // ── DEBIT FAB ─────────────────────────
-        floatingActionButton: !isOwner
-            ? FloatingActionButton.extended(
-          heroTag: 'debit',
-          icon: const Icon(Icons.add),
-          label: const Text('Debit'),
-          backgroundColor: AppColors.primary,
-          onPressed: () => _showDebitDialog(context, ctrl, ctrl.assistantId),
-        )
-            : null,
+        floatingActionButton:
+            !isOwner
+                ? FloatingActionButton.extended(
+                  heroTag: 'debit',
+                  icon: const Icon(Icons.add),
+                  label: const Text('Debit'),
+                  backgroundColor: AppColors.primary,
+                  onPressed:
+                      () => _showDebitDialog(context, ctrl, ctrl.assistantId),
+                )
+                : null,
       );
     });
   }
 }
 
-  Future<void> _showFilterDialog(
-      BuildContext context, AssistantFinanceController ctrl) {
-    String?   type   = ctrl.filterType.value;
-    DateTime? from   = ctrl.filterFrom.value;
-    DateTime? to     = ctrl.filterTo.value;
-    final df = DateFormat('yyyy-MM-dd');
+Future<void> _showFilterDialog(
+  BuildContext context,
+  AssistantFinanceController ctrl,
+) {
+  String? type = ctrl.filterType.value;
+  DateTime? from = ctrl.filterFrom.value;
+  DateTime? to = ctrl.filterTo.value;
+  final df = DateFormat('yyyy-MM-dd');
 
-    return showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: const Text('Filter Transactions'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
+  return showDialog(
+    context: context,
+    builder:
+        (ctx) => StatefulBuilder(
+          builder:
+              (ctx, setState) => AlertDialog(
+                title: const Text('Filter Transactions'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String?>(
+                      initialValue: type,
+                      decoration: AppInputDecorations.generalInputDecoration(
+                        label: 'Type',
+                        prefixIcon: Icons.swap_horiz,
+                      ),
+                      items: [
+                        const DropdownMenuItem(value: null, child: Text('All')),
+                        const DropdownMenuItem(
+                          value: 'credit',
+                          child: Text('Credit'),
+                        ),
+                        const DropdownMenuItem(
+                          value: 'debit',
+                          child: Text('Debit'),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => type = v),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: TextEditingController(
+                              text: from != null ? df.format(from!) : 'Any',
+                            ),
+                            decoration:
+                                AppInputDecorations.generalInputDecoration(
+                                  label: 'From',
+                                  prefixIcon: Icons.calendar_today,
+                                ),
+                            onTap: () async {
+                              final dt = await showDatePicker(
+                                context: ctx,
+                                initialDate: from ?? DateTime.now(),
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime.now(),
+                              );
+                              if (dt != null) setState(() => from = dt);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: TextEditingController(
+                              text: to != null ? df.format(to!) : 'Any',
+                            ),
+                            decoration:
+                                AppInputDecorations.generalInputDecoration(
+                                  label: 'To',
+                                  prefixIcon: Icons.calendar_today,
+                                ),
+                            onTap: () async {
+                              final dt = await showDatePicker(
+                                context: ctx,
+                                initialDate: to ?? DateTime.now(),
+                                firstDate: DateTime(2020),
+                                lastDate: DateTime.now(),
+                              );
+                              if (dt != null) setState(() => to = dt);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                actions: [
+                  CustomButton(
+                    btnColor: Colors.redAccent,
+                    height: MediaQuery.of(context).size.height * .04,
+                    width: MediaQuery.of(context).size.width * .25,
+                    onPressed: () => Navigator.pop(ctx),
+                    buttonText: 'Cancel',
+                  ),
+                  CustomButton(
+                    btnColor: AppColors.primary,
+                    height: MediaQuery.of(context).size.height * .04,
+                    width: MediaQuery.of(context).size.width * .25,
+                    onPressed: () {
+                      ctrl.setFilters(type: type, from: from, to: to);
+                      Navigator.pop(ctx);
+                    },
+                    buttonText: 'Apply',
+                  ),
+                ],
+                actionsAlignment: MainAxisAlignment.spaceAround,
+
+              ),
+        ),
+  );
+}
+
+Future<void> _showDebitDialog(
+  BuildContext context,
+  AssistantFinanceController ctrl,
+  int userId,
+) {
+  final amtCtrl = TextEditingController();
+
+  return showDialog(
+    context: context,
+    builder:
+        (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              Dimensions.inputFieldBorderRadius,
+            ),
+          ),
+          title: Row(
             children: [
-              DropdownButtonFormField<String?>(
-                initialValue: type,
-                decoration: AppInputDecorations.generalInputDecoration(
-                    label: 'Type', prefixIcon: Icons.swap_horiz),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('All')),
-                  const DropdownMenuItem(value: 'credit', child: Text('Credit')),
-                  const DropdownMenuItem(value: 'debit', child: Text('Debit')),
-                ],
-                onChanged: (v) => setState(() => type = v),
+              const Icon(
+                Icons.account_balance_wallet_rounded,
+                color: AppColors.primary,
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      readOnly: true,
-                      controller: TextEditingController(text: from != null ? df.format(from!) : 'Any'),
-                      decoration: AppInputDecorations.generalInputDecoration(
-                          label: 'From', prefixIcon: Icons.calendar_today),
-                      onTap: () async {
-                        final dt = await showDatePicker(
-                          context: ctx,
-                          initialDate: from ?? DateTime.now(),
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
-                        if (dt != null) setState(() => from = dt);
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextFormField(
-                      readOnly: true,
-                      controller: TextEditingController(text: to != null ? df.format(to!) : 'Any'),
-                      decoration: AppInputDecorations.generalInputDecoration(
-                          label: 'To', prefixIcon: Icons.calendar_today),
-                      onTap: () async {
-                        final dt = await showDatePicker(
-                          context: ctx,
-                          initialDate: to ?? DateTime.now(),
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime.now(),
-                        );
-                        if (dt != null) setState(() => to = dt);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
+              const SizedBox(width: 8),
+              Text('Debit Expense', style: Theme.of(ctx).textTheme.titleLarge),
             ],
           ),
+          content: TextFormField(
+            controller: amtCtrl,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: AppInputDecorations.generalInputDecoration(
+              label: 'Amount',
+              prefixIcon: Icons.currency_exchange_rounded,
+            ),
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton(
+            CustomButton(
+              btnColor: Colors.redAccent,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
+              onPressed: () => Navigator.pop(ctx),
+              buttonText: 'Cancel',
+            ),
+            CustomButton(
+              btnColor: AppColors.primary,
+              height: MediaQuery.of(context).size.height * .04,
+              width: MediaQuery.of(context).size.width * .25,
+              icon: Icons.check_circle_outline_rounded,
+              buttonText: 'Save',
               onPressed: () {
-                ctrl.setFilters(type: type, from: from, to: to);
-                Navigator.pop(ctx);
+                final amt = double.tryParse(amtCtrl.text.trim()) ?? 0;
+                if (amt > 0) {
+                  ctrl.addDebit(amt).then((_) => Navigator.pop(ctx));
+                }
               },
-              child: const Text('Apply'),
             ),
           ],
-        ),
-      ),
-    );
-  }
+          actionsAlignment: MainAxisAlignment.spaceAround,
 
-  Future<void> _showDebitDialog(
-      BuildContext context, AssistantFinanceController ctrl, int userId) {
-    final amtCtrl = TextEditingController();
-
-    return showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.inputFieldBorderRadius)),
-        title: Row(
-          children: [
-            const Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
-            const SizedBox(width: 8),
-            Text('Debit Expense', style: Theme.of(ctx).textTheme.titleLarge),
-          ],
         ),
-        content: TextFormField(
-          controller: amtCtrl,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: AppInputDecorations.generalInputDecoration(
-              label: 'Amount', prefixIcon: Icons.currency_exchange_rounded),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.check_circle_outline_rounded),
-            label: const Text('Save'),
-            onPressed: () {
-              final amt = double.tryParse(amtCtrl.text.trim()) ?? 0;
-              if (amt > 0) {
-                ctrl.addDebit(amt)
-                    .then((_) => Navigator.pop(ctx));
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  );
+}
 
 class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
@@ -340,15 +408,17 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => height;
 
   @override
-  double get minExtent => height;  // <-- keep full height
+  double get minExtent => height; // <-- keep full height
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) =>
-      Material(
-        elevation: overlapsContent ? 4 : 0,
-        child: SizedBox(height: height, child: child),
-      );
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => Material(
+    elevation: overlapsContent ? 4 : 0,
+    child: SizedBox(height: height, child: child),
+  );
 
   @override
   bool shouldRebuild(covariant _HeaderDelegate old) =>
@@ -380,7 +450,10 @@ class _TransactionsHeader extends StatelessWidget {
           IconButton(icon: const Icon(Icons.filter_list), onPressed: onFilter),
           Obx(() {
             if (showClear.value) {
-              return IconButton(icon: const Icon(Icons.clear), onPressed: onClear);
+              return IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: onClear,
+              );
             }
             return const SizedBox.shrink();
           }),

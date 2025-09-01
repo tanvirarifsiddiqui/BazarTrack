@@ -124,7 +124,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         );
       },
     );
-
     if (updated != null) {
       orderCtrl.loadItems(widget.orderId);
       await _reloadItems();
@@ -329,7 +328,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               _buildTableRow(
                                 Icons.group,
                                 'Assigned to',
-                                order.assignedUserName?.toString() ?? '-',
+                                order.assignedUserName ?? '-',
                               ),
                               _buildTableRow(
                                 Icons.flag,
@@ -527,6 +526,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   TableRow _buildTableRow(IconData icon, String label, String value) {
+    if(value == "null"){
+      value = "-";
+    }
     return TableRow(
       children: [
         Padding(
