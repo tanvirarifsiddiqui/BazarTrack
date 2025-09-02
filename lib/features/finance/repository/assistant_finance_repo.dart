@@ -1,5 +1,6 @@
 import 'package:flutter_boilerplate/data/api/bazartrack_api.dart';
 import '../model/finance.dart';
+import '../model/owner.dart';
 
 class AssistantFinanceRepo {
   final BazarTrackApi api;
@@ -47,6 +48,15 @@ class AssistantFinanceRepo {
     if (res.isOk && res.body is List) {
       return (res.body as List)
           .map((e) => Finance.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
+  Future<List<Owner>> getOwners() async {
+    final res = await api.owners();
+    if (res.isOk && res.body is List) {
+      return (res.body as List)
+          .map((e) => Owner.fromJson(e as Map<String, dynamic>))
           .toList();
     }
     return [];

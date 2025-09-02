@@ -1,6 +1,7 @@
 import 'package:flutter_boilerplate/features/auth/service/auth_service.dart';
 import 'package:get/get.dart';
 import '../model/finance.dart';
+import '../model/owner.dart';
 import '../repository/assistant_finance_repo.dart';
 
 class AssistantFinanceController extends GetxController {
@@ -18,6 +19,8 @@ class AssistantFinanceController extends GetxController {
     _assistantId = value;
   }
 
+  var owners = <Owner>[].obs;
+
   // ── Balance ────────────────────────────────────────
   var balance = 0.0.obs;
   var isLoadingBalance = false.obs;
@@ -33,11 +36,20 @@ class AssistantFinanceController extends GetxController {
   var filterFrom = Rxn<DateTime>();
   var filterTo = Rxn<DateTime>();
   var hasFilter = false.obs;
+  var assignedToOwnerId = Rxn<int>();
+
 
   Future<void> prepareAndLoadingPayments() async {
+    loadOwners();
     _loadBalance();
     _loadInitialTransactions();
   }
+
+  Future<void> loadOwners() async {
+    final ownerlist = await repo.getOwners();
+    owners.assignAll(ownerlist);
+  }
+
 
   Future<void> _loadBalance() async {
     isLoadingBalance.value = true;
@@ -100,6 +112,7 @@ class AssistantFinanceController extends GetxController {
   Future<void> addDebit(double amount) async {
     final f = Finance(
       userId: _assistantId,
+      ownerId: assignedToOwnerId.value,
       amount: amount,
       type: 'debit',
       createdAt: DateTime.now(),

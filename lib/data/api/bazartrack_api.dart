@@ -67,6 +67,8 @@ class BazarTrackApi {
     final uri = Endpoints.assistants + (withBalance ? '/?with_balance=true' : '');
     return client.getData(uri);
   }
+  // Owners
+  Future<Response> owners() => client.getData(Endpoints.owners);
 
   // History
   Future<Response> history({Map<String, dynamic>? query}) => client.getData(Endpoints.history,query: query);

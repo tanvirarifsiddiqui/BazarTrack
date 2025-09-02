@@ -11,6 +11,7 @@ import '../../base/empty_state.dart';
 import '../../base/price_format.dart';
 import '../../util/dimensions.dart';
 import '../auth/model/role.dart';
+import 'components/owner_selector.dart';
 import 'controller/assistant_finance_controller.dart';
 import 'model/assistant.dart';
 
@@ -362,13 +363,23 @@ Future<void> _showDebitDialog(
               Text('Debit Expense', style: Theme.of(ctx).textTheme.titleLarge),
             ],
           ),
-          content: TextFormField(
-            controller: amtCtrl,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: AppInputDecorations.generalInputDecoration(
-              label: 'Amount',
-              prefixIcon: Icons.currency_exchange_rounded,
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              OwnerSelector(ctrl: ctrl),
+
+              const SizedBox(height: 16),
+
+              TextFormField(
+                controller: amtCtrl,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: AppInputDecorations.generalInputDecoration(
+                  label: 'Amount',
+                  hint: 'Enter amount',
+                  prefixIcon: Icons.attach_money,
+                ),
+              ),
+            ],
           ),
           actions: [
             CustomButton(

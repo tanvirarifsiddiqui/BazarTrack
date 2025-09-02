@@ -27,10 +27,10 @@ class ReportsSummary extends StatelessWidget {
   );
 
   const ReportsSummary({
-    Key? key,
+    super.key,
     required this.reports,
     required this.theme,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,36 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/features/finance/controller/assistant_finance_controller.dart';
 import 'package:get/get.dart';
-import '../../../base/price_format.dart';
 import '../../../util/dimensions.dart';
 import '../../../util/input_decoration.dart';
-import '../controller/order_controller.dart';
 
-/// AssistantSelector
-/// - Shows assistant name + balance in a Dropdown
+/// OwnerSelector
+/// - Shows Owner name in a Dropdown
 /// - Uses Obx to react to changes in controller's assistants / assignedToUserId
 /// - Non-blocking: shows a disabled hint when list is empty
-class AssistantSelector extends StatelessWidget {
-  final OrderController ctrl;
+class OwnerSelector extends StatelessWidget {
+  final AssistantFinanceController ctrl;
   final String label;
   final ValueChanged<int?>? onChanged;
   final bool includeNoneOption;
 
-  const AssistantSelector({
+  const OwnerSelector({
     super.key,
     required this.ctrl,
-    this.label = 'Select Assistant',
+    this.label = 'Select Owner',
     this.onChanged,
-    this.includeNoneOption = true,
+    this.includeNoneOption = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final assistants = ctrl.assistants; // RxList expected
-      final int? selectedId = ctrl.assignedToUserId.value;
+      final owners = ctrl.owners; // RxList expected
+      final int? selectedId = ctrl.assignedToOwnerId.value;
 
       // If selected id no longer exists in the list, show null (keeps UI consistent)
-      final bool selectedExists = selectedId != null && assistants.any((a) => a.id == selectedId);
+      final bool selectedExists = selectedId != null && owners.any((owner) => owner.id == selectedId);
       final int? valueToShow = selectedExists ? selectedId : null;
 
       // Build items
@@ -45,20 +44,19 @@ class AssistantSelector extends StatelessWidget {
         );
       }
 
-      if (assistants.isEmpty) {
+      if (owners.isEmpty) {
         // No assistants: show single disabled item so UI still renders
         items.add(
           const DropdownMenuItem<int?>(
             value: null,
-            child: Text('No assistants available'),
+            child: Text('No owners available'),
           ),
         );
       } else {
-        for (final assistant in assistants) {
-          final balanceText = formatPrice(assistant.balance ?? 0);
+        for (final owner in owners) {
           items.add(
             DropdownMenuItem<int?>(
-              value: assistant.id,
+              value: owner.id,
               child: Row(
                 children: [
                   // initials avatar
@@ -66,7 +64,7 @@ class AssistantSelector extends StatelessWidget {
                     radius: 14,
                     backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.12),
                     child: Text(
-                      _initials(assistant.name),
+                      _initials(owner.name!),
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).primaryColor,
@@ -77,15 +75,10 @@ class AssistantSelector extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      assistant.name,
+                      owner.name!,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    balanceText,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -94,7 +87,7 @@ class AssistantSelector extends StatelessWidget {
         }
       }
 
-      final bool enabled = assistants.isNotEmpty;
+      final bool enabled = owners.isNotEmpty;
 
       return DropdownButtonFormField<int?>(
         initialValue: valueToShow,
@@ -102,7 +95,7 @@ class AssistantSelector extends StatelessWidget {
         onChanged: enabled
             ? (int? v) {
           // Update controller value
-          ctrl.assignedToUserId.value = v;
+          ctrl.assignedToOwnerId.value = v;
           // forward to optional callback
           if (onChanged != null) onChanged!(v);
         }
