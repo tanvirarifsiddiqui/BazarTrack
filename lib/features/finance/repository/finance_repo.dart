@@ -53,15 +53,6 @@ class FinanceRepo {
     throw Exception('Failed to fetch wallet');
   }
 
-  Future<List<Finance>> getWalletTransactions(int userId) async {
-    final res = await api.walletTransactions(userId);
-    if (res.isOk && res.body is List) {
-      return (res.body as List)
-          .map((e) => Finance.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    return [];
-  }
 
   Future<List<Assistant>> getAssistants({bool withBalance = false}) async {
     final res = await api.assistants(withBalance: withBalance);

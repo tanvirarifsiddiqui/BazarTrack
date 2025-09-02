@@ -17,7 +17,7 @@ import 'model/assistant.dart';
 
 class AssistantFinancePage extends StatefulWidget {
   final Assistant? assistant;
-  const AssistantFinancePage({Key? key, this.assistant}) : super(key: key);
+  const AssistantFinancePage({super.key, this.assistant});
 
   @override
   State<AssistantFinancePage> createState() => _AssistantFinancePageState();
@@ -208,9 +208,9 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
         floatingActionButton:
             !isOwner
                 ? FloatingActionButton.extended(
-                  heroTag: 'debit',
-                  icon: const Icon(Icons.add),
-                  label: const Text('Debit'),
+                  heroTag: 'refund',
+                  icon: const Icon(Icons.replay),
+                  label: const Text('Refund'),
                   backgroundColor: AppColors.primary,
                   onPressed:
                       () => _showDebitDialog(context, ctrl, ctrl.assistantId),
@@ -398,7 +398,7 @@ Future<void> _showDebitDialog(
               onPressed: () {
                 final amt = double.tryParse(amtCtrl.text.trim()) ?? 0;
                 if (amt > 0) {
-                  ctrl.addDebit(amt).then((_) => Navigator.pop(ctx));
+                  ctrl.addRefund(amt).then((_) => Navigator.pop(ctx));
                 }
               },
             ),

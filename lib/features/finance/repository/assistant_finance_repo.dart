@@ -6,16 +6,15 @@ class AssistantFinanceRepo {
   final BazarTrackApi api;
   AssistantFinanceRepo({ required this.api });
 
-  Future<List<Finance>> getPayments({int? userId, String? type, DateTime? from, DateTime? to,int limit = 30, int? cursor,}) async {
+  Future<List<Finance>> getTransactions({int? userId, String? type, DateTime? from, DateTime? to,int limit = 30, int? cursor,}) async {
     final query = <String, dynamic>{};
-    if (userId != null) query['user_id'] = userId;
     if (type   != null) query['type']    = type;
     if (from   != null) query['from']    = from.toIso8601String().split('T').first;
     if (to     != null) query['to']      = to  .toIso8601String().split('T').first;
     query['limit']  = limit;
     if (cursor != null) query['cursor'] = cursor;
 
-    final res = await api.payments(query: query.isEmpty ? null : query);
+    final res = await api.walletTransactions(userId!, query.isEmpty ? null : query);
     if (res.isOk && res.body is List) {
       return (res.body as List)
           .map((e) => Finance.fromJson(e as Map<String, dynamic>))
@@ -43,15 +42,7 @@ class AssistantFinanceRepo {
     throw Exception('Failed to fetch wallet');
   }
 
-  Future<List<Finance>> getWalletTransactions(int userId) async {
-    final res = await api.walletTransactions(userId);
-    if (res.isOk && res.body is List) {
-      return (res.body as List)
-          .map((e) => Finance.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    return [];
-  }
+
   Future<List<Owner>> getOwners() async {
     final res = await api.owners();
     if (res.isOk && res.body is List) {

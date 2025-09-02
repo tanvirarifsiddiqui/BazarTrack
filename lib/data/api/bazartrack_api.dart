@@ -60,7 +60,7 @@ class BazarTrackApi {
 
   // Wallet
   Future<Response> wallet(int userId) => client.getData(Endpoints.wallet(userId));
-  Future<Response> walletTransactions(int userId) => client.getData(Endpoints.walletTransactions(userId));
+  Future<Response> walletTransactions(int userId, Map<String, dynamic>? query) => client.getData(Endpoints.walletTransactions(userId), query: query);
 
   // Assistants
   Future<Response> assistants({bool withBalance = false}) {

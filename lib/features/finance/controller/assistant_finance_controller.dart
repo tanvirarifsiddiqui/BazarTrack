@@ -78,7 +78,7 @@ class AssistantFinanceController extends GetxController {
   Future<void> _fetchPage({bool reset = false}) async {
     final cursor = reset || transactions.isEmpty ? null : transactions.last.id;
 
-    final page = await repo.getPayments(
+    final page = await repo.getTransactions(
       userId: _assistantId,
       type: filterType.value,
       from: filterFrom.value,
@@ -109,12 +109,12 @@ class AssistantFinanceController extends GetxController {
     _loadInitialTransactions();
   }
 
-  Future<void> addDebit(double amount) async {
+  Future<void> addRefund(double amount) async {
     final f = Finance(
       userId: _assistantId,
       ownerId: assignedToOwnerId.value,
       amount: amount,
-      type: 'debit',
+      type: 'wallet',
       createdAt: DateTime.now(),
     );
     await repo.createPayment(f);
