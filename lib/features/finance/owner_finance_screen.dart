@@ -21,7 +21,7 @@ class OwnerFinancePage extends StatelessWidget {
       // 1) Show a full‐screen spinner while we fetch the first page
       if (ctrl.isInitialLoading.value || ctrl.isLoadingAssistants.value) {
         return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+          body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
         );
       }
 
@@ -108,7 +108,7 @@ class OwnerFinancePage extends StatelessWidget {
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
                     ),
                   ),
               ],

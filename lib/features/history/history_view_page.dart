@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/base/custom_app_bar.dart';
 import 'package:flutter_boilerplate/util/app_format.dart';
 import 'package:get/get.dart';
+import '../../util/colors.dart';
 import 'controller/history_controller.dart';
 import 'model/history_log_item.dart';
 
@@ -32,7 +33,7 @@ class HistoryViewPage extends StatelessWidget {
       body: SafeArea(
         child: Obx(() {
           if (ctrl.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
         
           if (ctrl.logs.isEmpty) {

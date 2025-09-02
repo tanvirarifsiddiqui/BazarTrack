@@ -38,7 +38,7 @@ class AssistantDashboardDetails extends StatelessWidget {
           isOwner ? CustomAppBar(title: "${assistant.name}'s Dashboard") : null,
       body: Obx(() {
         if (ctrl.isLoading.value || ctrl.analytics.value == null) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
         }
         final data = ctrl.analytics.value!; // now safe
         return RefreshIndicator(

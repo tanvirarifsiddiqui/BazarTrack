@@ -130,7 +130,7 @@ class _AssistantOrderListScreenState extends State<AssistantOrderListScreen>
         },
         child: Obx(() {
           if (orderCtrl.isInitialLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           final orders = orderCtrl.orders;
           if (orders.isEmpty) {
@@ -149,7 +149,7 @@ class _AssistantOrderListScreenState extends State<AssistantOrderListScreen>
               if (index >= orders.length) {
                 return const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
                 );
               }
               return OrderCard(order: orders[index]);

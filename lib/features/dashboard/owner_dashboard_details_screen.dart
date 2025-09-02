@@ -21,7 +21,7 @@ class OwnerDashboardDetails extends StatelessWidget {
     return Scaffold(
       body: Obx(() {
         if (ctrl.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
         }
         return RefreshIndicator(
           color: AppColors.primary,

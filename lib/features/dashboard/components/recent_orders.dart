@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:get/get.dart';
 import '../../../base/empty_state.dart';
 import '../../../util/dimensions.dart';
@@ -22,7 +23,7 @@ class RecentOrdersList<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (isLoadingRecent.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator(color: AppColors.primary,));
       }
 
       if (recentOrders.isEmpty) {
@@ -44,7 +45,7 @@ class RecentOrdersList<T> extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(isOwner?'Recent Created Orders' : 'Recent Assigned Orders', style: Theme.of(context).textTheme.titleLarge),
+                Text(isOwner?'Recently Created Orders' : 'Recently Assigned Orders', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 ListView.separated(
                   physics: const NeverScrollableScrollPhysics(),

@@ -71,7 +71,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
           },
           child: Obx(() {
             if (orderCtrl.isInitialLoading.value) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
             }
 
             return CustomScrollView(
@@ -113,7 +113,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
                     ),
                   ),
               ],

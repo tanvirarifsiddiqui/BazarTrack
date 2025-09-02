@@ -52,7 +52,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
     return Obx(() {
       // FULL-SCREEN LOADER on first page or balance load
       if (ctrl.isInitialLoading.value || ctrl.isLoadingBalance.value) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        return const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.primary,)));
       }
 
       // ACTUAL PAGE
@@ -196,7 +196,7 @@ class _AssistantFinancePageState extends State<AssistantFinancePage> {
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.primary,)),
                     ),
                   ),
               ],

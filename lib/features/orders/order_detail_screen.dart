@@ -148,7 +148,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: const [
-                          CircularProgressIndicator(),
+                          CircularProgressIndicator(color: AppColors.primary),
                           SizedBox(height: 12),
                           Text('Loading assistants...'),
                         ],
@@ -273,7 +273,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           future: _orderFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
             }
 
             if (snapshot.hasError) {
@@ -392,7 +392,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         if (itemSnap.connectionState ==
                             ConnectionState.waiting) {
                           return const Center(
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(color: AppColors.primary),
                           );
                         }
 
