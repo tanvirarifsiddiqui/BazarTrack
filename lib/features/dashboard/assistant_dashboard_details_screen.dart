@@ -24,6 +24,7 @@ class AssistantDashboardDetails extends StatelessWidget {
       AssistantAnalyticsController(
         analyticsRepo: Get.find<AnalyticsRepo>(),
         orderRepo: Get.find<OrderRepo>(),
+        authService: Get.find(),
         assistantId: assistant.id,
       ),
       tag: 'assistant_${assistant.id}', // << unique tag

@@ -30,4 +30,12 @@ class AnalyticsRepo {
     }
     throw Exception('Failed to load assistant analytics');
   }
+
+  Future<AssistantAnalytics> fetchAssistantSelfAnalytics() async {
+    final res = await api.assistantSelfAnalytics();
+    if (res.isOk && res.body is Map<String, dynamic>) {
+      return AssistantAnalytics.fromJson(res.body as Map<String, dynamic>);
+    }
+    throw Exception('Failed to load assistant analytics');
+  }
 }
