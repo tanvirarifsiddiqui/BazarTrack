@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 void showCustomSnackBar(String? message, {bool isError = true}) {
   if(message != null && message.isNotEmpty) {
     Get.showSnackbar(GetSnackBar(
+      title: isError? "Error:" : "Success",
       backgroundColor: isError ? Colors.red : Colors.green,
       message: message,
       maxWidth: Get.context?.width,

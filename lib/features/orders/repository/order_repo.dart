@@ -21,6 +21,7 @@ class OrderRepo {
       item.toJson(),
     );
 
+
     if (!res.isOk || res.body is! Map<String, dynamic>) {
       throw Exception('Failed to update order item (${res.statusCode})');
     }
@@ -74,7 +75,6 @@ class OrderRepo {
   Future<OrderItem> createOrderItem(OrderItem item) async {
     // 1) send JSON for creation (omit id/order_id)
     final res = await api.createItem(item.toJsonForCreate());
-    print(item.toJsonForCreate());
     if (!res.isOk || res.body is! Map<String, dynamic>) {
       throw Exception('Failed to create order item (${res.statusCode})');
     }
@@ -98,22 +98,45 @@ class OrderRepo {
     return [];
   }
 
-
-  Future<List<Order>> getOrders({OrderStatus? status, String? assignedTo}) async {
-    final res = await api.orders();
-    if (res.isOk && res.body is List) {
-      _cache
-        ..clear()
-        ..addAll((res.body as List).map((e) => Order.fromJson(e as Map<String, dynamic>)));
+  Future<List<Order>> getOrders({
+    OrderStatus? status,
+    int? ownerId,
+    int? limit,
+    int? cursor,
+    int? assignedTo,
+    bool unassigned = false,           // NEW
+  }) async {
+    final res = await api.orders(
+      status:      status?.toApi(),
+      ownerId:     ownerId,
+      limit:       limit,
+      cursor:      cursor,
+      assignedTo:  assignedTo,
+      unassigned:  unassigned,          // PASS IT THROUGH
+    );
+    if (!res.isOk || res.body is! List) {
+      throw Exception('Failed to load orders');
     }
-    return _cache.where((o) {
-      if (status != null && o.status != status) return false;
-      if (assignedTo != null && o.assignedTo != assignedTo) return false;
-      return true;
-    }).toList();
+    return (res.body as List)
+        .map((e) => Order.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-  Order? getById(String id) => _cache.firstWhereOrNull((o) => o.orderId == id);
+  Future<Order?> getOrderById(String id) async {
+    try {
+      final Response resp = await api.order(int.parse(id));
+      if (resp.statusCode == 200) {
+        // resp.data expected to be a Map / JSON object
+        return Order.fromJson(resp.body);
+      } else {
+        // handle non-200 as needed
+        throw Exception('Failed to load order: ${resp.statusCode}');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
 
   Future<void> updateOrder(Order order) async {
     final res = await api.updateOrder(int.parse(order.orderId!), order.toJson());
@@ -122,17 +145,17 @@ class OrderRepo {
     if (idx != -1) _cache[idx] = order;
   }
 
-  Future<void> assignOrder(String orderId, String userId) async {
-    final res = await api.assignOrder(int.parse(orderId), {'user_id': int.parse(userId)});
+  Future<void> assignOrder(String orderId, int userId) async {
+    final res = await api.assignOrder(int.parse(orderId), {'user_id': userId});
     if (!res.isOk) throw Exception('Failed to assign order: ${res.statusCode}');
-    final order = getById(orderId);
-    if (order != null) {
-      order.assignedTo = userId;
-      order.status = OrderStatus.pending;
-    }
+    // final order = getOrderById(orderId);
+    // if (order != null) {
+    //   order.assignedTo = userId.toString();
+    //   order.status = OrderStatus.pending;
+    // }
   }
 
-  bool selfAssign(String orderId, String userId) {
+  bool selfAssign(String orderId, int userId) {
     assignOrder(orderId, userId);
     return true;
   }

@@ -1,5 +1,5 @@
 name: flutter_boilerplate
-description: "A new Flutter project."
+description: "On-demand groceries. Real-time tracking. Instant payments."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -23,6 +23,7 @@ dependencies:
   firebase_messaging: ^15.2.5
   flutter_local_notifications: ^19.1.0
   flutter_svg:
+  syncfusion_flutter_charts: ^30.2.5
 
 dev_dependencies:
   flutter_test:

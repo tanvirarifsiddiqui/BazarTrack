@@ -1,11 +1,11 @@
-import 'package:flutter_boilerplate/helper/date_converter.dart';
+import 'history_log_item.dart';
 
 class HistoryLog {
-  final String id;
+  final int id;
   final String entityType;
-  final String entityId;
+  final int entityId;
   final String action;
-  final String changedByUserId;
+  final int changedByUserId;
   final DateTime timestamp;
   final Map<String, dynamic> dataSnapshot;
 
@@ -19,29 +19,39 @@ class HistoryLog {
     required this.dataSnapshot,
   });
 
-  factory HistoryLog.fromJson(Map<String, dynamic> json) => HistoryLog(
-        id: json['id'].toString(),
-        entityType:
-            json['entityType'] ?? json['entity_type'] ?? '',
-        entityId:
-            (json['entityId'] ?? json['entity_id'] ?? '').toString(),
-        action: json['action'] ?? '',
-        changedByUserId: (json['changedByUserId'] ??
-                json['changed_by_user_id'] ??
-                '')
-            .toString(),
-        timestamp: DateConverter.parseApiDate(json['timestamp']),
-        dataSnapshot: Map<String, dynamic>.from(
-            json['dataSnapshot'] ?? json['data_snapshot'] ?? {}),
-      );
+  factory HistoryLog.fromJson(Map<String, dynamic> json) {
+    // data_snapshot can be a Map or an empty List
+    final rawSnap = json['data_snapshot'];
+    final Map<String, dynamic> snapshot = (rawSnap is Map<String, dynamic>)
+        ? rawSnap
+        : <String, dynamic>{};
+
+    return HistoryLog(
+      id:              json['id'] as int,
+      entityType:      json['entity_type'] as String,
+      entityId:        json['entity_id'] as int,
+      action:          json['action'] as String,
+      changedByUserId: json['changed_by_user_id'] as int,
+      timestamp:       DateTime.parse(json['timestamp'] as String),
+      dataSnapshot:    snapshot,
+    );
+  }
+
+  List<HistoryLogItem> get items {
+    final raw = dataSnapshot['items'];
+    if (raw is List) {
+      return raw
+          .whereType<Map<String, dynamic>>()
+          .map((m) => HistoryLogItem.fromJson(m))
+          .toList();
+    }
+    return [];
+  }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'entity_type': entityType,
-        'entity_id': entityId,
-        'action': action,
-        'changed_by_user_id': changedByUserId,
-        'timestamp': DateConverter.formatApiDate(timestamp),
-        'data_snapshot': dataSnapshot,
-      };
+    'entity_type': entityType,
+    'entity_id': entityId,
+    'action': action,
+    'data_snapshot': dataSnapshot,
+  };
 }

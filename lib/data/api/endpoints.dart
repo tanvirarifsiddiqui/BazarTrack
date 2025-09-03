@@ -2,6 +2,8 @@ import 'package:flutter_boilerplate/util/app_constants.dart';
 
 class Endpoints {
   static const login = '${AppConstants.baseUrl}/api/auth/login';
+  static const password = '${AppConstants.baseUrl}/api/auth/password';
+  static const createUser = '${AppConstants.baseUrl}/api/users';
   static const logout = '${AppConstants.baseUrl}/api/auth/logout';
   static const me = '${AppConstants.baseUrl}/api/auth/me';
   static const refresh = '${AppConstants.baseUrl}/api/auth/refresh';
@@ -19,9 +21,15 @@ class Endpoints {
   static String wallet(int userId) => '${AppConstants.baseUrl}/api/wallet/$userId';
   static String walletTransactions(int userId) => '${AppConstants.baseUrl}/api/wallet/$userId/transactions';
 
+  static const assistants = '${AppConstants.baseUrl}/api/assistants';
+  static const owners = '${AppConstants.baseUrl}/api/owners';
+
   static const history = '${AppConstants.baseUrl}/api/history';
-  static String historyByEntity(String entity, int id) => '${AppConstants.baseUrl}/api/history/$entity/$id';
+  static String historyByEntityId(String entity, int id) => '${AppConstants.baseUrl}/api/history/$entity/$id';
+  static String historyByEntity(String entity) => '${AppConstants.baseUrl}/api/history/$entity';
 
   static const analyticsDashboard = '${AppConstants.baseUrl}/api/analytics/dashboard';
   static const analyticsReports = '${AppConstants.baseUrl}/api/analytics/reports';
+  static String assistantAnalytics(int id) => '${AppConstants.baseUrl}/api/analytics/assistants/$id';
+  static String assistantSelfAnalytics() => '${AppConstants.baseUrl}/api/analytics/assistant';
 }

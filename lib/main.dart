@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_boilerplate/controller/localization_controller.dart';
 import 'package:flutter_boilerplate/controller/theme_controller.dart';
-import 'package:flutter_boilerplate/firebase_options.dart';
-import 'package:flutter_boilerplate/theme/dark_theme.dart';
-import 'package:flutter_boilerplate/theme/light_theme.dart';
 import 'package:flutter_boilerplate/util/app_constants.dart';
-import 'package:flutter_boilerplate/util/colors.dart';
 import 'package:flutter_boilerplate/util/messages.dart';
+import 'package:flutter_boilerplate/util/theme_data.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'helper/get_di.dart' as di;
@@ -40,11 +36,7 @@ class MyApp extends StatelessWidget {
           title: AppConstants.appName,
           debugShowCheckedModeBanner: false,
           navigatorKey: Get.key,
-          theme: ThemeData(
-          primaryColor: AppColors.primary,
-          scaffoldBackgroundColor: AppColors.background,
-          colorScheme: ColorScheme.fromSwatch().copyWith(secondary: AppColors.accent),
-        ),
+          theme: appTheme,
           locale: localizeController.locale,
           translations: Messages(languages: languages),
           fallbackLocale: Locale(AppConstants.languages[0].languageCode, AppConstants.languages[0].countryCode),

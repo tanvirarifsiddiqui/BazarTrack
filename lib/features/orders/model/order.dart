@@ -6,8 +6,10 @@ import '../../../helper/date_converter.dart';
 
 /// Represents an Order with optional `id` for new orders.
 class Order {
-  final String? orderId;       // Nullable: server-assigned on creation
+  final String? orderId; // Nullable: server-assigned on creation
   final String createdBy;
+  final String? createdUserName;
+  final String? assignedUserName;
   String? assignedTo;
   OrderStatus status;
   final DateTime createdAt;
@@ -17,6 +19,8 @@ class Order {
   Order({
     required this.orderId,
     required this.createdBy,
+    this.assignedUserName,
+    this.createdUserName,
     this.assignedTo,
     this.status = OrderStatus.pending,
     required this.createdAt,
@@ -44,16 +48,29 @@ class Order {
     return Order(
       orderId: (json['id'] ?? json['orderId']).toString(),
       createdBy: (json['created_by'] ?? json['createdBy']).toString(),
-      assignedTo: json['assigned_to']?.toString() ?? json['assignedTo']?.toString(),
+      assignedTo:
+          json['assigned_to']?.toString() ?? json['assignedTo']?.toString(),
+      createdUserName:
+          (json['created_user_name'] ?? json['createdUserName']).toString(),
+      assignedUserName:
+          (json['assigned_user_name'] ?? json['assignedUserName']).toString(),
       status: OrderStatusExtension.fromString(json['status'] ?? 'pending'),
       createdAt: DateConverter.parseApiDate(
-          json['created_at'] ?? json['createdAt']),
-      completedAt: json['completed_at'] != null
-          ? DateConverter.parseApiDate(json['completed_at'])
-          : (json['completedAt'] != null
-          ? DateConverter.parseApiDate(json['completedAt'])
-          : null),
+        json['created_at'] ?? json['createdAt'],
+      ),
+      completedAt:
+          json['completed_at'] != null
+              ? DateConverter.parseApiDate(json['completed_at'])
+              : (json['completedAt'] != null
+                  ? DateConverter.parseApiDate(json['completedAt'])
+                  : null),
     );
+  }
+
+  /// Convenience parsed integer id for internal use (nullable)
+  int? get id {
+    if (orderId == null) return null;
+    return int.tryParse(orderId!);
   }
 
   /// Full JSON for updates/fetch
@@ -63,21 +80,30 @@ class Order {
     'assigned_to': assignedTo,
     'status': status.toApi(),
     'created_at': DateConverter.formatApiDate(createdAt),
-    'completed_at': completedAt != null
-        ? DateConverter.formatApiDate(completedAt!) : null,
+    'completed_at':
+        completedAt != null ? DateConverter.formatApiDate(completedAt!) : null,
   };
 
   /// JSON for creating a new order with nested items
-  Map<String, dynamic> toJsonForCreate({
-    required List<OrderItem> items,
-  }) {
-    return {
+  Map<String, dynamic> toJsonForCreate({required List<OrderItem> items}) {
+    final Map<String, dynamic> map = {
       'created_by': int.tryParse(createdBy) ?? createdBy,
-      'assigned_to': int.tryParse(assignedTo ?? createdBy) ?? (assignedTo ?? createdBy),
       'status': status.toApi(),
       'created_at': createdAt.toIso8601String(),
-      'completed_at': completedAt?.toIso8601String(),
       'items': items.map((i) => i.toJsonForCreate()).toList(),
     };
+
+    // only include assigned_to if it's provided (and convert to int if possible)
+    if (assignedTo != null && assignedTo!.isNotEmpty) {
+      final parsed = int.tryParse(assignedTo!);
+      map['assigned_to'] = parsed ?? assignedTo;
+    }
+
+    // include completed_at only if present (omit otherwise)
+    if (completedAt != null) {
+      map['completed_at'] = completedAt!.toIso8601String();
+    }
+
+    return map;
   }
 }
